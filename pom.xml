@@ -99,6 +99,15 @@
 						<id>reportar-cobertura</id>
 						<phase>verify</phase>
 						<goals><goal>report</goal></goals>
+						<configuration>
+							<excludes>
+								<exclude>**/*Application.class</exclude>
+								<exclude>**/Configuracao*.class</exclude>
+								<exclude>**/*Jpa.class</exclude>
+								<exclude>**/*$*.class</exclude>
+								<exclude>**/cliente/apresentacao/dto/**</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 					<execution>
 						<id>validar-cobertura-dominio</id>
