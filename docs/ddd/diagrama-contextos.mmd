@@ -1,0 +1,32 @@
+flowchart LR
+    Identidade["Identidade e Acesso<br/>usuários, perfis, JWT"]
+    Atendimento["Atendimento<br/>Cliente e Veículo"]
+    Catalogo["Catálogo de Serviços"]
+    Estoque["Estoque<br/>peças e insumos"]
+    OS["Ordem de Serviço<br/>diagnóstico e orçamento"]
+    Indicadores["Indicadores Operacionais"]
+    Cliente["Cliente / Acompanhamento<br/>API pública por código secreto"]
+    Banco[("PostgreSQL")]
+
+    Identidade -->|JWT e autorização| Atendimento
+    Identidade -->|JWT e autorização| Catalogo
+    Identidade -->|JWT e autorização| Estoque
+    Identidade -->|JWT e autorização| OS
+    Atendimento -->|IDs de cliente e veículo| OS
+    Catalogo -->|snapshot de serviço e preço| OS
+    Estoque -->|reserva, consumo, saldo| OS
+    OS -->|status, orçamento e histórico| Cliente
+    OS -->|instantes de execução/finalização| Indicadores
+    Atendimento --- Banco
+    Catalogo --- Banco
+    Estoque --- Banco
+    OS --- Banco
+    Identidade --- Banco
+    Indicadores --- Banco
+
+    classDef core fill:#f6c28b,stroke:#754c24,stroke-width:2px;
+    classDef support fill:#cde8ce,stroke:#356b3c;
+    classDef infra fill:#d8d8e8,stroke:#4d4d65;
+    class OS core;
+    class Atendimento,Catalogo,Estoque,Indicadores,Cliente support;
+    class Identidade,Banco infra;

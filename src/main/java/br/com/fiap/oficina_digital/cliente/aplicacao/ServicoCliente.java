@@ -34,13 +34,13 @@ public class ServicoCliente {
     @Transactional(readOnly = true)
     public Cliente buscarPorId(UUID id) {
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
+                .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
     }
 
     @Transactional(readOnly = true)
     public Cliente buscarPorDocumento(String numeroDocumento) {
         return repositorio.buscarPorDocumento(new Documento(numeroDocumento))
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
+                .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
     }
 
     @Transactional(readOnly = true)
@@ -60,11 +60,19 @@ public class ServicoCliente {
     }
 
     private LocalDate nascimentoDe(String nascimento) {
+        if (nascimento == null || nascimento.isBlank()) return null;
         try {
             return LocalDate.parse(nascimento);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Nascimento deve estar no formato YYYY-MM-DD.");
         }
+    }
+
+    @Transactional
+    public void inativar(UUID id) {
+        Cliente cliente = buscarPorId(id);
+        cliente.inativar();
+        repositorio.salvar(cliente);
     }
 
 }

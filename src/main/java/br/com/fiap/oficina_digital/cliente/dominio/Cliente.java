@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import java.time.ZoneId;
 
 public final class Cliente {
     private final UUID id;
@@ -15,6 +16,7 @@ public final class Cliente {
     private Endereco endereco;
     private LocalDate nascimento;
     private Instant dataCadastro;
+    private boolean ativo = true;
 
     private Cliente(UUID id, Documento documento, String nome, String email, String telefone,
                     Endereco endereco, LocalDate nascimento, Instant dataCadastro) {
@@ -40,12 +42,16 @@ public final class Cliente {
         if (!novoTelefone.matches("[0-9]{10,15}"))
             throw new IllegalArgumentException("Telefone deve conter de 10 a 15 dígitos.");
 
-        if (nascimento == null) throw new IllegalArgumentException("Nascimento obrigatório.");
-
-        if (nascimento.isAfter(LocalDate.now())) throw new IllegalArgumentException("Nascimento não pode ser no futuro.");
-
-        if (nascimento.isAfter(LocalDate.now().minusYears(18)))
-            throw new IllegalArgumentException("Cliente deve ter pelo menos 18 anos.");
+        boolean pessoaFisica = documento.numero().length() == 11;
+        if (pessoaFisica && nascimento == null)
+            throw new IllegalArgumentException("Data de nascimento obrigatória para CPF.");
+        if (!pessoaFisica && nascimento != null)
+            throw new IllegalArgumentException("Data de nascimento não se aplica a CNPJ.");
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        if (nascimento != null && nascimento.isAfter(hoje))
+            throw new IllegalArgumentException("Nascimento não pode ser no futuro.");
+        if (nascimento != null && !nascimento.isBefore(hoje.minusYears(18)))
+            throw new IllegalArgumentException("Cliente pessoa física deve ter mais de 18 anos.");
         // Validar tudo antes de alterar o objeto.
         this.nome = nome.trim(); 
         this.email = novoEmail;
@@ -62,8 +68,16 @@ public final class Cliente {
 
     public void atualizarDados(String nome, String email, String telefone, Endereco endereco,
                                LocalDate nascimento) {
+        if (!ativo) throw new IllegalStateException("Cliente inativo não pode ser atualizado.");
         definirDados(nome, email, telefone, endereco, nascimento);
     }
+
+    public void inativar() {
+        if (!ativo) throw new IllegalStateException("Cliente já está inativo.");
+        ativo = false;
+    }
+
+    public boolean isAtivo() { return ativo; }
         public static Cliente reconstituir(UUID id, Documento documento, String nome,
             String email, String telefone, Endereco endereco, LocalDate nascimento, Instant dataCadastro) {
         return new Cliente(id, documento, nome, email, telefone, endereco, nascimento, dataCadastro);
