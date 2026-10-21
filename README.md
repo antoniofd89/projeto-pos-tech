@@ -114,21 +114,5 @@ src/main/java/br/com/fiap/oficina_digital/
 ├── identidade/       # usuários, JWT e autorização
 ├── indicadores/      # consultas operacionais
 └── comum/            # infraestrutura compartilhada da API
-docs/ddd/             # Event Storming, linguagem ubíqua, regras e contextos
 ```
 
-## Documentação DDD
-
-- [Checklist do desafio](docs/ddd/TODO-PROJETO.md)
-- [Event Storming Mermaid](docs/ddd/event-storming.mmd)
-- [Mapa de contextos](docs/ddd/diagrama-contextos.mmd)
-- [Linguagem ubíqua](docs/ddd/linguagem-ubiqua.md)
-- [Regras de negócio](docs/ddd/regras-de-negocio.md)
-
-O Mermaid é a fonte textual versionada; PDFs acadêmicos, link Miro e entregáveis do grupo ainda precisam ser revisados/exportados pelo grupo.
-
-## Entrega acadêmica
-
-O grupo ainda deve preencher participantes/RMs/Discord, revisar as regras abertas, produzir o vídeo e PDF finais, publicar os links exigidos e confirmar acesso público. Nenhum dado pessoal, vídeo ou publicação externa é presumido neste repositório.
-
-Repositório informado no projeto: <https://github.com/antoniofd89/projeto-pos-tech>.
