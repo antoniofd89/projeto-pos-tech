@@ -118,8 +118,15 @@ class ServicoVeiculoTest {
 
     private VeiculoJpa entidade(UUID id) {
         var e = new VeiculoJpa();
-        e.id = id; e.clienteId = clienteId; e.placa = "ABC1D23"; e.marca = "Honda"; e.modelo = "Civic";
-        e.anoFabricacao = 2022; e.categoria = "Sedã"; e.ativo = true; e.dataCadastro = Instant.now();
+        e.id = id;
+        e.clienteId = clienteId;
+        e.placa = "ABC1D23";
+        e.marca = "Honda";
+        e.modelo = "Civic";
+        e.anoFabricacao = 2022;
+        e.categoria = "Sedã";
+        e.ativo = true;
+        e.dataCadastro = Instant.now();
         return e;
     }
 }

@@ -9,7 +9,7 @@ public record ClienteResposta(UUID id, String nome, String documento, String ema
         String telefone, EnderecoResposta endereco, LocalDate nascimento) {
     public static ClienteResposta de(Cliente cliente) {
         return new ClienteResposta(cliente.getId(), cliente.getNome(),
-            cliente.getDocumento().numero(), cliente.getEmail(), cliente.getTelefone(),
-            EnderecoResposta.de(cliente.getEndereco()), cliente.getNascimento());
+                cliente.getDocumento().numero(), cliente.getEmail(), cliente.getTelefone(),
+                EnderecoResposta.de(cliente.getEndereco()), cliente.getNascimento());
     }
 }

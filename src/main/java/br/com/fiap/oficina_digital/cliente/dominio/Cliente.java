@@ -19,23 +19,23 @@ public final class Cliente {
     private boolean ativo = true;
 
     private Cliente(UUID id, Documento documento, String nome, String email, String telefone,
-                    Endereco endereco, LocalDate nascimento, Instant dataCadastro) {
-       this.id = Objects.requireNonNull(id);
-       this.documento = Objects.requireNonNull(documento);
-       definirDados(nome, email, telefone, endereco, nascimento);
-       this.dataCadastro = Objects.requireNonNull(dataCadastro);
+            Endereco endereco, LocalDate nascimento, Instant dataCadastro) {
+        this.id = Objects.requireNonNull(id);
+        this.documento = Objects.requireNonNull(documento);
+        definirDados(nome, email, telefone, endereco, nascimento);
+        this.dataCadastro = Objects.requireNonNull(dataCadastro);
     }
 
     private void definirDados(String nome, String email, String telefone, Endereco endereco, LocalDate nascimento) {
         if (nome == null || nome.isBlank() || nome.trim().length() > 150)
             throw new IllegalArgumentException("Nome obrigatório, com até 150 caracteres.");
-        
+
         if (email == null || email.isBlank())
             throw new IllegalArgumentException("E-mail obrigatório.");
         String novoEmail = email.trim().toLowerCase(Locale.ROOT);
         if (novoEmail.length() > 254 || !novoEmail.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+"))
             throw new IllegalArgumentException("E-mail inválido.");
-        
+
         if (telefone == null || telefone.isBlank())
             throw new IllegalArgumentException("Telefone obrigatório.");
         String novoTelefone = telefone.trim().replaceAll("[() +\\-]", "");
@@ -53,7 +53,7 @@ public final class Cliente {
         if (nascimento != null && !nascimento.isBefore(hoje.minusYears(18)))
             throw new IllegalArgumentException("Cliente pessoa física deve ter mais de 18 anos.");
         // Validar tudo antes de alterar o objeto.
-        this.nome = nome.trim(); 
+        this.nome = nome.trim();
         this.email = novoEmail;
         this.telefone = novoTelefone;
         this.endereco = endereco;
@@ -61,35 +61,63 @@ public final class Cliente {
     }
 
     public static Cliente criar(Documento documento, String nome, String email, String telefone,
-                                Endereco endereco, LocalDate nascimento) {
+            Endereco endereco, LocalDate nascimento) {
         return new Cliente(UUID.randomUUID(), documento, nome, email, telefone, endereco,
                 nascimento, Instant.now());
     }
 
     public void atualizarDados(String nome, String email, String telefone, Endereco endereco,
-                               LocalDate nascimento) {
-        if (!ativo) throw new IllegalStateException("Cliente inativo não pode ser atualizado.");
+            LocalDate nascimento) {
+        if (!ativo)
+            throw new IllegalStateException("Cliente inativo não pode ser atualizado.");
         definirDados(nome, email, telefone, endereco, nascimento);
     }
 
     public void inativar() {
-        if (!ativo) throw new IllegalStateException("Cliente já está inativo.");
+        if (!ativo)
+            throw new IllegalStateException("Cliente já está inativo.");
         ativo = false;
     }
 
-    public boolean isAtivo() { return ativo; }
-        public static Cliente reconstituir(UUID id, Documento documento, String nome,
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public static Cliente reconstituir(UUID id, Documento documento, String nome,
             String email, String telefone, Endereco endereco, LocalDate nascimento, Instant dataCadastro) {
         return new Cliente(id, documento, nome, email, telefone, endereco, nascimento, dataCadastro);
     }
 
-    public UUID getId() { return id; }
-    public Documento getDocumento() { return documento; }
-    public String getNome() { return nome; }
-    public String getEmail() { return email; }
-    public String getTelefone() { return telefone; }
-    public Endereco getEndereco() { return endereco; }
-    public LocalDate getNascimento() { return nascimento; }
-    public Instant getDataCadastro() { return dataCadastro; }
+    public UUID getId() {
+        return id;
+    }
+
+    public Documento getDocumento() {
+        return documento;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public LocalDate getNascimento() {
+        return nascimento;
+    }
+
+    public Instant getDataCadastro() {
+        return dataCadastro;
+    }
 
 }

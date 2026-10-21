@@ -21,17 +21,89 @@ class ClienteTest {
         assertEquals("contato@example.com", cliente.getEmail());
         assertEquals("5511987654321", cliente.getTelefone());
     }
-    private Documento cpf(){return new Documento("52998224725");}
-    @Test void criaPessoaFisicaMaiorDeDezoito() { var c=Cliente.criar(cpf()," Ana ","ANA@EXEMPLO.COM","(11) 99999-9999",null,LocalDate.of(1990,1,1));assertEquals("ana@exemplo.com",c.getEmail());assertEquals("11999999999",c.getTelefone());assertNotNull(c.getDataCadastro()); }
-    @Test void cnpjNaoExigeNascimento() { var c=Cliente.criar(new Documento("11222333000181"),"Oficina Exemplo Ltda","contato@oficina.com","1133334444",null,null);assertNull(c.getNascimento()); }
-    @Test void cpfExigeNascimento() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","ana@exemplo.com","11999999999",null,null)); }
-    @Test void rejeitaPessoaComExatamenteDezoitoAnos() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","ana@exemplo.com","11999999999",null,LocalDate.now().minusYears(18))); }
-    @Test void rejeitaNascimentoFuturo() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","ana@exemplo.com","11999999999",null,LocalDate.now().plusDays(1))); }
-    @Test void rejeitaEmailVazio() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana"," ","11999999999",null,LocalDate.of(1990,1,1))); }
-    @Test void rejeitaEmailInvalido() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","invalido","11999999999",null,LocalDate.of(1990,1,1))); }
-    @Test void rejeitaTelefoneVazio() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","ana@exemplo.com"," ",null,LocalDate.of(1990,1,1))); }
-    @Test void rejeitaTelefoneCurto() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"Ana","ana@exemplo.com","1234",null,LocalDate.of(1990,1,1))); }
-    @Test void rejeitaNomeVazio() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf()," ","ana@exemplo.com","11999999999",null,LocalDate.of(1990,1,1))); }
-    @Test void atualizaDadosEInativaUmaVez() { var c=Cliente.criar(cpf(),"Ana","ana@exemplo.com","11999999999",null,LocalDate.of(1990,1,1));c.atualizarDados("Ana Silva","ana.silva@exemplo.com","11988887777",null,LocalDate.of(1990,1,1));assertEquals("Ana Silva",c.getNome());c.inativar();assertFalse(c.isAtivo());assertThrows(IllegalStateException.class,c::inativar);assertThrows(IllegalStateException.class,()->c.atualizarDados("Ana","ana@exemplo.com","11999999999",null,LocalDate.of(1990,1,1))); }
-    @Test void rejeitaNomeAcimaDoLimite() { assertThrows(IllegalArgumentException.class,()->Cliente.criar(cpf(),"n".repeat(151),"ana@exemplo.com","11999999999",null,LocalDate.of(1990,1,1))); }
+
+    private Documento cpf() {
+        return new Documento("52998224725");
+    }
+
+    @Test
+    void criaPessoaFisicaMaiorDeDezoito() {
+        var c = Cliente.criar(cpf(), " Ana ", "ANA@EXEMPLO.COM", "(11) 99999-9999", null, LocalDate.of(1990, 1, 1));
+        assertEquals("ana@exemplo.com", c.getEmail());
+        assertEquals("11999999999", c.getTelefone());
+        assertNotNull(c.getDataCadastro());
+    }
+
+    @Test
+    void cnpjNaoExigeNascimento() {
+        var c = Cliente.criar(new Documento("11222333000181"), "Oficina Exemplo Ltda", "contato@oficina.com",
+                "1133334444", null, null);
+        assertNull(c.getNascimento());
+    }
+
+    @Test
+    void cpfExigeNascimento() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", "ana@exemplo.com", "11999999999", null, null));
+    }
+
+    @Test
+    void rejeitaPessoaComExatamenteDezoitoAnos() {
+        assertThrows(IllegalArgumentException.class, () -> Cliente.criar(cpf(), "Ana", "ana@exemplo.com", "11999999999",
+                null, LocalDate.now().minusYears(18)));
+    }
+
+    @Test
+    void rejeitaNascimentoFuturo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", "ana@exemplo.com", "11999999999", null, LocalDate.now().plusDays(1)));
+    }
+
+    @Test
+    void rejeitaEmailVazio() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", " ", "11999999999", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void rejeitaEmailInvalido() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", "invalido", "11999999999", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void rejeitaTelefoneVazio() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", "ana@exemplo.com", " ", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void rejeitaTelefoneCurto() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), "Ana", "ana@exemplo.com", "1234", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void rejeitaNomeVazio() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Cliente.criar(cpf(), " ", "ana@exemplo.com", "11999999999", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void atualizaDadosEInativaUmaVez() {
+        var c = Cliente.criar(cpf(), "Ana", "ana@exemplo.com", "11999999999", null, LocalDate.of(1990, 1, 1));
+        c.atualizarDados("Ana Silva", "ana.silva@exemplo.com", "11988887777", null, LocalDate.of(1990, 1, 1));
+        assertEquals("Ana Silva", c.getNome());
+        c.inativar();
+        assertFalse(c.isAtivo());
+        assertThrows(IllegalStateException.class, c::inativar);
+        assertThrows(IllegalStateException.class,
+                () -> c.atualizarDados("Ana", "ana@exemplo.com", "11999999999", null, LocalDate.of(1990, 1, 1)));
+    }
+
+    @Test
+    void rejeitaNomeAcimaDoLimite() {
+        assertThrows(IllegalArgumentException.class, () -> Cliente.criar(cpf(), "n".repeat(151), "ana@exemplo.com",
+                "11999999999", null, LocalDate.of(1990, 1, 1)));
+    }
 }

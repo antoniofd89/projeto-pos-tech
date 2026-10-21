@@ -17,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProvisionarAdministradorInicial implements ApplicationRunner {
     private final RepositorioUsuarioJpa usuarios;
     private final PasswordEncoder codificador;
-    @Value("${app.administrador.email:}") private String email;
-    @Value("${app.administrador.senha:}") private String senha;
+    @Value("${app.administrador.email:}")
+    private String email;
+    @Value("${app.administrador.senha:}")
+    private String senha;
 
     public ProvisionarAdministradorInicial(RepositorioUsuarioJpa usuarios, PasswordEncoder codificador) {
         this.usuarios = usuarios;
@@ -28,10 +30,12 @@ public class ProvisionarAdministradorInicial implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if ((email == null || email.isBlank()) && (senha == null || senha.isBlank())) return;
+        if ((email == null || email.isBlank()) && (senha == null || senha.isBlank()))
+            return;
         if (email == null || email.isBlank() || senha == null || senha.length() < 12)
             throw new IllegalStateException("Configure ADMIN_EMAIL e ADMIN_PASSWORD com ao menos 12 caracteres.");
-        if (usuarios.existsByEmailIgnoreCase(email)) return;
+        if (usuarios.existsByEmailIgnoreCase(email))
+            return;
         var usuario = new UsuarioAdministrativoJpa();
         usuario.id = UUID.randomUUID();
         usuario.email = email.trim().toLowerCase();

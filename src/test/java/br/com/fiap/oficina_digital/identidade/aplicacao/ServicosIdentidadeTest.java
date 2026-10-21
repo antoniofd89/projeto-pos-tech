@@ -44,7 +44,8 @@ class ServicosIdentidadeTest {
         var autenticador = mock(AuthenticationManager.class);
         var usuarios = mock(RepositorioUsuarioJpa.class);
         when(usuarios.findByEmailIgnoreCaseAndAtivoTrue("ausente@oficina.com")).thenReturn(Optional.empty());
-        var servico = new ServicoAutenticacao(autenticador, usuarios, mock(JwtEncoder.class), "oficina", Duration.ofMinutes(5));
+        var servico = new ServicoAutenticacao(autenticador, usuarios, mock(JwtEncoder.class), "oficina",
+                Duration.ofMinutes(5));
         assertThrows(IllegalStateException.class, () -> servico.autenticar("ausente@oficina.com", "senha"));
     }
 
@@ -66,8 +67,12 @@ class ServicosIdentidadeTest {
 
     private static UsuarioAdministrativoJpa usuario() {
         var usuario = new UsuarioAdministrativoJpa();
-        usuario.id = UUID.randomUUID(); usuario.email = "admin@oficina.com"; usuario.senhaHash = "hash";
-        usuario.perfil = PerfilAcesso.ADMIN; usuario.ativo = true; usuario.criadoEm = Instant.now();
+        usuario.id = UUID.randomUUID();
+        usuario.email = "admin@oficina.com";
+        usuario.senhaHash = "hash";
+        usuario.perfil = PerfilAcesso.ADMIN;
+        usuario.ativo = true;
+        usuario.criadoEm = Instant.now();
         return usuario;
     }
 }

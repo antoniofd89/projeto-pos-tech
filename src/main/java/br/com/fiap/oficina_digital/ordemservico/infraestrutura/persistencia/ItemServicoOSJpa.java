@@ -10,13 +10,23 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
-@Entity @Table(name="itens_servico_os")
+@Entity
+@Table(name = "itens_servico_os")
 public class ItemServicoOSJpa {
-    @Id public UUID id;
-    @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="ordem_servico_id",nullable=false) public OrdemServicoJpa ordemServico;
-    @Column(name="servico_catalogo_id",nullable=false) public UUID servicoCatalogoId;
-    @Column(name="nome_snapshot",nullable=false,length=120) public String nome;
-    @Column(name="valor_unitario",nullable=false,precision=12,scale=2) public BigDecimal valorUnitario;
-    @Column(name="duracao_minutos",nullable=false) public int duracaoMinutos;
-    public ItemServicoOSJpa() {}
+    @Id
+    public UUID id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ordem_servico_id", nullable = false)
+    public OrdemServicoJpa ordemServico;
+    @Column(name = "servico_catalogo_id", nullable = false)
+    public UUID servicoCatalogoId;
+    @Column(name = "nome_snapshot", nullable = false, length = 120)
+    public String nome;
+    @Column(name = "valor_unitario", nullable = false, precision = 12, scale = 2)
+    public BigDecimal valorUnitario;
+    @Column(name = "duracao_minutos", nullable = false)
+    public int duracaoMinutos;
+
+    public ItemServicoOSJpa() {
+    }
 }

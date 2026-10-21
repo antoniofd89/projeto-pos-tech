@@ -11,10 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController @RequestMapping("/indicadores") @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
+@RestController
+@RequestMapping("/indicadores")
+@PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
 public class ControladorIndicadores {
     private final ServicoIndicadores servico;
-    public ControladorIndicadores(ServicoIndicadores servico){this.servico=servico;}
+
+    public ControladorIndicadores(ServicoIndicadores servico) {
+        this.servico = servico;
+    }
+
     @GetMapping("/tempo-medio-servicos")
-    public List<ServicoIndicadores.TempoMedioServico> tempoMedio(@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate inicio,@RequestParam @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate fim){return servico.tempoMedio(inicio.atStartOfDay().toInstant(ZoneOffset.UTC),fim.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));}
+    public List<ServicoIndicadores.TempoMedioServico> tempoMedio(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
+        return servico.tempoMedio(inicio.atStartOfDay().toInstant(ZoneOffset.UTC),
+                fim.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
+    }
 }

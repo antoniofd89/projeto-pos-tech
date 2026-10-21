@@ -56,14 +56,14 @@ public class ControladorCliente {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
     public List<ClienteResposta> listar(@RequestParam(defaultValue = "0") int pagina,
-                                         @RequestParam(defaultValue = "20") int tamanho) {
+            @RequestParam(defaultValue = "20") int tamanho) {
         return servicoCliente.listar(pagina, tamanho).stream().map(ClienteResposta::de).toList();
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     public ClienteResposta atualizar(@PathVariable UUID id,
-                                     @Valid @RequestBody AtualizacaoClienteRequisicao requisicao) {
+            @Valid @RequestBody AtualizacaoClienteRequisicao requisicao) {
         return ClienteResposta.de(servicoCliente.atualizar(id, requisicao.paraDados()));
     }
 

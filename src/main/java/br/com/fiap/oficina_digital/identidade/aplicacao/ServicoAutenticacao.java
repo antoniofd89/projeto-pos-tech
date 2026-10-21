@@ -24,8 +24,8 @@ public class ServicoAutenticacao {
     private final Duration duracao;
 
     public ServicoAutenticacao(AuthenticationManager autenticador, RepositorioUsuarioJpa usuarios,
-                               JwtEncoder emissorJwt, @Value("${app.jwt.issuer}") String emissor,
-                               @Value("${app.jwt.duracao:PT15M}") Duration duracao) {
+            JwtEncoder emissorJwt, @Value("${app.jwt.issuer}") String emissor,
+            @Value("${app.jwt.duracao:PT15M}") Duration duracao) {
         this.autenticador = autenticador;
         this.usuarios = usuarios;
         this.emissorJwt = emissorJwt;
@@ -47,5 +47,6 @@ public class ServicoAutenticacao {
         return new TokenResposta("Bearer", token, duracao.toSeconds());
     }
 
-    public record TokenResposta(String tipo, String token, long expiraEmSegundos) {}
+    public record TokenResposta(String tipo, String token, long expiraEmSegundos) {
+    }
 }

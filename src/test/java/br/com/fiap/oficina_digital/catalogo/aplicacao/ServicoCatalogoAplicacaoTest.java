@@ -95,8 +95,13 @@ class ServicoCatalogoAplicacaoTest {
 
     private static ServicoCatalogoJpa entidade(UUID id, boolean ativo) {
         var e = new ServicoCatalogoJpa();
-        e.id = id; e.nome = "Revisão"; e.descricao = "Troca de óleo"; e.categoria = "Preventiva";
-        e.valorBase = new BigDecimal("120.00"); e.duracaoEstimadaMinutos = 60; e.ativo = ativo;
+        e.id = id;
+        e.nome = "Revisão";
+        e.descricao = "Troca de óleo";
+        e.categoria = "Preventiva";
+        e.valorBase = new BigDecimal("120.00");
+        e.duracaoEstimadaMinutos = 60;
+        e.ativo = ativo;
         return e;
     }
 }

@@ -41,14 +41,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class ConfiguracaoSeguranca {
-    @Value("${app.jwt.segredo}") private String segredo;
-    @Value("${app.jwt.issuer}") private String emissor;
-    @Value("${app.cors.origens:http://localhost:4173,http://127.0.0.1:4173}") private String origensCors;
+    @Value("${app.jwt.segredo}")
+    private String segredo;
+    @Value("${app.jwt.issuer}")
+    private String emissor;
+    @Value("${app.cors.origens:http://localhost:4173,http://127.0.0.1:4173}")
+    private String origensCors;
 
     @Bean
     SecretKey chaveJwt() {
         byte[] bytes = segredo.getBytes(StandardCharsets.UTF_8);
-        if (bytes.length < 32) throw new IllegalStateException("JWT_SECRET deve conter ao menos 32 bytes.");
+        if (bytes.length < 32)
+            throw new IllegalStateException("JWT_SECRET deve conter ao menos 32 bytes.");
         return new SecretKeySpec(bytes, "HmacSHA256");
     }
 

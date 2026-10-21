@@ -10,14 +10,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ConfiguracaoOpenApi {
-    @Bean
-    OpenAPI oficinaDigitalOpenApi() {
-        return new OpenAPI()
-                .info(new Info().title("Oficina Digital API")
-                        .description("API do Sistema Integrado de Atendimento e Execução de Serviços")
-                        .version("v1"))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
-                .components(new Components().addSecuritySchemes("bearer-jwt",
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
-    }
+        @Bean
+        OpenAPI oficinaDigitalOpenApi() {
+                return new OpenAPI()
+                                .info(new Info().title("Oficina Digital API")
+                                                .description("API do Sistema Integrado de Atendimento e Execução de Serviços")
+                                                .version("v1"))
+                                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
+                                .components(new Components().addSecuritySchemes("bearer-jwt",
+                                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
+                                                                .bearerFormat("JWT")));
+        }
 }

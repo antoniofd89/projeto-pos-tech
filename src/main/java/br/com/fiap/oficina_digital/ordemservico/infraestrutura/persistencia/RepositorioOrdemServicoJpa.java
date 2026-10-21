@@ -14,10 +14,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface RepositorioOrdemServicoJpa extends JpaRepository<OrdemServicoJpa, UUID> {
-    @EntityGraph(attributePaths={"servicos","materiais","orcamentos","historicoStatus"}) Optional<OrdemServicoJpa> findById(UUID id);
-    @EntityGraph(attributePaths={"servicos","materiais","orcamentos","historicoStatus"}) Optional<OrdemServicoJpa> findByCodigoAcompanhamento(String codigo);
+    @EntityGraph(attributePaths = { "servicos", "materiais", "orcamentos", "historicoStatus" })
+    Optional<OrdemServicoJpa> findById(UUID id);
+
+    @EntityGraph(attributePaths = { "servicos", "materiais", "orcamentos", "historicoStatus" })
+    Optional<OrdemServicoJpa> findByCodigoAcompanhamento(String codigo);
+
     Page<OrdemServicoJpa> findAllByOrderByRecebidaEmDesc(Pageable pageable);
+
     List<OrdemServicoJpa> findAllByFinalizadaEmBetween(Instant inicio, Instant fim);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from OrdemServicoJpa o where o.id=:id")
     Optional<OrdemServicoJpa> buscarParaAtualizacao(@Param("id") UUID id);

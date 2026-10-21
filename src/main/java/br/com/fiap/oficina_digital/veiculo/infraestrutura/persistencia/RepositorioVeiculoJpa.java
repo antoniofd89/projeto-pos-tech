@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RepositorioVeiculoJpa extends JpaRepository<VeiculoJpa, UUID> {
     Optional<VeiculoJpa> findByPlaca(String placa);
+
     List<VeiculoJpa> findAllByClienteIdOrderByModelo(UUID clienteId);
 }

@@ -29,7 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/veiculos")
 public class ControladorVeiculo {
     private final ServicoVeiculo servico;
-    public ControladorVeiculo(ServicoVeiculo servico) { this.servico = servico; }
+
+    public ControladorVeiculo(ServicoVeiculo servico) {
+        this.servico = servico;
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
@@ -40,11 +43,15 @@ public class ControladorVeiculo {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public Veiculo buscar(@PathVariable UUID id) { return servico.buscar(id); }
+    public Veiculo buscar(@PathVariable UUID id) {
+        return servico.buscar(id);
+    }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public List<Veiculo> listar(@RequestParam UUID clienteId) { return servico.listar(clienteId); }
+    public List<Veiculo> listar(@RequestParam UUID clienteId) {
+        return servico.listar(clienteId);
+    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
@@ -54,16 +61,24 @@ public class ControladorVeiculo {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> inativar(@PathVariable UUID id) { servico.inativar(id); return ResponseEntity.noContent().build(); }
-
-    public record RequisicaoVeiculo(UUID clienteId, @NotBlank @Size(max=7) String placa,
-            @NotBlank @Size(max=80) String marca, @NotBlank @Size(max=100) String modelo,
-            @Min(1950) @Max(2100) int anoFabricacao, @Size(max=40) String categoria) {
-        public ServicoVeiculo.DadosVeiculo dados() { return new ServicoVeiculo.DadosVeiculo(placa, marca, modelo, anoFabricacao, categoria); }
+    public ResponseEntity<Void> inativar(@PathVariable UUID id) {
+        servico.inativar(id);
+        return ResponseEntity.noContent().build();
     }
-    public record AtualizacaoVeiculo(@NotBlank @Size(max=80) String marca,
-            @NotBlank @Size(max=100) String modelo, @Min(1950) @Max(2100) int anoFabricacao,
-            @Size(max=40) String categoria) {
-        public ServicoVeiculo.DadosVeiculo dados() { return new ServicoVeiculo.DadosVeiculo(null, marca, modelo, anoFabricacao, categoria); }
+
+    public record RequisicaoVeiculo(UUID clienteId, @NotBlank @Size(max = 7) String placa,
+            @NotBlank @Size(max = 80) String marca, @NotBlank @Size(max = 100) String modelo,
+            @Min(1950) @Max(2100) int anoFabricacao, @Size(max = 40) String categoria) {
+        public ServicoVeiculo.DadosVeiculo dados() {
+            return new ServicoVeiculo.DadosVeiculo(placa, marca, modelo, anoFabricacao, categoria);
+        }
+    }
+
+    public record AtualizacaoVeiculo(@NotBlank @Size(max = 80) String marca,
+            @NotBlank @Size(max = 100) String modelo, @Min(1950) @Max(2100) int anoFabricacao,
+            @Size(max = 40) String categoria) {
+        public ServicoVeiculo.DadosVeiculo dados() {
+            return new ServicoVeiculo.DadosVeiculo(null, marca, modelo, anoFabricacao, categoria);
+        }
     }
 }

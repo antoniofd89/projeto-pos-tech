@@ -25,8 +25,8 @@ public class TratadorErrosApi {
         return problema(HttpStatus.BAD_REQUEST, "Dados inválidos", campos, requisicao);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, ConstraintViolationException.class,
-            MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler({ IllegalArgumentException.class, ConstraintViolationException.class,
+            MethodArgumentTypeMismatchException.class })
     ProblemDetail tratarRequisicaoInvalida(Exception erro, HttpServletRequest requisicao) {
         return problema(HttpStatus.BAD_REQUEST, "Requisição inválida", erro.getMessage(), requisicao);
     }
@@ -38,7 +38,8 @@ public class TratadorErrosApi {
 
     @ExceptionHandler(AccessDeniedException.class)
     ProblemDetail tratarAcessoNegado(AccessDeniedException erro, HttpServletRequest requisicao) {
-        return problema(HttpStatus.FORBIDDEN, "Acesso negado", "Seu perfil não tem permissão para esta operação.", requisicao);
+        return problema(HttpStatus.FORBIDDEN, "Acesso negado", "Seu perfil não tem permissão para esta operação.",
+                requisicao);
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -48,7 +49,8 @@ public class TratadorErrosApi {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail tratarIntegridade(DataIntegrityViolationException erro, HttpServletRequest requisicao) {
-        return problema(HttpStatus.CONFLICT, "Conflito de dados", "Um registro com os mesmos dados já existe ou viola uma regra.", requisicao);
+        return problema(HttpStatus.CONFLICT, "Conflito de dados",
+                "Um registro com os mesmos dados já existe ou viola uma regra.", requisicao);
     }
 
     @ExceptionHandler(java.util.NoSuchElementException.class)
@@ -62,7 +64,8 @@ public class TratadorErrosApi {
     }
 
     private ProblemDetail problema(HttpStatus status, String titulo, String detalhe, HttpServletRequest requisicao) {
-        ProblemDetail problema = ProblemDetail.forStatusAndDetail(status, detalhe == null ? "Requisição inválida." : detalhe);
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(status,
+                detalhe == null ? "Requisição inválida." : detalhe);
         problema.setTitle(titulo);
         problema.setProperty("instante", Instant.now());
         problema.setProperty("caminho", requisicao.getRequestURI());

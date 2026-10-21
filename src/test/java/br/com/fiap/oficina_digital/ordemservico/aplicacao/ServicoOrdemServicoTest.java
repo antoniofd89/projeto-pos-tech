@@ -53,17 +53,22 @@ class ServicoOrdemServicoTest {
         clienteId = UUID.randomUUID();
         veiculoId = UUID.randomUUID();
         when(clientes.buscarPorId(clienteId)).thenReturn(Optional.of(cliente(clienteId)));
-        var veiculo = new VeiculoJpa(); veiculo.id = veiculoId; veiculo.clienteId = clienteId;
+        var veiculo = new VeiculoJpa();
+        veiculo.id = veiculoId;
+        veiculo.clienteId = clienteId;
         when(veiculos.findById(veiculoId)).thenReturn(Optional.of(veiculo));
         when(ordens.save(any(OrdemServicoJpa.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @AfterEach
-    void limparContexto() { SecurityContextHolder.clearContext(); }
+    void limparContexto() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void abreOrdemComHistoricoEIdentificadorDeAcompanhamento() {
-        var resposta = servico.abrir(new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
+        var resposta = servico
+                .abrir(new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
         assertEquals(StatusOrdemServico.RECEBIDA, resposta.ordemServico().status());
         assertEquals("Barulho no motor", resposta.ordemServico().descricaoInicial());
         assertNotNull(resposta.codigoAcompanhamento());
@@ -77,7 +82,9 @@ class ServicoOrdemServicoTest {
         when(clientes.buscarPorId(clienteId)).thenReturn(Optional.empty());
         assertThrows(java.util.NoSuchElementException.class, () -> servico.abrir(entrada("Falha")));
         when(clientes.buscarPorId(clienteId)).thenReturn(Optional.of(cliente(clienteId)));
-        var outroVeiculo = new VeiculoJpa(); outroVeiculo.id = veiculoId; outroVeiculo.clienteId = UUID.randomUUID();
+        var outroVeiculo = new VeiculoJpa();
+        outroVeiculo.id = veiculoId;
+        outroVeiculo.clienteId = UUID.randomUUID();
         when(veiculos.findById(veiculoId)).thenReturn(Optional.of(outroVeiculo));
         assertThrows(IllegalArgumentException.class, () -> servico.abrir(entrada("Falha")));
         outroVeiculo.clienteId = clienteId;
@@ -92,13 +99,15 @@ class ServicoOrdemServicoTest {
         var diagnostico = servico.registrarDiagnostico(os.id, "Motor precisa de revisão");
         assertEquals("Motor precisa de revisão", diagnostico.diagnostico());
         UUID servicoId = UUID.randomUUID();
-        when(catalogo.buscarAtivo(servicoId)).thenReturn(new ServicoCatalogo(servicoId, "Revisão", "Revisão geral", "MECANICA", bd("100"), 120, true));
+        when(catalogo.buscarAtivo(servicoId)).thenReturn(
+                new ServicoCatalogo(servicoId, "Revisão", "Revisão geral", "MECANICA", bd("100"), 120, true));
         servico.adicionarServico(os.id, servicoId);
         var orçamento = servico.gerarOrcamento(os.id);
         assertEquals(bd("100.00"), orçamento.valorTotal());
         servico.disponibilizarOrcamento(os.id);
 
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
         servico.aprovarOrcamento(os.id, orçamento.versao());
         servico.iniciarExecucao(os.id);
         servico.finalizar(os.id);
@@ -112,15 +121,21 @@ class ServicoOrdemServicoTest {
         var os = ordem(StatusOrdemServico.EM_DIAGNOSTICO);
         prepararBusca(os);
         UUID itemId = UUID.randomUUID();
-        var item = new ItemEstoqueJpa(); item.id=itemId; item.descricao="Óleo"; item.unidadeMedida="L"; item.precoUnitario=bd("25.50");
+        var item = new ItemEstoqueJpa();
+        item.id = itemId;
+        item.descricao = "Óleo";
+        item.unidadeMedida = "L";
+        item.precoUnitario = bd("25.50");
         when(itens.findById(itemId)).thenReturn(Optional.of(item));
         servico.adicionarMaterial(os.id, itemId, bd("2"));
         var orçamento = servico.gerarOrcamento(os.id);
         assertEquals(bd("51.00"), orçamento.valorMateriais());
         servico.disponibilizarOrcamento(os.id);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
         servico.aprovarOrcamento(os.id, orçamento.versao());
-        verify(estoque).reservar(eq(os.id), argThat(m -> m.size() == 1 && m.getFirst().quantidade().equals(bd("2.000"))));
+        verify(estoque).reservar(eq(os.id),
+                argThat(m -> m.size() == 1 && m.getFirst().quantidade().equals(bd("2.000"))));
         servico.iniciarExecucao(os.id);
         verify(estoque).consumir(os.id);
     }
@@ -130,8 +145,9 @@ class ServicoOrdemServicoTest {
         var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
         prepararBusca(os);
-        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> servico.aprovarOrcamento(os.id, 1));
-        when(ordens.findByCodigoAcompanhamento("token" )).thenReturn(Optional.of(os));
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> servico.aprovarOrcamento(os.id, 1));
+        when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
         assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token", 1).status());
         assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token", 2));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.acompanhar("invalido"));
@@ -169,18 +185,46 @@ class ServicoOrdemServicoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.iniciarDiagnostico(UUID.randomUUID()));
     }
 
-    private ServicoOrdemServico.DadosAbertura entrada(String descricao) { return new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, descricao); }
-    private static OrdemServicoJpa ordem(StatusOrdemServico status) {
-        var os = new OrdemServicoJpa(); os.id=UUID.randomUUID(); os.numero="OS-TESTE"; os.codigoAcompanhamento="token"; os.clienteId=UUID.randomUUID(); os.veiculoId=UUID.randomUUID(); os.descricaoInicial="Ruído"; os.status=status; os.recebidaEm=Instant.now(); os.ativa=true; return os;
+    private ServicoOrdemServico.DadosAbertura entrada(String descricao) {
+        return new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, descricao);
     }
+
+    private static OrdemServicoJpa ordem(StatusOrdemServico status) {
+        var os = new OrdemServicoJpa();
+        os.id = UUID.randomUUID();
+        os.numero = "OS-TESTE";
+        os.codigoAcompanhamento = "token";
+        os.clienteId = UUID.randomUUID();
+        os.veiculoId = UUID.randomUUID();
+        os.descricaoInicial = "Ruído";
+        os.status = status;
+        os.recebidaEm = Instant.now();
+        os.ativa = true;
+        return os;
+    }
+
     private void prepararBusca(OrdemServicoJpa os) {
         when(ordens.buscarParaAtualizacao(os.id)).thenReturn(Optional.of(os));
         when(ordens.findById(os.id)).thenReturn(Optional.of(os));
     }
+
     private static void adicionarOrcamento(OrdemServicoJpa os, StatusOrcamento status) {
-        var o = new OrcamentoJpa(); o.id=UUID.randomUUID(); o.ordemServico=os; o.versaoOrcamento=1; o.valorServicos=bd("0.00"); o.valorMateriais=bd("0.00"); o.valorTotal=bd("0.00"); o.status=status; o.geradoEm=Instant.now(); os.orcamentos.add(o);
+        var o = new OrcamentoJpa();
+        o.id = UUID.randomUUID();
+        o.ordemServico = os;
+        o.versaoOrcamento = 1;
+        o.valorServicos = bd("0.00");
+        o.valorMateriais = bd("0.00");
+        o.valorTotal = bd("0.00");
+        o.status = status;
+        o.geradoEm = Instant.now();
+        os.orcamentos.add(o);
     }
-    private static BigDecimal bd(String n) { return new BigDecimal(n); }
+
+    private static BigDecimal bd(String n) {
+        return new BigDecimal(n);
+    }
+
     private static br.com.fiap.oficina_digital.cliente.dominio.Cliente cliente(UUID id) {
         return br.com.fiap.oficina_digital.cliente.dominio.Cliente.reconstituir(id,
                 new br.com.fiap.oficina_digital.cliente.dominio.Documento("52998224725"), "Cliente Teste",

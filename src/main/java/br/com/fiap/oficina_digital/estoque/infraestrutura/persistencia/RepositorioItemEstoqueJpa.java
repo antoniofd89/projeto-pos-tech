@@ -12,7 +12,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface RepositorioItemEstoqueJpa extends JpaRepository<ItemEstoqueJpa, UUID> {
     Optional<ItemEstoqueJpa> findByCodigo(String codigo);
+
     List<ItemEstoqueJpa> findAllByOrderByDescricaoAsc();
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from ItemEstoqueJpa i where i.id=:id")
     Optional<ItemEstoqueJpa> buscarParaMovimentar(@Param("id") UUID id);

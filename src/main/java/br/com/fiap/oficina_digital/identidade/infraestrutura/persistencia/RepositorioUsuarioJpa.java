@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RepositorioUsuarioJpa extends JpaRepository<UsuarioAdministrativoJpa, UUID> {
     Optional<UsuarioAdministrativoJpa> findByEmailIgnoreCaseAndAtivoTrue(String email);
+
     boolean existsByEmailIgnoreCase(String email);
 }

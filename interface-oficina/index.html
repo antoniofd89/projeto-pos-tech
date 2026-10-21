@@ -1,220 +1,413 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b1213" />
-    <meta name="description" content="Painel de gestão da Oficina Digital." />
-    <title>Oficina Digital · Painel</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <div class="ambient ambient-one" aria-hidden="true"></div>
-    <div class="ambient ambient-two" aria-hidden="true"></div>
 
-    <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
-        <a class="brand" href="#inicio" aria-label="Oficina Digital, início">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none">
-              <path d="M9 28.5 12.3 19a4 4 0 0 1 3.8-2.7h15.8a4 4 0 0 1 3.8 2.7l3.3 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-2a2.5 2.5 0 0 1-2.5-2.5v-2H16v2a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 9 36.5v-8Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
-              <path d="M12 27h24M16 16.5l2-5h12l2 5M15 31.5h.01M33 31.5h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M7 9.5h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".5"/>
-            </svg>
-          </span>
-          <span class="brand-copy"><strong>oficina<span>digital</span></strong><small>GESTÃO INTELIGENTE</small></span>
-        </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1213" />
+  <meta name="description" content="Painel de gestão da Oficina Digital." />
+  <title>Oficina Digital · Painel</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
 
-        <div class="workspace-switcher">
-          <span class="workspace-icon">OD</span>
-          <span><strong>Oficina Central</strong><small>Unidade principal</small></span>
-          <svg class="tiny-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
-        </div>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
 
-        <p class="nav-label">MENU PRINCIPAL</p>
-        <nav class="main-nav" aria-label="Navegação principal">
-          <button class="nav-item is-active" data-view="inicio" aria-current="page">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="4" rx="2"/><rect x="13.5" y="10.5" width="7" height="10" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Visão geral</span>
-          </button>
-          <button class="nav-item" data-view="ordens">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/><path d="M14 3.75v4h4M8.5 12h7M8.5 15.5h7"/></svg><span>Ordens de serviço</span><span class="nav-count">18</span>
-          </button>
-          <button class="nav-item" data-view="clientes">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.25"/><path d="M3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h2.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 5.2a3.25 3.25 0 0 1 0 6.3M17 14.2a4.2 4.2 0 0 1 3.5 4.15v1.15"/></svg><span>Clientes</span>
-          </button>
-          <button class="nav-item" data-view="veiculos">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 15 1.7-5.2A2.5 2.5 0 0 1 8.1 8h7.8a2.5 2.5 0 0 1 2.4 1.8L20 15v4h-2v-2H6v2H4v-4Z"/><path d="M5 14h14M8 17h.01M16 17h.01M7 8l1-3h8l1 3"/></svg><span>Veículos</span>
-          </button>
-          <button class="nav-item" data-view="estoque">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.25v9.5L12 21l-8-4.25v-9.5L12 3Z"/><path d="m4.3 7.4 7.7 4.2 7.7-4.2M12 12v9M8 5.1l8 4.3"/></svg><span>Estoque</span>
-          </button>
-          <button class="nav-item" data-view="servicos">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.2a5 5 0 0 0-6.3 6.3L3.5 17.2a2.3 2.3 0 0 0 3.3 3.3l4.7-4.7a5 5 0 0 0 6.3-6.3l-3 3-3.1-3.1 2.8-3.2Z"/></svg><span>Serviços</span>
-          </button>
-          <button class="nav-item" data-view="indicadores">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V4.5M4 19.5h16"/><path d="m7 15 4-4 3 2.5 5-6"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="13.5" r="1"/><circle cx="19" cy="7.5" r="1"/></svg><span>Indicadores</span>
-          </button>
-        </nav>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#inicio" aria-label="Oficina Digital, início">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none">
+            <path
+              d="M9 28.5 12.3 19a4 4 0 0 1 3.8-2.7h15.8a4 4 0 0 1 3.8 2.7l3.3 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-2a2.5 2.5 0 0 1-2.5-2.5v-2H16v2a2.5 2.5 0 0 1-2.5 2.5h-2A2.5 2.5 0 0 1 9 36.5v-8Z"
+              stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+            <path d="M12 27h24M16 16.5l2-5h12l2 5M15 31.5h.01M33 31.5h.01" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" />
+            <path d="M7 9.5h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".5" />
+          </svg>
+        </span>
+        <span class="brand-copy"><strong>oficina<span>digital</span></strong><small>GESTÃO INTELIGENTE</small></span>
+      </a>
 
-        <div class="sidebar-spacer"></div>
-        <div class="sidebar-tip glass-card">
-          <span class="tip-spark">✦</span>
-          <strong>Oficina em ritmo</strong>
-          <p>Seu time concluiu <b>12 OS</b> nesta semana. Continue assim!</p>
-          <div class="tip-progress"><i></i></div>
-          <small>Meta semanal <b>75%</b></small>
-        </div>
-        <button class="nav-item nav-settings" data-view="configuracoes">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.1.85-1.5 2.6-1.3-.5a2 2 0 0 0-1.9.35l-.2.15-.2 1.45h-3l-.2-1.45a2 2 0 0 0-2.1-.5l-1.3.5-1.5-2.6 1.15-.85A2 2 0 0 0 9 13l-.1-.2-1.3-.7.8-2.9 1.45.15a2 2 0 0 0 1.7-1.35l.05-.2-.4-1.4 2.7-1.35.8 1.2a2 2 0 0 0 2.15.3l1.2-.8 2.1 2- .75 1.2a2 2 0 0 0 .5 2.1l.2.1 1.4.35-.3 2.95-1.45.2Z" transform="translate(-1 -1) scale(.96)"/></svg><span>Configurações</span>
+      <div class="workspace-switcher">
+        <span class="workspace-icon">OD</span>
+        <span><strong>Oficina Central</strong><small>Unidade principal</small></span>
+        <svg class="tiny-chevron" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </div>
+
+      <p class="nav-label">MENU PRINCIPAL</p>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-item is-active" data-view="inicio" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+            <rect x="13.5" y="3.5" width="7" height="4" rx="2" />
+            <rect x="13.5" y="10.5" width="7" height="10" rx="2" />
+            <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+          </svg><span>Visão geral</span>
         </button>
-        <div class="profile-card">
-          <div class="avatar">RF</div><span><strong>Roberto Ferreira</strong><small>Administrador</small></span>
-          <button class="more-button" aria-label="Mais opções do perfil">···</button>
-        </div>
-      </aside>
+        <button class="nav-item" data-view="ordens">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" />
+            <path d="M14 3.75v4h4M8.5 12h7M8.5 15.5h7" />
+          </svg><span>Ordens de serviço</span><span class="nav-count">18</span>
+        </button>
+        <button class="nav-item" data-view="clientes">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="9" cy="8" r="3.25" />
+            <path
+              d="M3.5 19.5v-1.25A4.25 4.25 0 0 1 7.75 14h2.5a4.25 4.25 0 0 1 4.25 4.25v1.25M16 5.2a3.25 3.25 0 0 1 0 6.3M17 14.2a4.2 4.2 0 0 1 3.5 4.15v1.15" />
+          </svg><span>Clientes</span>
+        </button>
+        <button class="nav-item" data-view="veiculos">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m4 15 1.7-5.2A2.5 2.5 0 0 1 8.1 8h7.8a2.5 2.5 0 0 1 2.4 1.8L20 15v4h-2v-2H6v2H4v-4Z" />
+            <path d="M5 14h14M8 17h.01M16 17h.01M7 8l1-3h8l1 3" />
+          </svg><span>Veículos</span>
+        </button>
+        <button class="nav-item" data-view="estoque">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 3 8 4.25v9.5L12 21l-8-4.25v-9.5L12 3Z" />
+            <path d="m4.3 7.4 7.7 4.2 7.7-4.2M12 12v9M8 5.1l8 4.3" />
+          </svg><span>Estoque</span>
+        </button>
+        <button class="nav-item" data-view="servicos">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M14.5 6.2a5 5 0 0 0-6.3 6.3L3.5 17.2a2.3 2.3 0 0 0 3.3 3.3l4.7-4.7a5 5 0 0 0 6.3-6.3l-3 3-3.1-3.1 2.8-3.2Z" />
+          </svg><span>Serviços</span>
+        </button>
+        <button class="nav-item" data-view="indicadores">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19.5V4.5M4 19.5h16" />
+            <path d="m7 15 4-4 3 2.5 5-6" />
+            <circle cx="7" cy="15" r="1" />
+            <circle cx="11" cy="11" r="1" />
+            <circle cx="14" cy="13.5" r="1" />
+            <circle cx="19" cy="7.5" r="1" />
+          </svg><span>Indicadores</span>
+        </button>
+      </nav>
 
-      <main class="main-content" id="main-content">
-        <header class="topbar">
-          <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Abrir menu">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-tip glass-card">
+        <span class="tip-spark">✦</span>
+        <strong>Oficina em ritmo</strong>
+        <p>Seu time concluiu <b>12 OS</b> nesta semana. Continue assim!</p>
+        <div class="tip-progress"><i></i></div>
+        <small>Meta semanal <b>75%</b></small>
+      </div>
+      <button class="nav-item nav-settings" data-view="configuracoes">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="m19.4 15 .1.1 1.1.85-1.5 2.6-1.3-.5a2 2 0 0 0-1.9.35l-.2.15-.2 1.45h-3l-.2-1.45a2 2 0 0 0-2.1-.5l-1.3.5-1.5-2.6 1.15-.85A2 2 0 0 0 9 13l-.1-.2-1.3-.7.8-2.9 1.45.15a2 2 0 0 0 1.7-1.35l.05-.2-.4-1.4 2.7-1.35.8 1.2a2 2 0 0 0 2.15.3l1.2-.8 2.1 2- .75 1.2a2 2 0 0 0 .5 2.1l.2.1 1.4.35-.3 2.95-1.45.2Z"
+            transform="translate(-1 -1) scale(.96)" />
+        </svg><span>Configurações</span>
+      </button>
+      <div class="profile-card">
+        <div class="avatar">RF</div><span><strong>Roberto Ferreira</strong><small>Administrador</small></span>
+        <button class="more-button" aria-label="Mais opções do perfil">···</button>
+      </div>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+        <div class="breadcrumbs"><span>Oficina Central</span><b>/</b><strong id="breadcrumb-current">Visão
+            geral</strong></div>
+        <div class="topbar-actions">
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.8" />
+              <path d="m16 16 4.5 4.5" />
+            </svg>
+            <input id="global-search" type="search" placeholder="Buscar OS, cliente, placa..." aria-label="Buscar" />
+            <kbd>⌘ K</kbd>
+          </label>
+          <button class="icon-button notification-button" id="notifications" aria-label="Notificações">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+            </svg><i></i>
           </button>
-          <div class="breadcrumbs"><span>Oficina Central</span><b>/</b><strong id="breadcrumb-current">Visão geral</strong></div>
-          <div class="topbar-actions">
-            <label class="search-box">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
-              <input id="global-search" type="search" placeholder="Buscar OS, cliente, placa..." aria-label="Buscar" />
-              <kbd>⌘ K</kbd>
-            </label>
-            <button class="icon-button notification-button" id="notifications" aria-label="Notificações">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i>
-            </button>
-            <span class="topbar-divider"></span>
-            <span class="today-label" id="today-label">QUARTA-FEIRA, 21 OUT</span>
+          <span class="topbar-divider"></span>
+          <span class="today-label" id="today-label">QUARTA-FEIRA, 21 OUT</span>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <section class="welcome-row">
+          <div>
+            <p class="eyebrow"><span class="live-dot"></span> SUA OFICINA, EM TEMPO REAL</p>
+            <h1>Bom dia, Roberto <span>✦</span></h1>
+            <p class="welcome-copy">Aqui está o que acontece na sua oficina hoje.</p>
           </div>
-        </header>
+          <button class="button button-primary" id="new-order-button"><span>＋</span> Nova ordem de serviço</button>
+        </section>
 
-        <div class="page-content">
-          <section class="welcome-row">
-            <div><p class="eyebrow"><span class="live-dot"></span> SUA OFICINA, EM TEMPO REAL</p><h1>Bom dia, Roberto <span>✦</span></h1><p class="welcome-copy">Aqui está o que acontece na sua oficina hoje.</p></div>
-            <button class="button button-primary" id="new-order-button"><span>＋</span> Nova ordem de serviço</button>
-          </section>
+        <section class="hero-panel glass-card">
+          <div class="hero-copy">
+            <div class="hero-kicker"><span class="hero-kicker-icon">✦</span> TERÇA-FEIRA · OPERAÇÃO EM DIA</div>
+            <h2>Bom trabalho começa<br />com uma <em>boa visão.</em></h2>
+            <p>A oficina está fluindo. Você tem <b>6 orçamentos</b> aguardando retorno e 3 veículos prontos para
+              entrega.</p>
+            <button class="text-link" data-view="ordens">Ver painel de ordens <span>↗</span></button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+            <div class="hero-glow"></div>
+            <svg class="hero-car" viewBox="0 0 480 210" fill="none">
+              <path
+                d="M52 132.5 77 119l37-62c6-10 17-16 29-16h145c13 0 25 7 31 18l35 60 50 13c14 4 24 17 24 32v14c0 8-7 15-15 15h-19c-2-21-20-37-42-37s-40 16-42 37H172c-2-21-20-37-42-37s-40 16-42 37H66c-8 0-14-6-14-14v-23c0-11 0-21 0-28Z"
+                fill="url(#carPaint)" stroke="#f6c98f" stroke-opacity=".82" stroke-width="2" />
+              <path d="m132 111 24-42c3-5 9-8 15-8h52v50H132ZM240 61h47c6 0 12 3 15 9l25 41H240V61Z" fill="#112225"
+                stroke="#f4c48b" stroke-opacity=".56" stroke-width="2" />
+              <path d="M240 61v50M84 132h327M183 128h49M348 128h35" stroke="#f4c48b" stroke-opacity=".42"
+                stroke-width="2" />
+              <circle cx="130" cy="165" r="28" fill="#11191a" stroke="#f4c48b" stroke-width="3" />
+              <circle cx="130" cy="165" r="12" fill="#c99159" />
+              <circle cx="130" cy="165" r="5" fill="#253032" />
+              <circle cx="369" cy="165" r="28" fill="#11191a" stroke="#f4c48b" stroke-width="3" />
+              <circle cx="369" cy="165" r="12" fill="#c99159" />
+              <circle cx="369" cy="165" r="5" fill="#253032" />
+              <path d="m54 142-21 5M411 142l19 5" stroke="#f1bc7d" stroke-width="5" stroke-linecap="round" />
+              <defs>
+                <linearGradient id="carPaint" x1="84" y1="71" x2="375" y2="183" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#657a70" />
+                  <stop offset=".48" stop-color="#344944" />
+                  <stop offset="1" stop-color="#1c2e2b" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="art-label art-label-top">GARAGEM 01 <i>↗</i></span>
+            <span class="art-label art-label-bottom"><span>●</span> EM MOVIMENTO</span>
+            <div class="art-spark spark-one">✦</div>
+            <div class="art-spark spark-two">✧</div>
+          </div>
+          <div class="hero-index"><span>01</span><i></i><span>03</span></div>
+        </section>
 
-          <section class="hero-panel glass-card">
-            <div class="hero-copy">
-              <div class="hero-kicker"><span class="hero-kicker-icon">✦</span> TERÇA-FEIRA · OPERAÇÃO EM DIA</div>
-              <h2>Bom trabalho começa<br />com uma <em>boa visão.</em></h2>
-              <p>A oficina está fluindo. Você tem <b>6 orçamentos</b> aguardando retorno e 3 veículos prontos para entrega.</p>
-              <button class="text-link" data-view="ordens">Ver painel de ordens <span>↗</span></button>
+        <section class="metrics-grid" aria-label="Indicadores da oficina">
+          <article class="metric-card glass-card">
+            <div class="metric-head"><span>OS em andamento</span><span class="metric-icon metric-icon-copper"><svg
+                  viewBox="0 0 24 24">
+                  <path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" />
+                  <path d="M14 3.75v4h4M8.5 12h7M8.5 15.5h4" />
+                </svg></span></div>
+            <div class="metric-value">18 <span class="trend positive">↗ 12%</span></div>
+            <div class="metric-foot"><span
+                class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>vs. semana
+                passada</span></div>
+          </article>
+          <article class="metric-card glass-card">
+            <div class="metric-head"><span>Aguardando aprovação</span><span class="metric-icon metric-icon-amber"><svg
+                  viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="8.5" />
+                  <path d="M12 7v5l3.25 2" />
+                </svg></span></div>
+            <div class="metric-value">06 <span class="metric-unit">orçamentos</span></div>
+            <div class="metric-foot"><span class="metric-foot-dot dot-amber"></span><span>2 há mais de 24 horas</span>
             </div>
-            <div class="hero-art" aria-hidden="true">
-              <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
-              <div class="hero-glow"></div>
-              <svg class="hero-car" viewBox="0 0 480 210" fill="none">
-                <path d="M52 132.5 77 119l37-62c6-10 17-16 29-16h145c13 0 25 7 31 18l35 60 50 13c14 4 24 17 24 32v14c0 8-7 15-15 15h-19c-2-21-20-37-42-37s-40 16-42 37H172c-2-21-20-37-42-37s-40 16-42 37H66c-8 0-14-6-14-14v-23c0-11 0-21 0-28Z" fill="url(#carPaint)" stroke="#f6c98f" stroke-opacity=".82" stroke-width="2"/>
-                <path d="m132 111 24-42c3-5 9-8 15-8h52v50H132ZM240 61h47c6 0 12 3 15 9l25 41H240V61Z" fill="#112225" stroke="#f4c48b" stroke-opacity=".56" stroke-width="2"/>
-                <path d="M240 61v50M84 132h327M183 128h49M348 128h35" stroke="#f4c48b" stroke-opacity=".42" stroke-width="2"/>
-                <circle cx="130" cy="165" r="28" fill="#11191a" stroke="#f4c48b" stroke-width="3"/><circle cx="130" cy="165" r="12" fill="#c99159"/><circle cx="130" cy="165" r="5" fill="#253032"/>
-                <circle cx="369" cy="165" r="28" fill="#11191a" stroke="#f4c48b" stroke-width="3"/><circle cx="369" cy="165" r="12" fill="#c99159"/><circle cx="369" cy="165" r="5" fill="#253032"/>
-                <path d="m54 142-21 5M411 142l19 5" stroke="#f1bc7d" stroke-width="5" stroke-linecap="round"/>
-                <defs><linearGradient id="carPaint" x1="84" y1="71" x2="375" y2="183" gradientUnits="userSpaceOnUse"><stop stop-color="#657a70"/><stop offset=".48" stop-color="#344944"/><stop offset="1" stop-color="#1c2e2b"/></linearGradient></defs>
-              </svg>
-              <span class="art-label art-label-top">GARAGEM 01 <i>↗</i></span>
-              <span class="art-label art-label-bottom"><span>●</span> EM MOVIMENTO</span>
-              <div class="art-spark spark-one">✦</div><div class="art-spark spark-two">✧</div>
+          </article>
+          <article class="metric-card glass-card">
+            <div class="metric-head"><span>Prontos para entrega</span><span class="metric-icon metric-icon-green"><svg
+                  viewBox="0 0 24 24">
+                  <path d="m5 12.5 4.5 4L19 7" />
+                  <circle cx="12" cy="12" r="9" />
+                </svg></span></div>
+            <div class="metric-value">03 <span class="metric-unit">veículos</span></div>
+            <div class="metric-foot"><span class="metric-foot-dot dot-green"></span><span>1 aguardando há 2 dias</span>
             </div>
-            <div class="hero-index"><span>01</span><i></i><span>03</span></div>
-          </section>
+          </article>
+          <article class="metric-card glass-card">
+            <div class="metric-head"><span>Faturamento do mês</span><span class="metric-icon metric-icon-blue"><svg
+                  viewBox="0 0 24 24">
+                  <path
+                    d="M12 3v18M17.5 7.5c0-1.7-1.9-3-4.5-3S8.5 5.8 8.5 7.5 10.4 10 13 10s4.5 1.3 4.5 3-1.9 3.5-4.5 3.5-4.5-1.4-4.5-3.2" />
+                </svg></span></div>
+            <div class="metric-value currency">R$ 42.850 <span class="trend positive">↗ 8,4%</span></div>
+            <div class="metric-foot"><span class="metric-foot-dot dot-blue"></span><span>de R$ 55 mil de meta</span>
+            </div>
+          </article>
+        </section>
 
-          <section class="metrics-grid" aria-label="Indicadores da oficina">
-            <article class="metric-card glass-card">
-              <div class="metric-head"><span>OS em andamento</span><span class="metric-icon metric-icon-copper"><svg viewBox="0 0 24 24"><path d="M7 3.75h7l4 4v12.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/><path d="M14 3.75v4h4M8.5 12h7M8.5 15.5h4"/></svg></span></div>
-              <div class="metric-value">18 <span class="trend positive">↗ 12%</span></div><div class="metric-foot"><span class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>vs. semana passada</span></div>
-            </article>
-            <article class="metric-card glass-card">
-              <div class="metric-head"><span>Aguardando aprovação</span><span class="metric-icon metric-icon-amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.25 2"/></svg></span></div>
-              <div class="metric-value">06 <span class="metric-unit">orçamentos</span></div><div class="metric-foot"><span class="metric-foot-dot dot-amber"></span><span>2 há mais de 24 horas</span></div>
-            </article>
-            <article class="metric-card glass-card">
-              <div class="metric-head"><span>Prontos para entrega</span><span class="metric-icon metric-icon-green"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4L19 7"/><circle cx="12" cy="12" r="9"/></svg></span></div>
-              <div class="metric-value">03 <span class="metric-unit">veículos</span></div><div class="metric-foot"><span class="metric-foot-dot dot-green"></span><span>1 aguardando há 2 dias</span></div>
-            </article>
-            <article class="metric-card glass-card">
-              <div class="metric-head"><span>Faturamento do mês</span><span class="metric-icon metric-icon-blue"><svg viewBox="0 0 24 24"><path d="M12 3v18M17.5 7.5c0-1.7-1.9-3-4.5-3S8.5 5.8 8.5 7.5 10.4 10 13 10s4.5 1.3 4.5 3-1.9 3.5-4.5 3.5-4.5-1.4-4.5-3.2"/></svg></span></div>
-              <div class="metric-value currency">R$ 42.850 <span class="trend positive">↗ 8,4%</span></div><div class="metric-foot"><span class="metric-foot-dot dot-blue"></span><span>de R$ 55 mil de meta</span></div>
-            </article>
-          </section>
+        <section class="content-grid">
+          <article class="section-card glass-card orders-card">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">ACOMPANHAMENTO</p>
+                <h3>Ordens em movimento</h3>
+              </div><button class="select-button" id="status-filter">Todas as etapas <span>⌄</span></button>
+            </div>
+            <div class="pipeline" id="pipeline">
+              <div class="pipeline-column">
+                <div class="pipeline-title"><span class="stage-dot stage-received"></span><span>Recebida</span><b>04</b>
+                </div>
+                <article class="order-item" data-search="os-2481 marcos honda civic abc1d23 recebida">
+                  <div class="order-id">OS-2481 <span class="order-time">há 18 min</span></div><strong>Honda Civic
+                    Touring</strong>
+                  <div class="order-meta"><span>Marcos Almeida</span><span>ABC-1D23</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-received">Triagem</span><span
+                      class="order-avatar avatar-sand">MA</span></div>
+                </article>
+                <article class="order-item" data-search="os-2480 fernanda hyundai hb20 xyz2e45 recebida">
+                  <div class="order-id">OS-2480 <span class="order-time">há 42 min</span></div><strong>Hyundai HB20
+                    Platinum</strong>
+                  <div class="order-meta"><span>Fernanda Costa</span><span>XYZ-2E45</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-received">Triagem</span><span
+                      class="order-avatar avatar-lilac">FC</span></div>
+                </article>
+                <button class="add-order" data-view="ordens">＋ Ver todas as recebidas</button>
+              </div>
+              <div class="pipeline-column">
+                <div class="pipeline-title"><span
+                    class="stage-dot stage-diagnosis"></span><span>Diagnóstico</span><b>05</b></div>
+                <article class="order-item" data-search="os-2476 paulo volkswagen t-cross fgh3j67 diagnostico">
+                  <div class="order-id">OS-2476 <span class="order-time">há 2 h</span></div><strong>VW T-Cross
+                    Highline</strong>
+                  <div class="order-meta"><span>Paulo Nascimento</span><span>FGH-3J67</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-diagnosis">Em análise</span><span
+                      class="order-avatar avatar-blue">PN</span></div>
+                </article>
+                <article class="order-item" data-search="os-2472 juliana jeep renegade klm4a89 diagnostico">
+                  <div class="order-id">OS-2472 <span class="order-time">há 4 h</span></div><strong>Jeep Renegade
+                    Longitude</strong>
+                  <div class="order-meta"><span>Juliana Mendes</span><span>KLM-4A89</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-diagnosis">Em análise</span><span
+                      class="order-avatar avatar-rose">JM</span></div>
+                </article>
+                <button class="add-order" data-view="ordens">＋ Ver diagnósticos</button>
+              </div>
+              <div class="pipeline-column">
+                <div class="pipeline-title"><span class="stage-dot stage-approval"></span><span>Aprovação</span><b
+                    class="count-alert">06</b></div>
+                <article class="order-item order-priority"
+                  data-search="os-2469 carlos toyota corolla nop5b21 aprovação orçamento">
+                  <div class="order-id">OS-2469 <span class="order-time time-alert">há 2 dias</span></div><strong>Toyota
+                    Corolla XEi</strong>
+                  <div class="order-meta"><span>Carlos Ribeiro</span><span>NOP-5B21</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-approval">Orçamento enviado</span><span
+                      class="order-avatar avatar-green">CR</span></div>
+                </article>
+                <article class="order-item" data-search="os-2467 ana chevrolet onix rst6c43 aprovação orçamento">
+                  <div class="order-id">OS-2467 <span class="order-time">há 5 h</span></div><strong>Chevrolet Onix
+                    Premier</strong>
+                  <div class="order-meta"><span>Ana Beatriz Lima</span><span>RST-6C43</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-approval">Orçamento enviado</span><span
+                      class="order-avatar avatar-peach">AL</span></div>
+                </article>
+                <button class="add-order" data-view="ordens">＋ Ver aprovações</button>
+              </div>
+              <div class="pipeline-column">
+                <div class="pipeline-title"><span class="stage-dot stage-work"></span><span>Em execução</span><b>03</b>
+                </div>
+                <article class="order-item" data-search="os-2458 bruno volkswagen nivus tuv7d02 execução troca oleo">
+                  <div class="order-id">OS-2458 <span class="order-time">há 1 h</span></div><strong>VW Nivus
+                    Comfortline</strong>
+                  <div class="order-meta"><span>Bruno Martins</span><span>TUV-7D02</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-work">Em serviço</span><span
+                      class="order-avatar avatar-blue">BM</span></div>
+                </article>
+                <article class="order-item" data-search="os-2455 lucia honda hr-v vwx8e90 execução revisão">
+                  <div class="order-id">OS-2455 <span class="order-time">há 3 h</span></div><strong>Honda HR-V
+                    EXL</strong>
+                  <div class="order-meta"><span>Lúcia Oliveira</span><span>VWX-8E90</span></div>
+                  <div class="order-bottom"><span class="status-chip chip-work">Em serviço</span><span
+                      class="order-avatar avatar-lilac">LO</span></div>
+                </article>
+                <button class="add-order" data-view="ordens">＋ Ver em execução</button>
+              </div>
+            </div>
+            <div class="empty-search" id="empty-search" hidden>Nenhuma ordem encontrada para essa busca.</div>
+            <div class="section-footer"><span>Exibindo 8 de 18 ordens ativas</span><button class="text-link"
+                data-view="ordens">Ver todas as ordens <span>↗</span></button></div>
+          </article>
 
-          <section class="content-grid">
-            <article class="section-card glass-card orders-card">
-              <div class="section-heading"><div><p class="eyebrow">ACOMPANHAMENTO</p><h3>Ordens em movimento</h3></div><button class="select-button" id="status-filter">Todas as etapas <span>⌄</span></button></div>
-              <div class="pipeline" id="pipeline">
-                <div class="pipeline-column">
-                  <div class="pipeline-title"><span class="stage-dot stage-received"></span><span>Recebida</span><b>04</b></div>
-                  <article class="order-item" data-search="os-2481 marcos honda civic abc1d23 recebida"><div class="order-id">OS-2481 <span class="order-time">há 18 min</span></div><strong>Honda Civic Touring</strong><div class="order-meta"><span>Marcos Almeida</span><span>ABC-1D23</span></div><div class="order-bottom"><span class="status-chip chip-received">Triagem</span><span class="order-avatar avatar-sand">MA</span></div></article>
-                  <article class="order-item" data-search="os-2480 fernanda hyundai hb20 xyz2e45 recebida"><div class="order-id">OS-2480 <span class="order-time">há 42 min</span></div><strong>Hyundai HB20 Platinum</strong><div class="order-meta"><span>Fernanda Costa</span><span>XYZ-2E45</span></div><div class="order-bottom"><span class="status-chip chip-received">Triagem</span><span class="order-avatar avatar-lilac">FC</span></div></article>
-                  <button class="add-order" data-view="ordens">＋ Ver todas as recebidas</button>
+          <aside class="right-rail">
+            <article class="section-card glass-card delivery-card">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">AGENDA DE HOJE</p>
+                  <h3>Próximas entregas</h3>
+                </div><button class="icon-button-small" aria-label="Abrir agenda">↗</button>
+              </div>
+              <div class="delivery-date"><span class="date-day">21</span><span><strong>Outubro,
+                    terça-feira</strong><small>3 entregas programadas</small></span></div>
+              <div class="timeline">
+                <div class="timeline-item"><span class="timeline-time">14:30</span><i class="timeline-line"><b></b></i>
+                  <div><strong>Ford Ka SE Plus</strong><small>Renata Souza · OS-2448</small></div><span
+                    class="timeline-status status-ready">Pronto</span>
                 </div>
-                <div class="pipeline-column">
-                  <div class="pipeline-title"><span class="stage-dot stage-diagnosis"></span><span>Diagnóstico</span><b>05</b></div>
-                  <article class="order-item" data-search="os-2476 paulo volkswagen t-cross fgh3j67 diagnostico"><div class="order-id">OS-2476 <span class="order-time">há 2 h</span></div><strong>VW T-Cross Highline</strong><div class="order-meta"><span>Paulo Nascimento</span><span>FGH-3J67</span></div><div class="order-bottom"><span class="status-chip chip-diagnosis">Em análise</span><span class="order-avatar avatar-blue">PN</span></div></article>
-                  <article class="order-item" data-search="os-2472 juliana jeep renegade klm4a89 diagnostico"><div class="order-id">OS-2472 <span class="order-time">há 4 h</span></div><strong>Jeep Renegade Longitude</strong><div class="order-meta"><span>Juliana Mendes</span><span>KLM-4A89</span></div><div class="order-bottom"><span class="status-chip chip-diagnosis">Em análise</span><span class="order-avatar avatar-rose">JM</span></div></article>
-                  <button class="add-order" data-view="ordens">＋ Ver diagnósticos</button>
+                <div class="timeline-item"><span class="timeline-time">16:00</span><i class="timeline-line"><b></b></i>
+                  <div><strong>Fiat Pulse Audace</strong><small>Eduardo Santos · OS-2439</small></div><span
+                    class="timeline-status status-ready">Pronto</span>
                 </div>
-                <div class="pipeline-column">
-                  <div class="pipeline-title"><span class="stage-dot stage-approval"></span><span>Aprovação</span><b class="count-alert">06</b></div>
-                  <article class="order-item order-priority" data-search="os-2469 carlos toyota corolla nop5b21 aprovação orçamento"><div class="order-id">OS-2469 <span class="order-time time-alert">há 2 dias</span></div><strong>Toyota Corolla XEi</strong><div class="order-meta"><span>Carlos Ribeiro</span><span>NOP-5B21</span></div><div class="order-bottom"><span class="status-chip chip-approval">Orçamento enviado</span><span class="order-avatar avatar-green">CR</span></div></article>
-                  <article class="order-item" data-search="os-2467 ana chevrolet onix rst6c43 aprovação orçamento"><div class="order-id">OS-2467 <span class="order-time">há 5 h</span></div><strong>Chevrolet Onix Premier</strong><div class="order-meta"><span>Ana Beatriz Lima</span><span>RST-6C43</span></div><div class="order-bottom"><span class="status-chip chip-approval">Orçamento enviado</span><span class="order-avatar avatar-peach">AL</span></div></article>
-                  <button class="add-order" data-view="ordens">＋ Ver aprovações</button>
-                </div>
-                <div class="pipeline-column">
-                  <div class="pipeline-title"><span class="stage-dot stage-work"></span><span>Em execução</span><b>03</b></div>
-                  <article class="order-item" data-search="os-2458 bruno volkswagen nivus tuv7d02 execução troca oleo"><div class="order-id">OS-2458 <span class="order-time">há 1 h</span></div><strong>VW Nivus Comfortline</strong><div class="order-meta"><span>Bruno Martins</span><span>TUV-7D02</span></div><div class="order-bottom"><span class="status-chip chip-work">Em serviço</span><span class="order-avatar avatar-blue">BM</span></div></article>
-                  <article class="order-item" data-search="os-2455 lucia honda hr-v vwx8e90 execução revisão"><div class="order-id">OS-2455 <span class="order-time">há 3 h</span></div><strong>Honda HR-V EXL</strong><div class="order-meta"><span>Lúcia Oliveira</span><span>VWX-8E90</span></div><div class="order-bottom"><span class="status-chip chip-work">Em serviço</span><span class="order-avatar avatar-lilac">LO</span></div></article>
-                  <button class="add-order" data-view="ordens">＋ Ver em execução</button>
+                <div class="timeline-item"><span class="timeline-time">17:30</span><i class="timeline-line"><b></b></i>
+                  <div><strong>Honda Fit EX</strong><small>Camila Rocha · OS-2432</small></div><span
+                    class="timeline-status status-pending">Em revisão</span>
                 </div>
               </div>
-              <div class="empty-search" id="empty-search" hidden>Nenhuma ordem encontrada para essa busca.</div>
-              <div class="section-footer"><span>Exibindo 8 de 18 ordens ativas</span><button class="text-link" data-view="ordens">Ver todas as ordens <span>↗</span></button></div>
+              <button class="calendar-link" data-view="ordens">Abrir agenda completa <span>→</span></button>
             </article>
+            <article class="section-card glass-card team-card">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">TIME DA OFICINA</p>
+                  <h3>Quem está na pista</h3>
+                </div><span class="team-online"><i></i> 4 ativos</span>
+              </div>
+              <div class="team-row">
+                <div class="avatar avatar-tech tech-1">RM</div>
+                <div class="team-person"><strong>Rafael Moraes</strong><small>Especialista · Diagnóstico</small></div>
+                <span class="team-status busy">Em serviço</span>
+              </div>
+              <div class="team-row">
+                <div class="avatar avatar-tech tech-2">LC</div>
+                <div class="team-person"><strong>Lucas Carvalho</strong><small>Mecânico · Motor</small></div><span
+                  class="team-status busy">Em serviço</span>
+              </div>
+              <div class="team-row">
+                <div class="avatar avatar-tech tech-3">AS</div>
+                <div class="team-person"><strong>André Silva</strong><small>Mecânico · Revisão</small></div><span
+                  class="team-status free">Disponível</span>
+              </div>
+              <button class="calendar-link" data-view="configuracoes">Ver equipe <span>→</span></button>
+            </article>
+          </aside>
+        </section>
 
-            <aside class="right-rail">
-              <article class="section-card glass-card delivery-card">
-                <div class="section-heading"><div><p class="eyebrow">AGENDA DE HOJE</p><h3>Próximas entregas</h3></div><button class="icon-button-small" aria-label="Abrir agenda">↗</button></div>
-                <div class="delivery-date"><span class="date-day">21</span><span><strong>Outubro, terça-feira</strong><small>3 entregas programadas</small></span></div>
-                <div class="timeline">
-                  <div class="timeline-item"><span class="timeline-time">14:30</span><i class="timeline-line"><b></b></i><div><strong>Ford Ka SE Plus</strong><small>Renata Souza · OS-2448</small></div><span class="timeline-status status-ready">Pronto</span></div>
-                  <div class="timeline-item"><span class="timeline-time">16:00</span><i class="timeline-line"><b></b></i><div><strong>Fiat Pulse Audace</strong><small>Eduardo Santos · OS-2439</small></div><span class="timeline-status status-ready">Pronto</span></div>
-                  <div class="timeline-item"><span class="timeline-time">17:30</span><i class="timeline-line"><b></b></i><div><strong>Honda Fit EX</strong><small>Camila Rocha · OS-2432</small></div><span class="timeline-status status-pending">Em revisão</span></div>
-                </div>
-                <button class="calendar-link" data-view="ordens">Abrir agenda completa <span>→</span></button>
-              </article>
-              <article class="section-card glass-card team-card">
-                <div class="section-heading"><div><p class="eyebrow">TIME DA OFICINA</p><h3>Quem está na pista</h3></div><span class="team-online"><i></i> 4 ativos</span></div>
-                <div class="team-row"><div class="avatar avatar-tech tech-1">RM</div><div class="team-person"><strong>Rafael Moraes</strong><small>Especialista · Diagnóstico</small></div><span class="team-status busy">Em serviço</span></div>
-                <div class="team-row"><div class="avatar avatar-tech tech-2">LC</div><div class="team-person"><strong>Lucas Carvalho</strong><small>Mecânico · Motor</small></div><span class="team-status busy">Em serviço</span></div>
-                <div class="team-row"><div class="avatar avatar-tech tech-3">AS</div><div class="team-person"><strong>André Silva</strong><small>Mecânico · Revisão</small></div><span class="team-status free">Disponível</span></div>
-                <button class="calendar-link" data-view="configuracoes">Ver equipe <span>→</span></button>
-              </article>
-            </aside>
-          </section>
+        <footer class="page-footer"><span>© 2026 Oficina Digital</span><span><i></i> Sistema
+            operacional</span><span>Feito para quem entende de cuidado.</span></footer>
+      </div>
+    </main>
+  </div>
 
-          <footer class="page-footer"><span>© 2026 Oficina Digital</span><span><i></i> Sistema operacional</span><span>Feito para quem entende de cuidado.</span></footer>
-        </div>
-      </main>
-    </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog class="order-dialog" id="order-dialog">
+    <form method="dialog" class="dialog-card" id="order-form">
+      <button class="dialog-close" value="cancel" aria-label="Fechar">×</button>
+      <p class="eyebrow">NOVO ATENDIMENTO</p>
+      <h2>Vamos abrir uma OS?</h2>
+      <p class="dialog-copy">Comece com os dados essenciais. Você pode completar o diagnóstico depois.</p>
+      <label>Cliente<input name="cliente" required placeholder="Nome do cliente" /></label>
+      <div class="dialog-fields"><label>Veículo<input name="veiculo" required
+            placeholder="Ex.: Honda Civic" /></label><label>Placa<input name="placa" required placeholder="ABC-1D23"
+            maxlength="8" /></label></div>
+      <label>O que precisa de atenção?<textarea name="descricao" required
+          placeholder="Conte brevemente o que o cliente relatou..."></textarea></label>
+      <div class="dialog-actions"><button class="button button-quiet" value="cancel">Cancelar</button><button
+          class="button button-primary" id="save-order" value="default">Criar ordem</button></div>
+    </form>
+  </dialog>
+</body>
 
-    <dialog class="order-dialog" id="order-dialog">
-      <form method="dialog" class="dialog-card" id="order-form">
-        <button class="dialog-close" value="cancel" aria-label="Fechar">×</button>
-        <p class="eyebrow">NOVO ATENDIMENTO</p><h2>Vamos abrir uma OS?</h2><p class="dialog-copy">Comece com os dados essenciais. Você pode completar o diagnóstico depois.</p>
-        <label>Cliente<input name="cliente" required placeholder="Nome do cliente" /></label>
-        <div class="dialog-fields"><label>Veículo<input name="veiculo" required placeholder="Ex.: Honda Civic" /></label><label>Placa<input name="placa" required placeholder="ABC-1D23" maxlength="8" /></label></div>
-        <label>O que precisa de atenção?<textarea name="descricao" required placeholder="Conte brevemente o que o cliente relatou..."></textarea></label>
-        <div class="dialog-actions"><button class="button button-quiet" value="cancel">Cancelar</button><button class="button button-primary" id="save-order" value="default">Criar ordem</button></div>
-      </form>
-    </dialog>
-  </body>
 </html>

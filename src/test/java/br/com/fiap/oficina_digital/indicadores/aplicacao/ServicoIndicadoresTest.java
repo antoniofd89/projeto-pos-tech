@@ -23,7 +23,8 @@ class ServicoIndicadoresTest {
         var semInicio = ordem(null, inicio.plusSeconds(30), servicoA);
         var negativa = ordem(inicio.plusSeconds(60), inicio, servicoA);
         var repo = mock(RepositorioOrdemServicoJpa.class);
-        when(repo.findAllByFinalizadaEmBetween(inicio, fim)).thenReturn(List.of(ordemCurta, ordemLonga, semInicio, negativa));
+        when(repo.findAllByFinalizadaEmBetween(inicio, fim))
+                .thenReturn(List.of(ordemCurta, ordemLonga, semInicio, negativa));
 
         var resultado = new ServicoIndicadores(repo).tempoMedio(inicio, fim);
 
@@ -42,8 +43,14 @@ class ServicoIndicadoresTest {
     }
 
     private static OrdemServicoJpa ordem(Instant iniciou, Instant finalizou, UUID... ids) {
-        var ordem = new OrdemServicoJpa(); ordem.execucaoIniciadaEm=iniciou; ordem.finalizadaEm=finalizou;
-        for (var id : ids) { var item = new ItemServicoOSJpa(); item.servicoCatalogoId=id; ordem.servicos.add(item); }
+        var ordem = new OrdemServicoJpa();
+        ordem.execucaoIniciadaEm = iniciou;
+        ordem.finalizadaEm = finalizou;
+        for (var id : ids) {
+            var item = new ItemServicoOSJpa();
+            item.servicoCatalogoId = id;
+            ordem.servicos.add(item);
+        }
         return ordem;
     }
 }

@@ -8,29 +8,109 @@
   "auth": {
     "type": "bearer",
     "bearer": [
-      { "key": "token", "value": "{{token}}", "type": "string" }
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
     ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
-    { "key": "token", "value": "", "type": "string" },
-    { "key": "clienteId", "value": "", "type": "string" },
-    { "key": "veiculoId", "value": "", "type": "string" },
-    { "key": "servicoId", "value": "", "type": "string" },
-    { "key": "itemEstoqueId", "value": "", "type": "string" },
-    { "key": "ordemServicoId", "value": "", "type": "string" },
-    { "key": "codigoAcompanhamento", "value": "", "type": "string" },
-    { "key": "versaoOrcamento", "value": "1", "type": "string" },
-    { "key": "ordemRecebidaDemoId", "value": "50000000-0000-4000-8000-000000000001", "type": "string" },
-    { "key": "ordemDiagnosticoDemoId", "value": "50000000-0000-4000-8000-000000000002", "type": "string" },
-    { "key": "ordemAprovacaoDemoId", "value": "50000000-0000-4000-8000-000000000003", "type": "string" },
-    { "key": "ordemExecucaoDemoId", "value": "50000000-0000-4000-8000-000000000004", "type": "string" },
-    { "key": "ordemFinalizadaDemoId", "value": "50000000-0000-4000-8000-000000000005", "type": "string" },
-    { "key": "ordemEntregueDemoId", "value": "50000000-0000-4000-8000-000000000006", "type": "string" },
-    { "key": "ordemCanceladaDemoId", "value": "50000000-0000-4000-8000-000000000007", "type": "string" },
-    { "key": "codigoAprovacaoDemo", "value": "DEMO-CODIGO-APROVACAO-003", "type": "string" },
-    { "key": "inicio", "value": "2020-01-01", "type": "string" },
-    { "key": "fim", "value": "2099-12-31", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clienteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "veiculoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "servicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemEstoqueId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ordemServicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "codigoAcompanhamento",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "versaoOrcamento",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ordemRecebidaDemoId",
+      "value": "50000000-0000-4000-8000-000000000001",
+      "type": "string"
+    },
+    {
+      "key": "ordemDiagnosticoDemoId",
+      "value": "50000000-0000-4000-8000-000000000002",
+      "type": "string"
+    },
+    {
+      "key": "ordemAprovacaoDemoId",
+      "value": "50000000-0000-4000-8000-000000000003",
+      "type": "string"
+    },
+    {
+      "key": "ordemExecucaoDemoId",
+      "value": "50000000-0000-4000-8000-000000000004",
+      "type": "string"
+    },
+    {
+      "key": "ordemFinalizadaDemoId",
+      "value": "50000000-0000-4000-8000-000000000005",
+      "type": "string"
+    },
+    {
+      "key": "ordemEntregueDemoId",
+      "value": "50000000-0000-4000-8000-000000000006",
+      "type": "string"
+    },
+    {
+      "key": "ordemCanceladaDemoId",
+      "value": "50000000-0000-4000-8000-000000000007",
+      "type": "string"
+    },
+    {
+      "key": "codigoAprovacaoDemo",
+      "value": "DEMO-CODIGO-APROVACAO-003",
+      "type": "string"
+    },
+    {
+      "key": "inicio",
+      "value": "2020-01-01",
+      "type": "string"
+    },
+    {
+      "key": "fim",
+      "value": "2099-12-31",
+      "type": "string"
+    }
   ],
   "item": [
     {
@@ -39,7 +119,9 @@
         {
           "name": "Health",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "url": "{{baseUrl}}/actuator/health",
             "description": "Verifica se a aplicação está respondendo."
@@ -63,13 +145,24 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"senha\": \"{{adminPassword}}\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": "{{baseUrl}}/autenticacao/login",
             "description": "Preencha adminEmail e adminPassword no ambiente Postman. O teste salva o JWT automaticamente na variável token."
@@ -82,15 +175,24 @@
       "item": [
         {
           "name": "Listar clientes",
-          "request": { "method": "GET", "url": "{{baseUrl}}/clientes?pagina=0&tamanho=20" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/clientes?pagina=0&tamanho=20"
+          }
         },
         {
           "name": "Buscar cliente por ID",
-          "request": { "method": "GET", "url": "{{baseUrl}}/clientes/{{clienteId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/clientes/{{clienteId}}"
+          }
         },
         {
           "name": "Buscar cliente por CPF/CNPJ",
-          "request": { "method": "GET", "url": "{{baseUrl}}/clientes/por-documento?documento=52998224725" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/clientes/por-documento?documento=52998224725"
+          }
         },
         {
           "name": "Cadastrar cliente de teste",
@@ -109,11 +211,20 @@
           ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nome\": \"Maria Teste Postman\",\n  \"documento\": \"16899535009\",\n  \"email\": \"maria.postman@example.test\",\n  \"telefone\": \"11987654322\",\n  \"nascimento\": \"1990-05-12\",\n  \"endereco\": null\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": "{{baseUrl}}/clientes",
             "description": "CPF fictício válido de exemplo. Se já existir (409), altere documento e email antes de repetir."
@@ -123,18 +234,30 @@
           "name": "Atualizar cliente",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"nome\": \"Maria Teste Atualizada\",\n  \"email\": \"maria.atualizada@example.test\",\n  \"telefone\": \"11987654323\",\n  \"nascimento\": \"1990-05-12\",\n  \"endereco\": null\n}",
-              "options": { "raw": { "language": "json" } }
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
             "url": "{{baseUrl}}/clientes/{{clienteId}}"
           }
         },
         {
           "name": "Inativar cliente (ADMIN)",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/clientes/{{clienteId}}", "description": "Inativação lógica; exige perfil ADMIN. Execute por último para este cliente."
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/clientes/{{clienteId}}",
+            "description": "Inativação lógica; exige perfil ADMIN. Execute por último para este cliente."
           }
         }
       ]
@@ -144,35 +267,80 @@
       "item": [
         {
           "name": "Listar veículos do cliente",
-          "request": { "method": "GET", "url": "{{baseUrl}}/veiculos?clienteId={{clienteId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/veiculos?clienteId={{clienteId}}"
+          }
         },
         {
           "name": "Cadastrar veículo",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.environment.set('veiculoId', pm.response.json().id);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.environment.set('veiculoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"placa\": \"QWE1R23\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla Postman\",\n  \"anoFabricacao\": 2022,\n  \"categoria\": \"SEDAN\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"placa\": \"QWE1R23\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla Postman\",\n  \"anoFabricacao\": 2022,\n  \"categoria\": \"SEDAN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/veiculos",
             "description": "Se já existir placa duplicada, escolha outra placa. Requer clienteId válido."
           }
         },
         {
           "name": "Buscar veículo",
-          "request": { "method": "GET", "url": "{{baseUrl}}/veiculos/{{veiculoId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/veiculos/{{veiculoId}}"
+          }
         },
         {
           "name": "Atualizar veículo",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla XEi\",\n  \"anoFabricacao\": 2022,\n  \"categoria\": \"SEDAN\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla XEi\",\n  \"anoFabricacao\": 2022,\n  \"categoria\": \"SEDAN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/veiculos/{{veiculoId}}"
           }
         },
         {
           "name": "Inativar veículo (ADMIN)",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/veiculos/{{veiculoId}}" }
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/veiculos/{{veiculoId}}"
+          }
         }
       ]
     },
@@ -181,34 +349,79 @@
       "item": [
         {
           "name": "Listar serviços",
-          "request": { "method": "GET", "url": "{{baseUrl}}/servicos" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/servicos"
+          }
         },
         {
           "name": "Cadastrar serviço (ADMIN)",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.environment.set('servicoId', pm.response.json().id);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.environment.set('servicoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Revisão Postman\",\n  \"descricao\": \"Serviço de teste da coleção\",\n  \"categoria\": \"MANUTENCAO\",\n  \"valorBase\": 250.00,\n  \"duracaoEstimadaMinutos\": 120\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Revisão Postman\",\n  \"descricao\": \"Serviço de teste da coleção\",\n  \"categoria\": \"MANUTENCAO\",\n  \"valorBase\": 250.00,\n  \"duracaoEstimadaMinutos\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/servicos"
           }
         },
         {
           "name": "Buscar serviço",
-          "request": { "method": "GET", "url": "{{baseUrl}}/servicos/{{servicoId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/servicos/{{servicoId}}"
+          }
         },
         {
           "name": "Atualizar serviço (ADMIN)",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Revisão Postman Atualizada\",\n  \"descricao\": \"Serviço atualizado pelo Postman\",\n  \"categoria\": \"MANUTENCAO\",\n  \"valorBase\": 275.00,\n  \"duracaoEstimadaMinutos\": 135\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Revisão Postman Atualizada\",\n  \"descricao\": \"Serviço atualizado pelo Postman\",\n  \"categoria\": \"MANUTENCAO\",\n  \"valorBase\": 275.00,\n  \"duracaoEstimadaMinutos\": 135\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/servicos/{{servicoId}}"
           }
         },
         {
           "name": "Inativar serviço (ADMIN)",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/servicos/{{servicoId}}", "description": "Execute por último se o serviço ainda for necessário para montar uma OS."
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/servicos/{{servicoId}}",
+            "description": "Execute por último se o serviço ainda for necessário para montar uma OS."
           }
         }
       ]
@@ -218,28 +431,70 @@
       "item": [
         {
           "name": "Listar itens",
-          "request": { "method": "GET", "url": "{{baseUrl}}/estoque/itens" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/estoque/itens"
+          }
         },
         {
           "name": "Cadastrar peça",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) pm.environment.set('itemEstoqueId', pm.response.json().id);"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.environment.set('itemEstoqueId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"POSTMAN-FILTRO-01\",\n  \"descricao\": \"Filtro de óleo de teste\",\n  \"tipo\": \"PECA\",\n  \"unidadeMedida\": \"UN\",\n  \"precoUnitario\": 45.00,\n  \"quantidadeInicial\": 20.000,\n  \"estoqueMinimo\": 2.000\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"POSTMAN-FILTRO-01\",\n  \"descricao\": \"Filtro de óleo de teste\",\n  \"tipo\": \"PECA\",\n  \"unidadeMedida\": \"UN\",\n  \"precoUnitario\": 45.00,\n  \"quantidadeInicial\": 20.000,\n  \"estoqueMinimo\": 2.000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/estoque/itens"
           }
         },
         {
           "name": "Consultar item",
-          "request": { "method": "GET", "url": "{{baseUrl}}/estoque/itens/{{itemEstoqueId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/estoque/itens/{{itemEstoqueId}}"
+          }
         },
         {
           "name": "Registrar entrada",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"quantidade\": 5.000,\n  \"observacao\": \"Reposição de teste via Postman\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantidade\": 5.000,\n  \"observacao\": \"Reposição de teste via Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/estoque/itens/{{itemEstoqueId}}/entradas"
           }
         }
@@ -251,36 +506,85 @@
       "item": [
         {
           "name": "Abrir OS",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 201) { const r = pm.response.json(); pm.environment.set('ordemServicoId', r.ordemServico.id); pm.environment.set('codigoAcompanhamento', r.codigoAcompanhamento); }"] } }],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const r = pm.response.json(); pm.environment.set('ordemServicoId', r.ordemServico.id); pm.environment.set('codigoAcompanhamento', r.codigoAcompanhamento); }"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"veiculoId\": \"{{veiculoId}}\",\n  \"descricaoInicial\": \"Ruído ao frear; verificar sistema de freios.\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"veiculoId\": \"{{veiculoId}}\",\n  \"descricaoInicial\": \"Ruído ao frear; verificar sistema de freios.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico"
           }
         },
         {
           "name": "Listar OS",
-          "request": { "method": "GET", "url": "{{baseUrl}}/ordens-servico?pagina=0&tamanho=20" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ordens-servico?pagina=0&tamanho=20"
+          }
         },
         {
           "name": "Detalhar OS atual",
-          "request": { "method": "GET", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}"
+          }
         },
         {
           "name": "Cancelar OS atual (ramo alternativo)",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}", "description": "Execute em uma OS ainda não iniciada para testar cancelamento. Após cancelar, não continue o fluxo principal desta OS." }
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}",
+            "description": "Execute em uma OS ainda não iniciada para testar cancelamento. Após cancelar, não continue o fluxo principal desta OS."
+          }
         },
         {
           "name": "Iniciar diagnóstico",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/diagnostico/iniciar" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/diagnostico/iniciar"
+          }
         },
         {
           "name": "Registrar diagnóstico",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"texto\": \"Pastilhas dianteiras desgastadas; recomenda-se substituição.\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Pastilhas dianteiras desgastadas; recomenda-se substituição.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/diagnostico"
           }
         },
@@ -288,8 +592,21 @@
           "name": "Adicionar serviço à OS",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"servicoId\": \"{{servicoId}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"servicoId\": \"{{servicoId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/servicos"
           }
         },
@@ -297,56 +614,130 @@
           "name": "Adicionar material à OS",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"itemEstoqueId\": \"{{itemEstoqueId}}\",\n  \"quantidade\": 1.000\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemEstoqueId\": \"{{itemEstoqueId}}\",\n  \"quantidade\": 1.000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/materiais"
           }
         },
         {
           "name": "Gerar orçamento",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos"
+          }
         },
         {
           "name": "Disponibilizar orçamento",
-          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["if (pm.response.code === 200) pm.environment.set('versaoOrcamento', String(pm.response.json().versao));"] } }],
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/disponibilizar" }
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) pm.environment.set('versaoOrcamento', String(pm.response.json().versao));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/disponibilizar"
+          }
         },
         {
           "name": "Acompanhar OS (cliente, público)",
-          "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}" }
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}"
+          }
         },
         {
           "name": "Aprovar orçamento (cliente, público)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}/orcamento/aprovar"
           }
         },
         {
           "name": "Rejeitar orçamento (alternativa pública)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}/orcamento/rejeitar",
             "description": "Use como alternativa à aprovação. A rejeição retorna a OS ao diagnóstico; não execute depois de aprovar a mesma versão."
           }
         },
         {
           "name": "Iniciar execução",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/execucao/iniciar" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/execucao/iniciar"
+          }
         },
         {
           "name": "Finalizar OS",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/finalizar" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/finalizar"
+          }
         },
         {
           "name": "Registrar entrega",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/entrega" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/entrega"
+          }
         }
       ]
     },
@@ -356,33 +747,66 @@
       "item": [
         {
           "name": "Consultar OS de demonstração",
-          "request": { "method": "GET", "url": "{{baseUrl}}/ordens-servico/{{ordemRecebidaDemoId}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemRecebidaDemoId}}"
+          }
         },
         {
           "name": "Avançar OS RECEBIDA para diagnóstico",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemRecebidaDemoId}}/diagnostico/iniciar" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemRecebidaDemoId}}/diagnostico/iniciar"
+          }
         },
         {
           "name": "Consultar OS aguardando aprovação (público)",
-          "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAprovacaoDemo}}" }
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAprovacaoDemo}}"
+          }
         },
         {
           "name": "Aprovar orçamento da OS DEMO (público)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"versao\": 1\n}", "options": { "raw": { "language": "json" } } },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAprovacaoDemo}}/orcamento/aprovar"
           }
         },
         {
           "name": "Finalizar OS DEMO em execução",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemExecucaoDemoId}}/finalizar" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemExecucaoDemoId}}/finalizar"
+          }
         },
         {
           "name": "Entregar OS DEMO finalizada",
-          "request": { "method": "POST", "url": "{{baseUrl}}/ordens-servico/{{ordemFinalizadaDemoId}}/entrega" }
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemFinalizadaDemoId}}/entrega"
+          }
         }
       ]
     },
@@ -391,7 +815,10 @@
       "item": [
         {
           "name": "Tempo médio por serviço",
-          "request": { "method": "GET", "url": "{{baseUrl}}/indicadores/tempo-medio-servicos?inicio={{inicio}}&fim={{fim}}" }
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/indicadores/tempo-medio-servicos?inicio={{inicio}}&fim={{fim}}"
+          }
         }
       ]
     }

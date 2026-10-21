@@ -3,8 +3,9 @@ package br.com.fiap.oficina_digital.cliente.infraestrutura.persistencia;
 import br.com.fiap.oficina_digital.cliente.dominio.*;
 
 public class MapeadorCliente {
-    private MapeadorCliente() {}
-    
+    private MapeadorCliente() {
+    }
+
     static Cliente paraDominio(ClienteJpa entidade) {
         return Cliente.reconstituir(entidade.id, new Documento(entidade.documento),
                 entidade.nome, entidade.email, entidade.telefone, entidade.endereco,

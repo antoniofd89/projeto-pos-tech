@@ -23,5 +23,6 @@ public class ControladorAutenticacao {
         return servico.autenticar(requisicao.email(), requisicao.senha());
     }
 
-    public record LoginRequisicao(@NotBlank @Email String email, @NotBlank String senha) {}
+    public record LoginRequisicao(@NotBlank @Email String email, @NotBlank String senha) {
+    }
 }

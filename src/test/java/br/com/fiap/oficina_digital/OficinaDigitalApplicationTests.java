@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 class OficinaDigitalApplicationTests {
     @Test
     void contextoDaAplicacaoInicia() {
-        // Reativar quando o teste de integração executar migrations PostgreSQL em banco isolado.
+        // Reativar quando o teste de integração executar migrations PostgreSQL em banco
+        // isolado.
     }
 }

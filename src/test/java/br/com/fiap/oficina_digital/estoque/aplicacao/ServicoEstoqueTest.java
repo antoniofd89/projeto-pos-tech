@@ -41,13 +41,15 @@ class ServicoEstoqueTest {
         assertEquals(bd("12.35"), resposta.precoUnitario());
         assertEquals(bd("4.000"), resposta.quantidadeDisponivel());
         verify(itens).save(any(ItemEstoqueJpa.class));
-        verify(movimentacoes).save(argThat(m -> m.tipo == TipoMovimentacao.ENTRADA && m.quantidade.equals(bd("4.000"))));
+        verify(movimentacoes)
+                .save(argThat(m -> m.tipo == TipoMovimentacao.ENTRADA && m.quantidade.equals(bd("4.000"))));
     }
 
     @Test
     void validaCadastroEDetectaDuplicidade() {
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(null));
-        assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(new ServicoEstoque.DadosItem("X", "Y", null, "un", bd("1"), bd("0"), bd("0"))));
+        assertThrows(IllegalArgumentException.class,
+                () -> servico.cadastrar(new ServicoEstoque.DadosItem("X", "Y", null, "un", bd("1"), bd("0"), bd("0"))));
         when(itens.findByCodigo("X")).thenReturn(Optional.of(item("X", "1", "0")));
         assertThrows(IllegalStateException.class, () -> servico.cadastrar(dados("X", "0")));
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(dados("Y", "-1")));
@@ -59,7 +61,8 @@ class ServicoEstoqueTest {
         when(itens.buscarParaMovimentar(item.id)).thenReturn(Optional.of(item));
         var resposta = servico.registrarEntrada(item.id, bd("2.5"), "Reposição");
         assertEquals(bd("5.500"), resposta.quantidadeFisica());
-        verify(movimentacoes).save(argThat(m -> m.tipo == TipoMovimentacao.ENTRADA && "Reposição".equals(m.observacao)));
+        verify(movimentacoes)
+                .save(argThat(m -> m.tipo == TipoMovimentacao.ENTRADA && "Reposição".equals(m.observacao)));
         assertThrows(IllegalArgumentException.class, () -> servico.registrarEntrada(item.id, bd("0"), null));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.buscar(UUID.randomUUID()));
     }
@@ -70,9 +73,11 @@ class ServicoEstoqueTest {
         var item = item("PASTILHA", "10", "0");
         when(movimentacoes.existsByOrdemServicoIdAndTipo(any(), any())).thenReturn(false);
         when(itens.buscarParaMovimentar(item.id)).thenReturn(Optional.of(item));
-        servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("2")), new ServicoEstoque.Material(item.id, bd("1"))));
+        servico.reservar(os,
+                List.of(new ServicoEstoque.Material(item.id, bd("2")), new ServicoEstoque.Material(item.id, bd("1"))));
         assertEquals(bd("3.000"), item.quantidadeReservada);
-        verify(movimentacoes).save(argThat(m -> m.tipo == TipoMovimentacao.RESERVA && m.quantidade.equals(bd("3.000"))));
+        verify(movimentacoes)
+                .save(argThat(m -> m.tipo == TipoMovimentacao.RESERVA && m.quantidade.equals(bd("3.000"))));
 
         var reserva = new MovimentacaoEstoqueJpa();
         reserva.itemEstoqueId = item.id;
@@ -90,15 +95,18 @@ class ServicoEstoqueTest {
         var item = item("CORREIA", "2", "0");
         when(movimentacoes.existsByOrdemServicoIdAndTipo(any(), any())).thenReturn(false);
         when(itens.buscarParaMovimentar(item.id)).thenReturn(Optional.of(item));
-        assertThrows(IllegalStateException.class, () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("3")))));
-        assertThrows(IllegalArgumentException.class, () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("0")))));
+        assertThrows(IllegalStateException.class,
+                () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("3")))));
+        assertThrows(IllegalArgumentException.class,
+                () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("0")))));
 
         item.quantidadeReservada = bd("1");
         var reserva = new MovimentacaoEstoqueJpa();
         reserva.itemEstoqueId = item.id;
         reserva.quantidade = bd("1");
         when(movimentacoes.findAllByOrdemServicoIdAndTipo(os, TipoMovimentacao.RESERVA)).thenReturn(List.of(reserva));
-        when(movimentacoes.existsByOrdemServicoIdAndItemEstoqueIdAndTipo(os, item.id, TipoMovimentacao.ESTORNO)).thenReturn(false, true);
+        when(movimentacoes.existsByOrdemServicoIdAndItemEstoqueIdAndTipo(os, item.id, TipoMovimentacao.ESTORNO))
+                .thenReturn(false, true);
         servico.estornar(os);
         servico.estornar(os);
         assertEquals(0, item.quantidadeReservada.compareTo(bd("0.000")));
@@ -124,5 +132,7 @@ class ServicoEstoqueTest {
         return item;
     }
 
-    private static BigDecimal bd(String valor) { return new BigDecimal(valor); }
+    private static BigDecimal bd(String valor) {
+        return new BigDecimal(valor);
+    }
 }

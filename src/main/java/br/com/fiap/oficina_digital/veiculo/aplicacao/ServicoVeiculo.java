@@ -24,10 +24,13 @@ public class ServicoVeiculo {
     @Transactional
     public Veiculo cadastrar(UUID clienteId, DadosVeiculo dados) {
         validar(dados);
-        clientes.buscarPorId(clienteId).orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
+        clientes.buscarPorId(clienteId)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
         String placa = new Placa(dados.placa()).valor();
-        if (veiculos.findByPlaca(placa).isPresent()) throw new IllegalStateException("Já existe veículo com esta placa.");
-        return salvar(Veiculo.criar(clienteId, placa, dados.marca(), dados.modelo(), dados.anoFabricacao(), dados.categoria()));
+        if (veiculos.findByPlaca(placa).isPresent())
+            throw new IllegalStateException("Já existe veículo com esta placa.");
+        return salvar(Veiculo.criar(clienteId, placa, dados.marca(), dados.modelo(), dados.anoFabricacao(),
+                dados.categoria()));
     }
 
     @Transactional(readOnly = true)
@@ -38,20 +41,24 @@ public class ServicoVeiculo {
 
     @Transactional(readOnly = true)
     public List<Veiculo> listar(UUID clienteId) {
-        clientes.buscarPorId(clienteId).orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
+        clientes.buscarPorId(clienteId)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
         return veiculos.findAllByClienteIdOrderByModelo(clienteId).stream().map(ServicoVeiculo::dominio).toList();
     }
 
     @Transactional
     public Veiculo atualizar(UUID id, DadosVeiculo dados) {
         validar(dados);
-        var entidade = veiculos.findById(id).orElseThrow(() -> new java.util.NoSuchElementException("Veículo não encontrado."));
-        return salvar(dominio(entidade).atualizar(dados.marca(), dados.modelo(), dados.anoFabricacao(), dados.categoria()));
+        var entidade = veiculos.findById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Veículo não encontrado."));
+        return salvar(
+                dominio(entidade).atualizar(dados.marca(), dados.modelo(), dados.anoFabricacao(), dados.categoria()));
     }
 
     @Transactional
     public void inativar(UUID id) {
-        var entidade = veiculos.findById(id).orElseThrow(() -> new java.util.NoSuchElementException("Veículo não encontrado."));
+        var entidade = veiculos.findById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Veículo não encontrado."));
         var veiculo = dominio(entidade).inativar();
         preencher(entidade, veiculo);
         veiculos.save(entidade);
@@ -64,13 +71,20 @@ public class ServicoVeiculo {
     }
 
     private static void validar(DadosVeiculo dados) {
-        if (dados == null) throw new IllegalArgumentException("Dados do veículo são obrigatórios.");
+        if (dados == null)
+            throw new IllegalArgumentException("Dados do veículo são obrigatórios.");
     }
 
     private static void preencher(VeiculoJpa e, Veiculo v) {
-        e.id = v.id(); e.clienteId = v.clienteId(); e.placa = v.placa().valor();
-        e.marca = v.marca(); e.modelo = v.modelo(); e.anoFabricacao = v.anoFabricacao();
-        e.categoria = v.categoria(); e.ativo = v.ativo(); e.dataCadastro = v.dataCadastro();
+        e.id = v.id();
+        e.clienteId = v.clienteId();
+        e.placa = v.placa().valor();
+        e.marca = v.marca();
+        e.modelo = v.modelo();
+        e.anoFabricacao = v.anoFabricacao();
+        e.categoria = v.categoria();
+        e.ativo = v.ativo();
+        e.dataCadastro = v.dataCadastro();
     }
 
     public static Veiculo dominio(VeiculoJpa e) {
@@ -78,5 +92,6 @@ public class ServicoVeiculo {
                 e.anoFabricacao, e.categoria, e.ativo, e.dataCadastro);
     }
 
-    public record DadosVeiculo(String placa, String marca, String modelo, int anoFabricacao, String categoria) {}
+    public record DadosVeiculo(String placa, String marca, String modelo, int anoFabricacao, String categoria) {
+    }
 }

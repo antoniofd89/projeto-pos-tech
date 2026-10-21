@@ -60,7 +60,8 @@ public class ServicoCliente {
     }
 
     private LocalDate nascimentoDe(String nascimento) {
-        if (nascimento == null || nascimento.isBlank()) return null;
+        if (nascimento == null || nascimento.isBlank())
+            return null;
         try {
             return LocalDate.parse(nascimento);
         } catch (DateTimeParseException e) {
