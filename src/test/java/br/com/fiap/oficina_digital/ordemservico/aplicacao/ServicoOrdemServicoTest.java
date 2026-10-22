@@ -74,6 +74,10 @@ class ServicoOrdemServicoTest {
         assertNotNull(resposta.codigoAcompanhamento());
         assertTrue(resposta.codigoAcompanhamento().length() >= 40);
         assertEquals("SISTEMA", resposta.ordemServico().historicoStatus().getFirst().ator());
+        assertNotNull(resposta.ordemServico().criadoEm());
+        assertNotNull(resposta.ordemServico().atualizadoEm());
+        assertNull(resposta.ordemServico().validadeAte());
+        assertNull(resposta.ordemServico().prazoServico());
         verify(ordens).save(any(OrdemServicoJpa.class));
     }
 
@@ -102,18 +106,33 @@ class ServicoOrdemServicoTest {
         when(catalogo.buscarAtivo(servicoId)).thenReturn(
                 new ServicoCatalogo(servicoId, "Revisão", "Revisão geral", "MECANICA", bd("100"), 120, true));
         servico.adicionarServico(os.id, servicoId);
+        os.validadeAte = null;
+        os.prazoServico = null;
         var orcamento = servico.gerarOrcamento(os.id);
         assertEquals(bd("100.00"), orcamento.valorTotal());
-        servico.disponibilizarOrcamento(os.id);
+        assertNull(os.validadeAte);
+        assertNull(os.prazoServico);
+        var disponibilizado = servico.disponibilizarOrcamento(os.id);
+        assertNotNull(os.atualizadoEm);
+        assertEquals(os.atualizadoEm, disponibilizado.atualizadoEm());
+        assertEquals(os.atualizadoEm.plus(java.time.Duration.ofDays(7)), os.validadeAte);
+        assertEquals(os.atualizadoEm.plus(java.time.Duration.ofMinutes(120)), os.prazoServico);
+        Instant validadeEnviada = os.validadeAte;
+        Instant prazoEnviado = os.prazoServico;
 
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id, orcamento.versao());
+        servico.aprovarOrcamento(os.id);
+        Instant atualizadoOrcamentoAposAprovacao = os.orcamento.atualizadoEm;
         servico.iniciarExecucao(os.id);
         servico.finalizar(os.id);
         var entregue = servico.entregar(os.id);
         assertEquals(StatusOrdemServico.ENTREGUE, entregue.status());
         assertEquals(5, entregue.historicoStatus().size());
+        assertEquals(atualizadoOrcamentoAposAprovacao, os.orcamento.atualizadoEm);
+        assertEquals(os.atualizadoEm, entregue.atualizadoEm());
+        assertEquals(validadeEnviada, entregue.validadeAte());
+        assertEquals(prazoEnviado, entregue.prazoServico());
     }
 
     @Test
@@ -133,7 +152,7 @@ class ServicoOrdemServicoTest {
         servico.disponibilizarOrcamento(os.id);
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id, orcamento.versao());
+        servico.aprovarOrcamento(os.id);
         verify(estoque).reservar(eq(os.id),
                 argThat(m -> m.size() == 1 && m.getFirst().quantidade().equals(bd("2.000"))));
         servico.iniciarExecucao(os.id);
@@ -146,10 +165,10 @@ class ServicoOrdemServicoTest {
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
         prepararBusca(os);
         assertThrows(org.springframework.security.access.AccessDeniedException.class,
-                () -> servico.aprovarOrcamento(os.id, 1));
+                () -> servico.aprovarOrcamento(os.id));
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token", 1).status());
-        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token", 2));
+        assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token").status());
+        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token"));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.acompanhar("invalido"));
     }
 
@@ -157,12 +176,26 @@ class ServicoOrdemServicoTest {
     void rejeitaOrcamentoEstornaEVoltaAoDiagnostico() {
         var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
+        Instant validadeOriginal = os.validadeAte;
+        Instant prazoOriginal = os.prazoServico;
         prepararBusca(os);
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        var resultado = servico.rejeitarPorCodigo("token", 1);
+        var resultado = servico.rejeitarPorCodigo("token");
         assertEquals(StatusOrdemServico.EM_DIAGNOSTICO, resultado.status());
-        assertEquals(StatusOrcamento.REJEITADO, os.orcamentos.getFirst().status);
+        assertEquals(StatusOrcamento.REJEITADO, os.orcamento.status);
+        assertEquals(validadeOriginal, os.validadeAte);
+        assertEquals(prazoOriginal, resultado.prazoServico());
         verify(estoque).estornar(os.id);
+    }
+
+    @Test
+    void recusaAprovacaoDeOrcamentoVencido() {
+        var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
+        adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
+        os.validadeAte = Instant.now().minusSeconds(1);
+        prepararBusca(os);
+        when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
+        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token"));
     }
 
     @Test
@@ -198,7 +231,10 @@ class ServicoOrdemServicoTest {
         os.veiculoId = UUID.randomUUID();
         os.descricaoInicial = "Ruído";
         os.status = status;
-        os.atualizadoEm = Instant.now();
+        os.criadoEm = Instant.now();
+        os.atualizadoEm = os.criadoEm;
+        os.validadeAte = os.criadoEm.plus(java.time.Duration.ofDays(7));
+        os.prazoServico = os.criadoEm.plus(java.time.Duration.ofDays(15));
         os.ativa = true;
         return os;
     }
@@ -212,13 +248,13 @@ class ServicoOrdemServicoTest {
         var o = new OrcamentoJpa();
         o.id = UUID.randomUUID();
         o.ordemServico = os;
-        o.versaoOrcamento = 1;
         o.valorServicos = bd("0.00");
         o.valorMateriais = bd("0.00");
         o.valorTotal = bd("0.00");
         o.status = status;
         o.geradoEm = Instant.now();
-        os.orcamentos.add(o);
+        o.atualizadoEm = Instant.now();
+        os.orcamento = o;
     }
 
     private static BigDecimal bd(String n) {

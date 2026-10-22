@@ -3,6 +3,7 @@ package br.com.fiap.oficina_digital.ordemservico.aplicacao;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class ServicoOrdemServico {
     private static final SecureRandom ALEATORIO = new SecureRandom();
     private static final BigDecimal ZERO = new BigDecimal("0.00");
+    private static final Duration PRAZO_VALIDADE_ORCAMENTO = Duration.ofDays(7);
     private final RepositorioOrdemServicoJpa ordens;
     private final RepositorioCliente clientes;
     private final RepositorioVeiculoJpa veiculos;
@@ -70,8 +72,11 @@ public class ServicoOrdemServico {
         os.descricaoInicial = dados.descricaoInicial().trim();
         os.status = StatusOrdemServico.RECEBIDA;
         os.ativa = true;
+        Instant agora = Instant.now();
+        os.criadoEm = agora;
+        os.atualizadoEm = agora;
         registrarHistorico(os, StatusOrdemServico.RECEBIDA);
-        salvar(os);
+        ordens.save(os);
         return new CriacaoResposta(detalhe(os), os.codigoAcompanhamento);
     }
 
@@ -154,24 +159,22 @@ public class ServicoOrdemServico {
         exigir(os, StatusOrdemServico.EM_DIAGNOSTICO);
         if (os.servicos.isEmpty() && os.materiais.isEmpty())
             throw new IllegalStateException("Inclua ao menos um serviço ou material antes de gerar o orçamento.");
-        os.orcamentos.stream()
-                .filter(o -> o.status == StatusOrcamento.DISPONIBILIZADO || o.status == StatusOrcamento.GERADO)
-                .forEach(o -> o.status = StatusOrcamento.SUBSTITUIDO);
         BigDecimal valorServicos = os.servicos.stream().map(i -> i.valorUnitario).reduce(ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
         BigDecimal valorMateriais = os.materiais.stream().map(i -> i.valorUnitario.multiply(i.quantidade))
                 .reduce(ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
-        int versao = os.orcamentos.stream().mapToInt(o -> o.versaoOrcamento).max().orElse(0) + 1;
-        var o = new OrcamentoJpa();
-        o.id = UUID.randomUUID();
-        o.ordemServico = os;
-        o.versaoOrcamento = versao;
+        var o = os.orcamento == null ? new OrcamentoJpa() : os.orcamento;
+        if (os.orcamento == null) {
+            o.id = UUID.randomUUID();
+            o.ordemServico = os;
+            o.geradoEm = Instant.now();
+            os.orcamento = o;
+        }
         o.valorServicos = valorServicos;
         o.valorMateriais = valorMateriais;
         o.valorTotal = valorServicos.add(valorMateriais);
         o.status = StatusOrcamento.GERADO;
-        o.geradoEm = Instant.now();
-        os.orcamentos.add(o);
+        registrarAtualizacaoOrcamento(o, Instant.now());
         salvar(os);
         return orcamento(o);
     }
@@ -184,46 +187,50 @@ public class ServicoOrdemServico {
         if (o.status != StatusOrcamento.GERADO)
             throw new IllegalStateException("O orçamento atual não está pronto para disponibilização.");
         o.status = StatusOrcamento.DISPONIBILIZADO;
-        o.disponibilizadoEm = Instant.now();
         transicionar(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
-        salvar(os);
+        Instant agora = Instant.now();
+        registrarPrazosNoEnvio(os, agora);
+        os.atualizadoEm = agora;
+        registrarAtualizacaoOrcamento(o, agora);
+        ordens.save(os);
         return orcamento(o);
     }
 
     @Transactional
-    public DetalheOrdem aprovarOrcamento(UUID id, int versao) {
+    public DetalheOrdem aprovarOrcamento(UUID id) {
         if (SecurityContextHolder.getContext().getAuthentication() == null
                 || SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                         .noneMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()))) {
             throw new org.springframework.security.access.AccessDeniedException(
                     "A aprovação de orçamento é exclusiva do cliente pelo código de acompanhamento.");
         }
-        return aprovarOrcamentoValidado(id, versao);
+        return aprovarOrcamentoValidado(id);
     }
 
-    private DetalheOrdem aprovarOrcamentoValidado(UUID id, int versao) {
+    private DetalheOrdem aprovarOrcamentoValidado(UUID id) {
         var os = bloquear(id);
         exigir(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
         var o = orcamentoAtual(os);
-        if (o.versaoOrcamento != versao || o.status != StatusOrcamento.DISPONIBILIZADO)
-            throw new IllegalStateException("Somente a versão vigente do orçamento pode ser aprovada.");
+        if (o.status != StatusOrcamento.DISPONIBILIZADO)
+            throw new IllegalStateException("Somente o orçamento vigente pode ser aprovado.");
+        exigirOrcamentoVigente(os);
         if (!os.materiais.isEmpty())
             estoque.reservar(os.id, os.materiais.stream()
                     .map(i -> new ServicoEstoque.Material(i.itemEstoqueId, i.quantidade)).toList());
         o.status = StatusOrcamento.APROVADO;
-        o.decididoEm = Instant.now();
+        registrarAtualizacaoOrcamento(o, Instant.now());
         return detalhe(salvar(os));
     }
 
     @Transactional
-    public DetalheOrdem rejeitarOrcamento(UUID id, int versao) {
+    public DetalheOrdem rejeitarOrcamento(UUID id) {
         var os = bloquear(id);
         exigir(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
         var o = orcamentoAtual(os);
-        if (o.versaoOrcamento != versao || o.status != StatusOrcamento.DISPONIBILIZADO)
-            throw new IllegalStateException("Somente a versão vigente do orçamento pode ser rejeitada.");
+        if (o.status != StatusOrcamento.DISPONIBILIZADO)
+            throw new IllegalStateException("Somente o orçamento vigente pode ser rejeitado.");
         o.status = StatusOrcamento.REJEITADO;
-        o.decididoEm = Instant.now();
+        registrarAtualizacaoOrcamento(o, Instant.now());
         estoque.estornar(os.id);
         transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
         return detalhe(salvar(os));
@@ -269,17 +276,17 @@ public class ServicoOrdemServico {
     }
 
     @Transactional
-    public DetalheOrdem aprovarPorCodigo(String codigo, int versao) {
+    public DetalheOrdem aprovarPorCodigo(String codigo) {
         var os = ordens.findByCodigoAcompanhamento(codigo)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Código de acompanhamento inválido."));
-        return aprovarOrcamentoValidado(os.id, versao);
+        return aprovarOrcamentoValidado(os.id);
     }
 
     @Transactional
-    public DetalheOrdem rejeitarPorCodigo(String codigo, int versao) {
+    public DetalheOrdem rejeitarPorCodigo(String codigo) {
         var os = ordens.findByCodigoAcompanhamento(codigo)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Código de acompanhamento inválido."));
-        return rejeitarOrcamento(os.id, versao);
+        return rejeitarOrcamento(os.id);
     }
 
     private OrdemServicoJpa obter(UUID id) {
@@ -292,11 +299,17 @@ public class ServicoOrdemServico {
         return ordens.save(os);
     }
 
+    private static void registrarAtualizacaoOrcamento(OrcamentoJpa orcamento, Instant quando) {
+        orcamento.atualizadoEm = quando;
+    }
+
     private OrdemServicoJpa bloquear(UUID id) {
         return ordens.buscarParaAtualizacao(id).map(os -> {
             os.servicos.size();
             os.materiais.size();
-            os.orcamentos.size();
+            if (os.orcamento != null) {
+                os.orcamento.status.name();
+            }
             os.historicoStatus.size();
             return os;
         }).orElseThrow(() -> new java.util.NoSuchElementException("Ordem de serviço não encontrada."));
@@ -320,8 +333,20 @@ public class ServicoOrdemServico {
     }
 
     private static OrcamentoJpa orcamentoAtual(OrdemServicoJpa os) {
-        return os.orcamentos.stream().max(Comparator.comparingInt(o -> o.versaoOrcamento))
-                .orElseThrow(() -> new IllegalStateException("A OS não possui orçamento."));
+        if (os.orcamento == null)
+            throw new IllegalStateException("A OS não possui orçamento.");
+        return os.orcamento;
+    }
+
+    private static void exigirOrcamentoVigente(OrdemServicoJpa os) {
+        if (os.validadeAte != null && Instant.now().isAfter(os.validadeAte))
+            throw new IllegalStateException("O orçamento está vencido. Gere e disponibilize um novo orçamento.");
+    }
+
+    private static void registrarPrazosNoEnvio(OrdemServicoJpa os, Instant envio) {
+        os.validadeAte = envio.plus(PRAZO_VALIDADE_ORCAMENTO);
+        int minutos = os.servicos.stream().mapToInt(item -> item.duracaoMinutos).sum();
+        os.prazoServico = minutos > 0 ? envio.plus(Duration.ofMinutes(minutos)) : null;
     }
 
     private static String codigoSeguro() {
@@ -331,8 +356,8 @@ public class ServicoOrdemServico {
     }
 
     private static OrcamentoResposta orcamento(OrcamentoJpa o) {
-        return new OrcamentoResposta(o.versaoOrcamento, o.valorServicos, o.valorMateriais, o.valorTotal, o.status,
-                o.geradoEm, o.disponibilizadoEm, o.decididoEm);
+        return new OrcamentoResposta(o.valorServicos, o.valorMateriais, o.valorTotal, o.status, o.geradoEm,
+                o.atualizadoEm);
     }
 
     private static DetalheOrdem detalhe(OrdemServicoJpa o) {
@@ -341,12 +366,11 @@ public class ServicoOrdemServico {
         var m = o.materiais.stream().map(
                 i -> new ItemMaterial(i.itemEstoqueId, i.descricao, i.quantidade, i.unidadeMedida, i.valorUnitario))
                 .toList();
-        var b = o.orcamentos.stream().sorted(Comparator.comparingInt(x -> x.versaoOrcamento))
-                .map(ServicoOrdemServico::orcamento).toList();
         var h = o.historicoStatus.stream().sorted(Comparator.comparing(x -> x.ocorridoEm))
                 .map(x -> new HistoricoStatus(x.status, x.ocorridoEm, x.ator)).toList();
         return new DetalheOrdem(o.id, o.numero, o.clienteId, o.veiculoId, o.descricaoInicial, o.diagnostico, o.status,
-                o.atualizadoEm, s, m, b, h);
+                o.criadoEm, o.atualizadoEm, o.validadeAte, o.prazoServico, s, m,
+                o.orcamento == null ? null : orcamento(o.orcamento), h);
     }
 
     public record DadosAbertura(UUID clienteId, UUID veiculoId, String descricaoInicial) {
@@ -356,9 +380,9 @@ public class ServicoOrdemServico {
     }
 
     public record DetalheOrdem(UUID id, String numero, UUID clienteId, UUID veiculoId, String descricaoInicial,
-            String diagnostico, StatusOrdemServico status, Instant atualizadoEm,
-            List<ItemServico> servicos, List<ItemMaterial> materiais,
-            List<OrcamentoResposta> orcamentos, List<HistoricoStatus> historicoStatus) {
+            String diagnostico, StatusOrdemServico status, Instant criadoEm, Instant atualizadoEm,
+            Instant validadeAte, Instant prazoServico, List<ItemServico> servicos, List<ItemMaterial> materiais,
+            OrcamentoResposta orcamento, List<HistoricoStatus> historicoStatus) {
     }
 
     public record HistoricoStatus(StatusOrdemServico status, Instant atualizadoEm, String ator) {
@@ -371,8 +395,7 @@ public class ServicoOrdemServico {
             BigDecimal valorUnitario) {
     }
 
-    public record OrcamentoResposta(int versao, BigDecimal valorServicos, BigDecimal valorMateriais,
-            BigDecimal valorTotal, StatusOrcamento status, Instant geradoEm, Instant disponibilizadoEm,
-            Instant decididoEm) {
+    public record OrcamentoResposta(BigDecimal valorServicos, BigDecimal valorMateriais, BigDecimal valorTotal,
+            StatusOrcamento status, Instant geradoEm, Instant atualizadoEm) {
     }
 }

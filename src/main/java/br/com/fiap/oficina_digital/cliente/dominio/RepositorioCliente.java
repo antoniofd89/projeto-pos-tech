@@ -11,5 +11,5 @@ public interface RepositorioCliente {
 
     Optional<Cliente> buscarPorDocumento(Documento documento);
 
-    List<Cliente> listar(int pagina, int tamanho);
+    List<Cliente> listar();
 }

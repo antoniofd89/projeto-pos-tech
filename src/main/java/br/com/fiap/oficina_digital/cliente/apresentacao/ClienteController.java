@@ -41,23 +41,10 @@ public class ClienteController {
         return ResponseEntity.created(URI.create("/clientes/" + cliente.id())).body(cliente);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public ClienteResposta buscarPorId(@PathVariable UUID id) {
-        return ClienteResposta.de(servicoCliente.buscarPorId(id));
-    }
-
-    @GetMapping("/por-documento")
-    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public ClienteResposta buscarPorDocumento(@RequestParam String documento) {
-        return ClienteResposta.de(servicoCliente.buscarPorDocumento(documento));
-    }
-
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public List<ClienteResposta> listar(@RequestParam(defaultValue = "0") int pagina,
-            @RequestParam(defaultValue = "20") int tamanho) {
-        return servicoCliente.listar(pagina, tamanho).stream().map(ClienteResposta::de).toList();
+    public List<ClienteResposta> buscarClientes(@RequestParam(required = false) String documento) {
+        return servicoCliente.listar(documento).stream().map(ClienteResposta::de).toList();
     }
 
     @PutMapping("/{id}")
@@ -69,6 +56,7 @@ public class ClienteController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    //Incluir motivo para inativação do cliente para auditoria futura
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {
         servicoCliente.inativar(id);
         return ResponseEntity.noContent().build();

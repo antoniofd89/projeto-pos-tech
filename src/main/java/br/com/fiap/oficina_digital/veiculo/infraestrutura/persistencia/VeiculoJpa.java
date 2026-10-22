@@ -7,17 +7,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
-import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "veiculos")
-@SQLRestriction("ativo = true")
 public class VeiculoJpa {
     @Id
     public UUID id;
-    @Version
-    public Long versao;
     @Column(name = "cliente_id", nullable = false)
     public UUID clienteId;
     @Column(nullable = false, unique = true, length = 7)

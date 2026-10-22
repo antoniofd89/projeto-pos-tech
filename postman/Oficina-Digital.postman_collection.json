@@ -57,11 +57,6 @@
       "type": "string"
     },
     {
-      "key": "versaoOrcamento",
-      "value": "1",
-      "type": "string"
-    },
-    {
       "key": "ordemRecebidaDemoId",
       "value": "50000000-0000-4000-8000-000000000001",
       "type": "string"
@@ -641,17 +636,6 @@
         },
         {
           "name": "Disponibilizar orçamento",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 200) pm.environment.set('versaoOrcamento', String(pm.response.json().versao));"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/disponibilizar"
@@ -674,21 +658,6 @@
               "type": "noauth"
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}/orcamento/aprovar"
           }
         },
@@ -699,23 +668,8 @@
               "type": "noauth"
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"versao\": {{versaoOrcamento}}\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAcompanhamento}}/orcamento/rejeitar",
-            "description": "Use como alternativa à aprovação. A rejeição retorna a OS ao diagnóstico; não execute depois de aprovar a mesma versão."
+            "description": "Use como alternativa à aprovação. A rejeição retorna a OS ao diagnóstico; não execute depois de aprovar o mesmo orçamento."
           }
         },
         {
@@ -776,21 +730,6 @@
               "type": "noauth"
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"versao\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": "{{baseUrl}}/ordens-servico/acompanhamento/{{codigoAprovacaoDemo}}/orcamento/aprovar"
           }
         },

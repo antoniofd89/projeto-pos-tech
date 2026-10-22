@@ -8,8 +8,6 @@ import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Repository;
 
@@ -44,8 +42,7 @@ public class AdaptadorRepositorioCliente implements RepositorioCliente {
     }
 
     @Override
-    public List<Cliente> listar(int pagina, int tamanho) {
-        return jpa.findAll(PageRequest.of(pagina, tamanho, Sort.by("nome"))).getContent().stream()
-                .map(MapeadorCliente::paraDominio).toList();
+    public List<Cliente> listar() {
+        return jpa.findAll().stream().map(MapeadorCliente::paraDominio).toList();
     }
 }

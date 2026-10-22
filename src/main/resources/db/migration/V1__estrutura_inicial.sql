@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS clientes (
     id UUID PRIMARY KEY,
-    versao BIGINT NOT NULL DEFAULT 0,
     nome VARCHAR(150) NOT NULL,
     documento VARCHAR(14) NOT NULL UNIQUE,
     email VARCHAR(254) NOT NULL,
@@ -15,7 +14,6 @@ CREATE TABLE IF NOT EXISTS clientes (
 
 CREATE TABLE IF NOT EXISTS veiculos (
     id UUID PRIMARY KEY,
-    versao BIGINT NOT NULL DEFAULT 0,
     cliente_id UUID NOT NULL REFERENCES clientes(id),
     placa VARCHAR(7) NOT NULL UNIQUE,
     marca VARCHAR(80) NOT NULL,
@@ -27,6 +25,7 @@ CREATE TABLE IF NOT EXISTS veiculos (
 );
 CREATE INDEX ix_veiculos_cliente ON veiculos(cliente_id);
 
+--Precisamos implementar o endpoint de servicos
 CREATE TABLE IF NOT EXISTS servicos (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
@@ -34,7 +33,7 @@ CREATE TABLE IF NOT EXISTS servicos (
     descricao VARCHAR(500),
     categoria VARCHAR(80) NOT NULL,
     valor_base NUMERIC(12,2) NOT NULL CHECK (valor_base >= 0),
-    duracao_estimada_minutos INTEGER NOT NULL CHECK (duracao_estimada_minutos > 0),
+    duracao_estimada_minutos INTEGER NOT NULL CHECK (duracao_estimada_minutos > 0), -- não tem que ter duracao estimada
     ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -66,7 +65,6 @@ CREATE INDEX ix_movimentacoes_item_data ON movimentacoes_estoque(item_estoque_id
 
 CREATE TABLE IF NOT EXISTS ordens_servico (
     id UUID PRIMARY KEY,
-    versao BIGINT NOT NULL DEFAULT 0,
     numero VARCHAR(24) NOT NULL UNIQUE,
     codigo_acompanhamento VARCHAR(64) NOT NULL UNIQUE,
     cliente_id UUID NOT NULL REFERENCES clientes(id),
@@ -74,8 +72,12 @@ CREATE TABLE IF NOT EXISTS ordens_servico (
     descricao_inicial VARCHAR(1000) NOT NULL,
     diagnostico VARCHAR(3000),
     status VARCHAR(2) NOT NULL,
+    validade_ate TIMESTAMP WITH TIME ZONE,
+    prazo_servico TIMESTAMP WITH TIME ZONE,
+    criado_em TIMESTAMP WITH TIME ZONE NOT NULL,
     atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL,
-    ativa BOOLEAN NOT NULL DEFAULT TRUE
+    ativa BOOLEAN NOT NULL DEFAULT TRUE,
+    historico_status JSONB NOT NULL DEFAULT '[]'::jsonb
 );
 CREATE INDEX ix_ordens_status ON ordens_servico(status);
 CREATE INDEX ix_ordens_status_data ON ordens_servico(status, atualizado_em);
@@ -110,17 +112,13 @@ CREATE TABLE IF NOT EXISTS itens_material_os (
 );
 CREATE TABLE IF NOT EXISTS orcamentos (
     id UUID PRIMARY KEY,
-    ordem_servico_id UUID NOT NULL REFERENCES ordens_servico(id) ON DELETE CASCADE,
-    versao_orcamento INTEGER NOT NULL,
+    ordem_servico_id UUID NOT NULL UNIQUE REFERENCES ordens_servico(id) ON DELETE CASCADE,
     valor_servicos NUMERIC(12,2) NOT NULL CHECK (valor_servicos >= 0),
     valor_materiais NUMERIC(12,2) NOT NULL CHECK (valor_materiais >= 0),
     valor_total NUMERIC(12,2) NOT NULL CHECK (valor_total >= 0),
     status VARCHAR(24) NOT NULL,
     gerado_em TIMESTAMP WITH TIME ZONE NOT NULL,
-    disponibilizado_em TIMESTAMP WITH TIME ZONE,
-    validade_ate TIMESTAMP WITH TIME ZONE,
-    decidido_em TIMESTAMP WITH TIME ZONE,
-    UNIQUE (ordem_servico_id, versao_orcamento)
+    atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS usuarios_administrativos (
