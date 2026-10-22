@@ -1,6 +1,7 @@
 package br.com.fiap.oficina_digital.cliente.infraestrutura.persistencia;
 
-import br.com.fiap.oficina_digital.cliente.dominio.*;
+import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
+import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 
 public class MapeadorCliente {
     private MapeadorCliente() {

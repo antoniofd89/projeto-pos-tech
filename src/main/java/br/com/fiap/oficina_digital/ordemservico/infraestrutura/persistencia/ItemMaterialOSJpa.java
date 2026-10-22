@@ -25,7 +25,7 @@ public class ItemMaterialOSJpa {
     @Column(nullable = false, precision = 12, scale = 3)
     public BigDecimal quantidade;
     @Column(name = "unidade_medida", nullable = false, length = 20)
-    public String unidadeMedida;
+    public String unidadeMedida; //aqui o campo esta se repetindo, faz sentido ter esse campo aqui?
     @Column(name = "valor_unitario", nullable = false, precision = 12, scale = 2)
     public BigDecimal valorUnitario;
 

@@ -62,14 +62,12 @@ class ServicoClienteTest {
     }
 
     @Test
-    void validaPaginacaoAntesDeConsultarRepositorio() {
-        when(repositorio.listar(0, 10)).thenReturn(List.of(cliente()));
+    void listaTodosQuandoDocumentoNaoInformado() {
+        when(repositorio.listar()).thenReturn(List.of(cliente()));
 
-        assertEquals(1, servico.listar(0, 10).size());
-        assertThrows(IllegalArgumentException.class, () -> servico.listar(-1, 10));
-        assertThrows(IllegalArgumentException.class, () -> servico.listar(0, 0));
-        assertThrows(IllegalArgumentException.class, () -> servico.listar(0, 101));
-        verify(repositorio, times(1)).listar(0, 10);
+        assertEquals(1, servico.listar(null).size());
+        assertEquals(1, servico.listar(" ").size());
+        verify(repositorio, times(2)).listar();
     }
 
     @Test

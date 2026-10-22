@@ -1,7 +1,6 @@
 package br.com.fiap.oficina_digital.identidade.infraestrutura;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.List;
 
 import javax.crypto.SecretKey;

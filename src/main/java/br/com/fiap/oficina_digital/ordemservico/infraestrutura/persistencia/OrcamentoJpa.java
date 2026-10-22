@@ -10,8 +10,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,11 +19,9 @@ import jakarta.persistence.Table;
 public class OrcamentoJpa {
     @Id
     public UUID id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ordem_servico_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ordem_servico_id", nullable = false, unique = true)
     public OrdemServicoJpa ordemServico;
-    @Column(name = "versao_orcamento", nullable = false)
-    public int versaoOrcamento;
     @Column(name = "valor_servicos", nullable = false, precision = 12, scale = 2)
     public BigDecimal valorServicos;
     @Column(name = "valor_materiais", nullable = false, precision = 12, scale = 2)
@@ -35,12 +33,8 @@ public class OrcamentoJpa {
     public StatusOrcamento status;
     @Column(name = "gerado_em", nullable = false)
     public Instant geradoEm;
-    @Column(name = "disponibilizado_em")
-    public Instant disponibilizadoEm;
-    @Column(name = "validade_ate")
-    public Instant validadeAte;
-    @Column(name = "decidido_em")
-    public Instant decididoEm;
+    @Column(name = "atualizado_em", nullable = false)
+    public Instant atualizadoEm;
 
     public OrcamentoJpa() {
     }

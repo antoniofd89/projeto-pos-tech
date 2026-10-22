@@ -3,21 +3,20 @@ package br.com.fiap.oficina_digital.cliente.infraestrutura.persistencia;
 import java.time.Instant;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.annotations.SQLRestriction;
 
 import br.com.fiap.oficina_digital.cliente.dominio.Endereco;
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "clientes")
-@SQLRestriction("ativo = true")
 public class ClienteJpa {
     @Id
     UUID id;
-    @Version
-    Long versao;
     @Column(nullable = false, length = 150)
     String nome;
     @Column(nullable = false, length = 14)
