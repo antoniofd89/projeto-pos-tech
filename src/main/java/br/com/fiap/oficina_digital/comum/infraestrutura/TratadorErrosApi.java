@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,10 +15,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class TratadorErrosApi {
+    private static final Logger LOG = LoggerFactory.getLogger(TratadorErrosApi.class);
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ProblemDetail tratarValidacao(MethodArgumentNotValidException erro, HttpServletRequest requisicao) {
         String campos = erro.getBindingResult().getFieldErrors().stream()
@@ -60,6 +65,9 @@ public class TratadorErrosApi {
 
     @ExceptionHandler(Exception.class)
     ProblemDetail tratarErroInterno(Exception erro, HttpServletRequest requisicao) {
+        Object padraoRota = requisicao.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String rota = padraoRota instanceof String ? (String) padraoRota : "<rota não identificada>";
+        LOG.error("Erro inesperado na API: {} {}", requisicao.getMethod(), rota, erro);
         return problema(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno", "Ocorreu um erro inesperado.", requisicao);
     }
 

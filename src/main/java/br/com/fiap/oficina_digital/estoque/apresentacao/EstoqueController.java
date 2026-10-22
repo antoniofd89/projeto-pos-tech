@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/estoque")
 @PreAuthorize("hasRole('ADMIN')")
-public class ControladorEstoque {
+public class EstoqueController {
     private final ServicoEstoque servico;
 
-    public ControladorEstoque(ServicoEstoque servico) {
+    public EstoqueController(ServicoEstoque servico) {
         this.servico = servico;
     }
 

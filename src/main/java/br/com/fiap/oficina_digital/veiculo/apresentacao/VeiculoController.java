@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/veiculos")
-public class ControladorVeiculo {
+public class VeiculoController {
     private final ServicoVeiculo servico;
 
-    public ControladorVeiculo(ServicoVeiculo servico) {
+    public VeiculoController(ServicoVeiculo servico) {
         this.servico = servico;
     }
 

@@ -22,7 +22,8 @@ public class ServicoIndicadores {
     public List<TempoMedioServico> tempoMedio(Instant inicio, Instant fim) {
         if (inicio == null || fim == null || !fim.isAfter(inicio))
             throw new IllegalArgumentException("Informe período válido, com fim posterior ao início.");
-        var concluidas = ordens.buscarPorStatusNoHistoricoEntre(StatusOrdemServico.FINALIZADA, inicio, fim);
+        var concluidas = ordens.buscarPorStatusNoHistoricoEntre(
+                StatusOrdemServico.FINALIZADA.codigoPersistencia(), inicio, fim);
         var tempos = new java.util.HashMap<UUID, long[]>();
         for (var os : concluidas) {
             var execucaoIniciadaEm = dataDoStatus(os, StatusOrdemServico.EM_EXECUCAO);
@@ -46,7 +47,7 @@ public class ServicoIndicadores {
     private static Instant dataDoStatus(OrdemServicoJpa os, StatusOrdemServico status) {
         return os.historicoStatus.stream()
                 .filter(h -> h.status == status)
-                .map(h -> h.atualizadoEm)
+                .map(h -> h.ocorridoEm)
                 .min(Instant::compareTo)
                 .orElse(null);
     }

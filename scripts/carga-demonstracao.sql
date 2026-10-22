@@ -40,42 +40,15 @@ ON CONFLICT (id) DO NOTHING;
 -- Cada OS fica em um status para testar a ação seguinte daquele ponto.
 INSERT INTO ordens_servico
     (id, versao, numero, codigo_acompanhamento, cliente_id, veiculo_id,
-     descricao_inicial, diagnostico, status, atualizado_em, ativa)
+     descricao_inicial, diagnostico, status, historico_status, atualizado_em, ativa)
 VALUES
-    ('50000000-0000-4000-8000-000000000001', 0, 'DEMO-OS-001', 'DEMO-CODIGO-RECEBIDA-001', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração no status RECEBIDA.', NULL, '01', now() - interval '7 days', TRUE),
-    ('50000000-0000-4000-8000-000000000002', 0, 'DEMO-OS-002', 'DEMO-CODIGO-DIAGNOSTICO-002', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração no status EM_DIAGNOSTICO.', 'Aguardando composição do orçamento.', '02', now() - interval '5 days', TRUE),
-    ('50000000-0000-4000-8000-000000000003', 0, 'DEMO-OS-003', 'DEMO-CODIGO-APROVACAO-003', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração aguardando decisão do cliente.', 'Revisão e troca do filtro de óleo.', '03', now() - interval '2 days', TRUE),
-    ('50000000-0000-4000-8000-000000000004', 0, 'DEMO-OS-004', 'DEMO-CODIGO-EXECUCAO-004', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração no status EM_EXECUCAO.', 'Revisão aprovada; veículo em execução.', '04', now() - interval '2 days', TRUE),
-    ('50000000-0000-4000-8000-000000000005', 0, 'DEMO-OS-005', 'DEMO-CODIGO-FINALIZADA-005', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração pronta para entrega.', 'Serviços concluídos.', '05', now() - interval '1 day', TRUE),
-    ('50000000-0000-4000-8000-000000000006', 0, 'DEMO-OS-006', 'DEMO-CODIGO-ENTREGUE-006', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração já entregue.', 'Serviços concluídos e veículo entregue.', '06', now() - interval '1 day', TRUE),
-    ('50000000-0000-4000-8000-000000000007', 0, 'DEMO-OS-007', 'DEMO-CODIGO-CANCELADA-007', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração cancelada.', NULL, '07', now() - interval '2 days', FALSE)
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO historico_status_os (id, ordem_servico_id, status, atualizado_em, ator)
-VALUES
-    ('60000000-0000-4000-8000-000000000001', '50000000-0000-4000-8000-000000000001', 'RECEBIDA', now() - interval '7 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000002', '50000000-0000-4000-8000-000000000002', 'RECEBIDA', now() - interval '6 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000003', '50000000-0000-4000-8000-000000000002', 'EM_DIAGNOSTICO', now() - interval '5 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000004', '50000000-0000-4000-8000-000000000003', 'RECEBIDA', now() - interval '4 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000005', '50000000-0000-4000-8000-000000000003', 'EM_DIAGNOSTICO', now() - interval '3 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000006', '50000000-0000-4000-8000-000000000003', 'AGUARDANDO_APROVACAO', now() - interval '2 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000007', '50000000-0000-4000-8000-000000000004', 'RECEBIDA', now() - interval '5 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000008', '50000000-0000-4000-8000-000000000004', 'EM_DIAGNOSTICO', now() - interval '4 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000009', '50000000-0000-4000-8000-000000000004', 'AGUARDANDO_APROVACAO', now() - interval '3 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000010', '50000000-0000-4000-8000-000000000004', 'EM_EXECUCAO', now() - interval '2 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000011', '50000000-0000-4000-8000-000000000005', 'RECEBIDA', now() - interval '8 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000012', '50000000-0000-4000-8000-000000000005', 'EM_DIAGNOSTICO', now() - interval '7 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000013', '50000000-0000-4000-8000-000000000005', 'AGUARDANDO_APROVACAO', now() - interval '6 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000014', '50000000-0000-4000-8000-000000000005', 'EM_EXECUCAO', now() - interval '5 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000015', '50000000-0000-4000-8000-000000000005', 'FINALIZADA', now() - interval '1 day', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000016', '50000000-0000-4000-8000-000000000006', 'RECEBIDA', now() - interval '10 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000017', '50000000-0000-4000-8000-000000000006', 'EM_DIAGNOSTICO', now() - interval '9 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000018', '50000000-0000-4000-8000-000000000006', 'AGUARDANDO_APROVACAO', now() - interval '8 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000019', '50000000-0000-4000-8000-000000000006', 'EM_EXECUCAO', now() - interval '7 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000020', '50000000-0000-4000-8000-000000000006', 'FINALIZADA', now() - interval '2 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000021', '50000000-0000-4000-8000-000000000006', 'ENTREGUE', now() - interval '1 day', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000022', '50000000-0000-4000-8000-000000000007', 'RECEBIDA', now() - interval '3 days', 'CARGA_DEMO'),
-    ('60000000-0000-4000-8000-000000000023', '50000000-0000-4000-8000-000000000007', 'CANCELADA', now() - interval '2 days', 'CARGA_DEMO')
+    ('50000000-0000-4000-8000-000000000001', 0, 'DEMO-OS-001', 'DEMO-CODIGO-RECEBIDA-001', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração no status RECEBIDA.', NULL, 1, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '7 days', 'ator', 'CARGA_DEMO')), now() - interval '7 days', TRUE),
+    ('50000000-0000-4000-8000-000000000002', 0, 'DEMO-OS-002', 'DEMO-CODIGO-DIAGNOSTICO-002', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração no status EM_DIAGNOSTICO.', 'Aguardando composição do orçamento.', 2, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '6 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 2, 'ocorridoEm', now() - interval '5 days', 'ator', 'CARGA_DEMO')), now() - interval '5 days', TRUE),
+    ('50000000-0000-4000-8000-000000000003', 0, 'DEMO-OS-003', 'DEMO-CODIGO-APROVACAO-003', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração aguardando decisão do cliente.', 'Revisão e troca do filtro de óleo.', 3, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '4 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 2, 'ocorridoEm', now() - interval '3 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 3, 'ocorridoEm', now() - interval '2 days', 'ator', 'CARGA_DEMO')), now() - interval '2 days', TRUE),
+    ('50000000-0000-4000-8000-000000000004', 0, 'DEMO-OS-004', 'DEMO-CODIGO-EXECUCAO-004', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração no status EM_EXECUCAO.', 'Revisão aprovada; veículo em execução.', 4, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '5 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 2, 'ocorridoEm', now() - interval '4 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 3, 'ocorridoEm', now() - interval '3 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 4, 'ocorridoEm', now() - interval '2 days', 'ator', 'CARGA_DEMO')), now() - interval '2 days', TRUE),
+    ('50000000-0000-4000-8000-000000000005', 0, 'DEMO-OS-005', 'DEMO-CODIGO-FINALIZADA-005', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração pronta para entrega.', 'Serviços concluídos.', 5, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '8 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 2, 'ocorridoEm', now() - interval '7 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 3, 'ocorridoEm', now() - interval '6 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 4, 'ocorridoEm', now() - interval '5 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 5, 'ocorridoEm', now() - interval '1 day', 'ator', 'CARGA_DEMO')), now() - interval '1 day', TRUE),
+    ('50000000-0000-4000-8000-000000000006', 0, 'DEMO-OS-006', 'DEMO-CODIGO-ENTREGUE-006', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração já entregue.', 'Serviços concluídos e veículo entregue.', 6, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '10 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 2, 'ocorridoEm', now() - interval '9 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 3, 'ocorridoEm', now() - interval '8 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 4, 'ocorridoEm', now() - interval '7 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 5, 'ocorridoEm', now() - interval '2 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 6, 'ocorridoEm', now() - interval '1 day', 'ator', 'CARGA_DEMO')), now() - interval '1 day', TRUE),
+    ('50000000-0000-4000-8000-000000000007', 0, 'DEMO-OS-007', 'DEMO-CODIGO-CANCELADA-007', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração cancelada.', NULL, 7, jsonb_build_array(jsonb_build_object('status', 1, 'ocorridoEm', now() - interval '3 days', 'ator', 'CARGA_DEMO'), jsonb_build_object('status', 7, 'ocorridoEm', now() - interval '2 days', 'ator', 'CARGA_DEMO')), now() - interval '2 days', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO itens_servico_os

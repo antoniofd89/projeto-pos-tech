@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
-import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.HistoricoStatusOSJpa;
+import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.EventoHistoricoStatusOS;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.ItemServicoOSJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrdemServicoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.RepositorioOrdemServicoJpa;
@@ -25,7 +25,7 @@ class ServicoIndicadoresTest {
         var semInicio = ordem(null, inicio.plusSeconds(30), servicoA);
         var negativa = ordem(inicio.plusSeconds(60), inicio, servicoA);
         var repo = mock(RepositorioOrdemServicoJpa.class);
-        when(repo.buscarPorStatusNoHistoricoEntre(StatusOrdemServico.FINALIZADA, inicio, fim))
+        when(repo.buscarPorStatusNoHistoricoEntre(StatusOrdemServico.FINALIZADA.codigoPersistencia(), inicio, fim))
                 .thenReturn(List.of(ordemCurta, ordemLonga, semInicio, negativa));
 
         var resultado = new ServicoIndicadores(repo).tempoMedio(inicio, fim);
@@ -59,9 +59,6 @@ class ServicoIndicadoresTest {
     private static void adicionarHistorico(OrdemServicoJpa ordem, StatusOrdemServico status, Instant data) {
         if (data == null)
             return;
-        var historico = new HistoricoStatusOSJpa();
-        historico.status = status;
-        historico.atualizadoEm = data;
-        ordem.historicoStatus.add(historico);
+        ordem.historicoStatus.add(new EventoHistoricoStatusOS(status, data, "TESTE"));
     }
 }
