@@ -26,8 +26,8 @@ public class MovimentacaoEstoqueJpa {
     public TipoMovimentacao tipo;
     @Column(nullable = false, precision = 12, scale = 3)
     public BigDecimal quantidade;
-    @Column(name = "ocorrido_em", nullable = false)
-    public Instant ocorridoEm;
+    @Column(name = "atualizado_em", nullable = false)
+    public Instant atualizadoEm;
     @Column(length = 300)
     public String observacao;
 

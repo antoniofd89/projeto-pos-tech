@@ -2,10 +2,8 @@ package br.com.fiap.oficina_digital.ordemservico.aplicacao;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +21,6 @@ import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.Orca
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrdemServicoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.RepositorioOrdemServicoJpa;
 import br.com.fiap.oficina_digital.veiculo.infraestrutura.persistencia.RepositorioVeiculoJpa;
-import br.com.fiap.oficina_digital.veiculo.aplicacao.ServicoVeiculo;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.RepositorioItemEstoqueJpa;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -72,10 +69,9 @@ public class ServicoOrdemServico {
         os.veiculoId = dados.veiculoId();
         os.descricaoInicial = dados.descricaoInicial().trim();
         os.status = StatusOrdemServico.RECEBIDA;
-        os.recebidaEm = Instant.now();
         os.ativa = true;
         registrarHistorico(os, StatusOrdemServico.RECEBIDA);
-        ordens.save(os);
+        salvar(os);
         return new CriacaoResposta(detalhe(os), os.codigoAcompanhamento);
     }
 
@@ -94,7 +90,7 @@ public class ServicoOrdemServico {
     public List<DetalheOrdem> listar(int pagina, int tamanho) {
         if (pagina < 0 || tamanho < 1 || tamanho > 100)
             throw new IllegalArgumentException("Paginação inválida.");
-        return ordens.findAllByOrderByRecebidaEmDesc(PageRequest.of(pagina, tamanho)).getContent().stream()
+        return ordens.findAllByOrderByAtualizadoEmDesc(PageRequest.of(pagina, tamanho)).getContent().stream()
                 .map(ServicoOrdemServico::detalhe).toList();
     }
 
@@ -103,8 +99,7 @@ public class ServicoOrdemServico {
         var os = bloquear(id);
         exigir(os, StatusOrdemServico.RECEBIDA);
         transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
-        os.diagnosticoIniciadoEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -114,7 +109,7 @@ public class ServicoOrdemServico {
         if (texto == null || texto.isBlank() || texto.length() > 3000)
             throw new IllegalArgumentException("Diagnóstico obrigatório, com até 3.000 caracteres.");
         os.diagnostico = texto.trim();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -130,7 +125,7 @@ public class ServicoOrdemServico {
         item.valorUnitario = s.valorBase();
         item.duracaoMinutos = s.duracaoEstimadaMinutos();
         os.servicos.add(item);
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -150,7 +145,7 @@ public class ServicoOrdemServico {
         item.unidadeMedida = estoqueItem.unidadeMedida;
         item.valorUnitario = estoqueItem.precoUnitario;
         os.materiais.add(item);
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -177,7 +172,7 @@ public class ServicoOrdemServico {
         o.status = StatusOrcamento.GERADO;
         o.geradoEm = Instant.now();
         os.orcamentos.add(o);
-        ordens.save(os);
+        salvar(os);
         return orcamento(o);
     }
 
@@ -191,8 +186,7 @@ public class ServicoOrdemServico {
         o.status = StatusOrcamento.DISPONIBILIZADO;
         o.disponibilizadoEm = Instant.now();
         transicionar(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
-        os.orcamentoDisponibilizadoEm = o.disponibilizadoEm;
-        ordens.save(os);
+        salvar(os);
         return orcamento(o);
     }
 
@@ -218,7 +212,7 @@ public class ServicoOrdemServico {
                     .map(i -> new ServicoEstoque.Material(i.itemEstoqueId, i.quantidade)).toList());
         o.status = StatusOrcamento.APROVADO;
         o.decididoEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -232,7 +226,7 @@ public class ServicoOrdemServico {
         o.decididoEm = Instant.now();
         estoque.estornar(os.id);
         transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -244,8 +238,7 @@ public class ServicoOrdemServico {
         if (!os.materiais.isEmpty())
             estoque.consumir(os.id);
         transicionar(os, StatusOrdemServico.EM_EXECUCAO);
-        os.execucaoIniciadaEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -253,8 +246,7 @@ public class ServicoOrdemServico {
         var os = bloquear(id);
         exigir(os, StatusOrdemServico.EM_EXECUCAO);
         transicionar(os, StatusOrdemServico.FINALIZADA);
-        os.finalizadaEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -262,8 +254,7 @@ public class ServicoOrdemServico {
         var os = bloquear(id);
         exigir(os, StatusOrdemServico.FINALIZADA);
         transicionar(os, StatusOrdemServico.ENTREGUE);
-        os.entregueEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -274,8 +265,7 @@ public class ServicoOrdemServico {
             throw new IllegalStateException("A OS não pode ser cancelada neste estado.");
         estoque.estornar(os.id);
         transicionar(os, StatusOrdemServico.CANCELADA);
-        os.canceladaEm = Instant.now();
-        return detalhe(ordens.save(os));
+        return detalhe(salvar(os));
     }
 
     @Transactional
@@ -295,6 +285,11 @@ public class ServicoOrdemServico {
     private OrdemServicoJpa obter(UUID id) {
         return ordens.findById(id)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Ordem de serviço não encontrada."));
+    }
+
+    private OrdemServicoJpa salvar(OrdemServicoJpa os) {
+        os.atualizadoEm = Instant.now();
+        return ordens.save(os);
     }
 
     private OrdemServicoJpa bloquear(UUID id) {
@@ -317,7 +312,7 @@ public class ServicoOrdemServico {
         h.id = UUID.randomUUID();
         h.ordemServico = os;
         h.status = status;
-        h.ocorridoEm = Instant.now();
+        h.atualizadoEm = Instant.now();
         var autenticacao = SecurityContextHolder.getContext().getAuthentication();
         h.ator = autenticacao == null || !autenticacao.isAuthenticated()
                 || "anonymousUser".equals(autenticacao.getPrincipal()) ? "SISTEMA" : autenticacao.getName();
@@ -353,11 +348,10 @@ public class ServicoOrdemServico {
                 .toList();
         var b = o.orcamentos.stream().sorted(Comparator.comparingInt(x -> x.versaoOrcamento))
                 .map(ServicoOrdemServico::orcamento).toList();
-        var h = o.historicoStatus.stream().sorted(Comparator.comparing(x -> x.ocorridoEm))
-                .map(x -> new HistoricoStatus(x.status, x.ocorridoEm, x.ator)).toList();
+        var h = o.historicoStatus.stream().sorted(Comparator.comparing(x -> x.atualizadoEm))
+                .map(x -> new HistoricoStatus(x.status, x.atualizadoEm, x.ator)).toList();
         return new DetalheOrdem(o.id, o.numero, o.clienteId, o.veiculoId, o.descricaoInicial, o.diagnostico, o.status,
-                o.recebidaEm, o.diagnosticoIniciadoEm, o.orcamentoDisponibilizadoEm, o.execucaoIniciadaEm,
-                o.finalizadaEm, o.entregueEm, o.canceladaEm, s, m, b, h);
+                o.atualizadoEm, s, m, b, h);
     }
 
     public record DadosAbertura(UUID clienteId, UUID veiculoId, String descricaoInicial) {
@@ -367,13 +361,12 @@ public class ServicoOrdemServico {
     }
 
     public record DetalheOrdem(UUID id, String numero, UUID clienteId, UUID veiculoId, String descricaoInicial,
-            String diagnostico, StatusOrdemServico status, Instant recebidaEm, Instant diagnosticoIniciadoEm,
-            Instant orcamentoDisponibilizadoEm, Instant execucaoIniciadaEm, Instant finalizadaEm, Instant entregueEm,
-            Instant canceladaEm, List<ItemServico> servicos, List<ItemMaterial> materiais,
+            String diagnostico, StatusOrdemServico status, Instant atualizadoEm,
+            List<ItemServico> servicos, List<ItemMaterial> materiais,
             List<OrcamentoResposta> orcamentos, List<HistoricoStatus> historicoStatus) {
     }
 
-    public record HistoricoStatus(StatusOrdemServico status, Instant ocorridoEm, String ator) {
+    public record HistoricoStatus(StatusOrdemServico status, Instant atualizadoEm, String ator) {
     }
 
     public record ItemServico(UUID servicoId, String nome, BigDecimal valorUnitario, int duracaoMinutos) {

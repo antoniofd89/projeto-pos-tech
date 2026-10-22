@@ -5,6 +5,13 @@ import org.junit.jupiter.api.Test;
 
 class StatusOrdemServicoTest {
     @Test
+    void recuperaStatusPeloCodigo() {
+        assertEquals("01", StatusOrdemServico.RECEBIDA.getCodigo());
+        assertEquals(StatusOrdemServico.EM_EXECUCAO, StatusOrdemServico.porCodigo("04"));
+        assertThrows(IllegalArgumentException.class, () -> StatusOrdemServico.porCodigo("99"));
+    }
+
+    @Test
     void aceitaTransicoesDoFluxoPrincipalERejeicao() {
         assertEquals(StatusOrdemServico.EM_DIAGNOSTICO,
                 StatusOrdemServico.RECEBIDA.transicionarPara(StatusOrdemServico.EM_DIAGNOSTICO));

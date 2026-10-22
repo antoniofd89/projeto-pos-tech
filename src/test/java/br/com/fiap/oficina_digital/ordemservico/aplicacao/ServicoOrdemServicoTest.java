@@ -102,13 +102,13 @@ class ServicoOrdemServicoTest {
         when(catalogo.buscarAtivo(servicoId)).thenReturn(
                 new ServicoCatalogo(servicoId, "Revisão", "Revisão geral", "MECANICA", bd("100"), 120, true));
         servico.adicionarServico(os.id, servicoId);
-        var orçamento = servico.gerarOrcamento(os.id);
-        assertEquals(bd("100.00"), orçamento.valorTotal());
+        var orcamento = servico.gerarOrcamento(os.id);
+        assertEquals(bd("100.00"), orcamento.valorTotal());
         servico.disponibilizarOrcamento(os.id);
 
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id, orçamento.versao());
+        servico.aprovarOrcamento(os.id, orcamento.versao());
         servico.iniciarExecucao(os.id);
         servico.finalizar(os.id);
         var entregue = servico.entregar(os.id);
@@ -128,12 +128,12 @@ class ServicoOrdemServicoTest {
         item.precoUnitario = bd("25.50");
         when(itens.findById(itemId)).thenReturn(Optional.of(item));
         servico.adicionarMaterial(os.id, itemId, bd("2"));
-        var orçamento = servico.gerarOrcamento(os.id);
-        assertEquals(bd("51.00"), orçamento.valorMateriais());
+        var orcamento = servico.gerarOrcamento(os.id);
+        assertEquals(bd("51.00"), orcamento.valorMateriais());
         servico.disponibilizarOrcamento(os.id);
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id, orçamento.versao());
+        servico.aprovarOrcamento(os.id, orcamento.versao());
         verify(estoque).reservar(eq(os.id),
                 argThat(m -> m.size() == 1 && m.getFirst().quantidade().equals(bd("2.000"))));
         servico.iniciarExecucao(os.id);
@@ -179,7 +179,7 @@ class ServicoOrdemServicoTest {
     void validaPaginacaoEOrdemInexistente() {
         assertThrows(IllegalArgumentException.class, () -> servico.listar(-1, 10));
         assertThrows(IllegalArgumentException.class, () -> servico.listar(0, 101));
-        when(ordens.findAllByOrderByRecebidaEmDesc(any())).thenReturn(new PageImpl<>(List.of()));
+        when(ordens.findAllByOrderByAtualizadoEmDesc(any())).thenReturn(new PageImpl<>(List.of()));
         assertTrue(servico.listar(0, 20).isEmpty());
         when(ordens.buscarParaAtualizacao(any())).thenReturn(Optional.empty());
         assertThrows(java.util.NoSuchElementException.class, () -> servico.iniciarDiagnostico(UUID.randomUUID()));
@@ -198,7 +198,7 @@ class ServicoOrdemServicoTest {
         os.veiculoId = UUID.randomUUID();
         os.descricaoInicial = "Ruído";
         os.status = status;
-        os.recebidaEm = Instant.now();
+        os.atualizadoEm = Instant.now();
         os.ativa = true;
         return os;
     }

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +21,16 @@ public interface RepositorioOrdemServicoJpa extends JpaRepository<OrdemServicoJp
     @EntityGraph(attributePaths = { "servicos", "materiais", "orcamentos", "historicoStatus" })
     Optional<OrdemServicoJpa> findByCodigoAcompanhamento(String codigo);
 
-    Page<OrdemServicoJpa> findAllByOrderByRecebidaEmDesc(Pageable pageable);
+    Page<OrdemServicoJpa> findAllByOrderByAtualizadoEmDesc(Pageable pageable);
 
-    List<OrdemServicoJpa> findAllByFinalizadaEmBetween(Instant inicio, Instant fim);
+    @EntityGraph(attributePaths = { "servicos", "historicoStatus" })
+    @Query("""
+            select distinct o from OrdemServicoJpa o
+            join o.historicoStatus h
+            where h.status = :status and h.atualizadoEm between :inicio and :fim
+            """)
+    List<OrdemServicoJpa> buscarPorStatusNoHistoricoEntre(@Param("status") StatusOrdemServico status,
+            @Param("inicio") Instant inicio, @Param("fim") Instant fim);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from OrdemServicoJpa o where o.id=:id")

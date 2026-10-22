@@ -3,7 +3,6 @@ package br.com.fiap.oficina_digital.estoque.aplicacao;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -167,7 +166,7 @@ public class ServicoEstoque {
         m.ordemServicoId = osId;
         m.tipo = tipo;
         m.quantidade = qtd;
-        m.ocorridoEm = Instant.now();
+        m.atualizadoEm = Instant.now();
         m.observacao = obs;
         movimentacoes.save(m);
     }

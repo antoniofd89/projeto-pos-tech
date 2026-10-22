@@ -8,9 +8,8 @@ import java.util.UUID;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -35,23 +34,11 @@ public class OrdemServicoJpa {
     public String descricaoInicial;
     @Column(length = 3000)
     public String diagnostico;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 32)
+    @Convert(converter = ConversorStatusOrdemServico.class)
+    @Column(nullable = false, length = 2)
     public StatusOrdemServico status;
-    @Column(name = "recebida_em", nullable = false)
-    public Instant recebidaEm;
-    @Column(name = "diagnostico_iniciado_em")
-    public Instant diagnosticoIniciadoEm;
-    @Column(name = "orcamento_disponibilizado_em")
-    public Instant orcamentoDisponibilizadoEm;
-    @Column(name = "execucao_iniciada_em")
-    public Instant execucaoIniciadaEm;
-    @Column(name = "finalizada_em")
-    public Instant finalizadaEm;
-    @Column(name = "entregue_em")
-    public Instant entregueEm;
-    @Column(name = "cancelada_em")
-    public Instant canceladaEm;
+    @Column(name = "atualizado_em", nullable = false)
+    public Instant atualizadoEm;
     @Column(nullable = false)
     public boolean ativa = true;
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -1,4 +1,4 @@
-CREATE TABLE clientes (
+CREATE TABLE IF NOT EXISTS clientes (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
     nome VARCHAR(150) NOT NULL,
@@ -7,13 +7,13 @@ CREATE TABLE clientes (
     telefone VARCHAR(15) NOT NULL,
     endereco JSON,
     nascimento DATE,
-    data_cadastro TIMESTAMPTZ NOT NULL,
+    data_cadastro TIMESTAMP WITH TIME ZONE NOT NULL,
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT ck_cliente_documento_tamanho CHECK (length(documento) IN (11, 14)),
     CONSTRAINT ck_cliente_nascimento_por_tipo CHECK ((length(documento) = 11 AND nascimento IS NOT NULL) OR (length(documento) = 14 AND nascimento IS NULL))
 );
 
-CREATE TABLE veiculos (
+CREATE TABLE IF NOT EXISTS veiculos (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
     cliente_id UUID NOT NULL REFERENCES clientes(id),
@@ -23,11 +23,11 @@ CREATE TABLE veiculos (
     ano_fabricacao INTEGER NOT NULL,
     categoria VARCHAR(40),
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    data_cadastro TIMESTAMPTZ NOT NULL
+    data_cadastro TIMESTAMP WITH TIME ZONE NOT NULL
 );
 CREATE INDEX ix_veiculos_cliente ON veiculos(cliente_id);
 
-CREATE TABLE servicos (
+CREATE TABLE IF NOT EXISTS servicos (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
     nome VARCHAR(120) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE servicos (
     ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE itens_estoque (
+CREATE TABLE IF NOT EXISTS itens_estoque (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
     codigo VARCHAR(40) NOT NULL UNIQUE,
@@ -53,18 +53,18 @@ CREATE TABLE itens_estoque (
     CONSTRAINT ck_estoque_reservado_nao_excede_fisico CHECK (quantidade_reservada <= quantidade_fisica)
 );
 
-CREATE TABLE movimentacoes_estoque (
+CREATE TABLE IF NOT EXISTS movimentacoes_estoque (
     id UUID PRIMARY KEY,
     item_estoque_id UUID NOT NULL REFERENCES itens_estoque(id),
     ordem_servico_id UUID,
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('ENTRADA', 'RESERVA', 'ESTORNO', 'CONSUMO')),
     quantidade NUMERIC(12,3) NOT NULL CHECK (quantidade > 0),
-    ocorrido_em TIMESTAMPTZ NOT NULL,
+    atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL,
     observacao VARCHAR(300)
 );
-CREATE INDEX ix_movimentacoes_item_data ON movimentacoes_estoque(item_estoque_id, ocorrido_em);
+CREATE INDEX ix_movimentacoes_item_data ON movimentacoes_estoque(item_estoque_id, atualizado_em);
 
-CREATE TABLE ordens_servico (
+CREATE TABLE IF NOT EXISTS ordens_servico (
     id UUID PRIMARY KEY,
     versao BIGINT NOT NULL DEFAULT 0,
     numero VARCHAR(24) NOT NULL UNIQUE,
@@ -73,30 +73,25 @@ CREATE TABLE ordens_servico (
     veiculo_id UUID NOT NULL REFERENCES veiculos(id),
     descricao_inicial VARCHAR(1000) NOT NULL,
     diagnostico VARCHAR(3000),
-    status VARCHAR(32) NOT NULL,
-    recebida_em TIMESTAMPTZ NOT NULL,
-    diagnostico_iniciado_em TIMESTAMPTZ,
-    orcamento_disponibilizado_em TIMESTAMPTZ,
-    execucao_iniciada_em TIMESTAMPTZ,
-    finalizada_em TIMESTAMPTZ,
-    entregue_em TIMESTAMPTZ,
-    cancelada_em TIMESTAMPTZ,
+    status VARCHAR(2) NOT NULL,
+    atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL,
     ativa BOOLEAN NOT NULL DEFAULT TRUE
 );
-CREATE INDEX ix_ordens_status_data ON ordens_servico(status, recebida_em);
-CREATE INDEX ix_ordens_cliente_data ON ordens_servico(cliente_id, recebida_em);
-CREATE INDEX ix_ordens_veiculo_data ON ordens_servico(veiculo_id, recebida_em);
+CREATE INDEX ix_ordens_status ON ordens_servico(status);
+CREATE INDEX ix_ordens_status_data ON ordens_servico(status, atualizado_em);
+--criar indice por historico de status
+--criar indice por historico de status e data
 
-CREATE TABLE historico_status_os (
+CREATE TABLE IF NOT EXISTS historico_status_os (
     id UUID PRIMARY KEY,
     ordem_servico_id UUID NOT NULL REFERENCES ordens_servico(id) ON DELETE CASCADE,
     status VARCHAR(32) NOT NULL,
-    ocorrido_em TIMESTAMPTZ NOT NULL,
+    atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL,
     ator VARCHAR(254) NOT NULL
 );
-CREATE INDEX ix_historico_os_data ON historico_status_os(ordem_servico_id, ocorrido_em);
+CREATE INDEX ix_historico_os_data ON historico_status_os(ordem_servico_id, atualizado_em);
 
-CREATE TABLE itens_servico_os (
+CREATE TABLE IF NOT EXISTS itens_servico_os (
     id UUID PRIMARY KEY,
     ordem_servico_id UUID NOT NULL REFERENCES ordens_servico(id) ON DELETE CASCADE,
     servico_catalogo_id UUID NOT NULL REFERENCES servicos(id),
@@ -104,7 +99,7 @@ CREATE TABLE itens_servico_os (
     valor_unitario NUMERIC(12,2) NOT NULL CHECK (valor_unitario >= 0),
     duracao_minutos INTEGER NOT NULL CHECK (duracao_minutos > 0)
 );
-CREATE TABLE itens_material_os (
+CREATE TABLE IF NOT EXISTS itens_material_os (
     id UUID PRIMARY KEY,
     ordem_servico_id UUID NOT NULL REFERENCES ordens_servico(id) ON DELETE CASCADE,
     item_estoque_id UUID NOT NULL REFERENCES itens_estoque(id),
@@ -113,7 +108,7 @@ CREATE TABLE itens_material_os (
     unidade_medida VARCHAR(20) NOT NULL,
     valor_unitario NUMERIC(12,2) NOT NULL CHECK (valor_unitario >= 0)
 );
-CREATE TABLE orcamentos (
+CREATE TABLE IF NOT EXISTS orcamentos (
     id UUID PRIMARY KEY,
     ordem_servico_id UUID NOT NULL REFERENCES ordens_servico(id) ON DELETE CASCADE,
     versao_orcamento INTEGER NOT NULL,
@@ -121,29 +116,30 @@ CREATE TABLE orcamentos (
     valor_materiais NUMERIC(12,2) NOT NULL CHECK (valor_materiais >= 0),
     valor_total NUMERIC(12,2) NOT NULL CHECK (valor_total >= 0),
     status VARCHAR(24) NOT NULL,
-    gerado_em TIMESTAMPTZ NOT NULL,
-    disponibilizado_em TIMESTAMPTZ,
-    validade_ate TIMESTAMPTZ,
-    decidido_em TIMESTAMPTZ,
+    gerado_em TIMESTAMP WITH TIME ZONE NOT NULL,
+    disponibilizado_em TIMESTAMP WITH TIME ZONE,
+    validade_ate TIMESTAMP WITH TIME ZONE,
+    decidido_em TIMESTAMP WITH TIME ZONE,
     UNIQUE (ordem_servico_id, versao_orcamento)
 );
 
-CREATE TABLE usuarios_administrativos (
+CREATE TABLE IF NOT EXISTS usuarios_administrativos (
     id UUID PRIMARY KEY,
     email VARCHAR(254) NOT NULL UNIQUE,
     senha_hash VARCHAR(100) NOT NULL,
     perfil VARCHAR(24) NOT NULL CHECK (perfil IN ('ADMIN', 'ATENDENTE', 'MECANICO')),
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    criado_em TIMESTAMPTZ NOT NULL
+    criado_em TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-CREATE TABLE auditoria (
+--remover a tabela de auditoria que não é parte do escopo atual do sistema, mas pode ser reintroduzida futuramente se necessário
+CREATE TABLE IF NOT EXISTS auditoria (
     id UUID PRIMARY KEY,
     ator VARCHAR(254) NOT NULL,
     acao VARCHAR(100) NOT NULL,
     tipo_recurso VARCHAR(80) NOT NULL,
     recurso_id VARCHAR(80),
-    ocorrido_em TIMESTAMPTZ NOT NULL,
+    atualizado_em TIMESTAMP WITH TIME ZONE NOT NULL,
     correlacao_id VARCHAR(80)
 );
-CREATE INDEX ix_auditoria_recurso_data ON auditoria(tipo_recurso, recurso_id, ocorrido_em);
+CREATE INDEX ix_auditoria_recurso_data ON auditoria(tipo_recurso, recurso_id, atualizado_em);
