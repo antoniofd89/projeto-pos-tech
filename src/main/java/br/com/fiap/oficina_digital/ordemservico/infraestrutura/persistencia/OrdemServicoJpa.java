@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -34,8 +36,8 @@ public class OrdemServicoJpa {
     public String descricaoInicial;
     @Column(length = 3000)
     public String diagnostico;
-    @Convert(converter = ConversorStatusOrdemServico.class)
-    @Column(nullable = false, length = 2)
+    @Convert(converter = StatusOrdemServicoConverter.class)
+    @Column(nullable = false)
     public StatusOrdemServico status;
     @Column(name = "atualizado_em", nullable = false)
     public Instant atualizadoEm;
@@ -47,8 +49,9 @@ public class OrdemServicoJpa {
     public List<ItemMaterialOSJpa> materiais = new ArrayList<>();
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<OrcamentoJpa> orcamentos = new ArrayList<>();
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<HistoricoStatusOSJpa> historicoStatus = new ArrayList<>();
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "historico_status", nullable = false, columnDefinition = "jsonb")
+    public List<EventoHistoricoStatusOS> historicoStatus = new ArrayList<>();
 
     public OrdemServicoJpa() {
     }

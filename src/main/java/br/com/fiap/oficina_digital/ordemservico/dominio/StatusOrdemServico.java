@@ -3,37 +3,32 @@ package br.com.fiap.oficina_digital.ordemservico.dominio;
 import java.util.Map;
 import java.util.Set;
 
+/** Códigos numéricos fazem parte do contrato de persistência; não renumerar nem reutilizar. */
 public enum StatusOrdemServico {
-    RECEBIDA ("01", "RECEBIDA"),
-    EM_DIAGNOSTICO ("02", "EM DIAGNÓSTICO"),
-    AGUARDANDO_APROVACAO ("03", "AGUARDANDO APROVAÇÃO"),
-    EM_EXECUCAO ("04", "EM EXECUÇÃO"),
-    FINALIZADA ("05", "FINALIZADA"),
-    ENTREGUE ("06", "ENTREGUE"),
-    CANCELADA ("07", "CANCELADA");
+    RECEBIDA(1),
+    EM_DIAGNOSTICO(2),
+    AGUARDANDO_APROVACAO(3),
+    EM_EXECUCAO(4),
+    FINALIZADA(5),
+    ENTREGUE(6),
+    CANCELADA(7);
 
-    private final String codigo;
-    private final String descricao;
+    private final int codigoPersistencia;
 
-    StatusOrdemServico(String codigo, String descricao) {
-        this.codigo = codigo;
-        this.descricao = descricao;
+    StatusOrdemServico(int codigoPersistencia) {
+        this.codigoPersistencia = codigoPersistencia;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public int codigoPersistencia() {
+        return codigoPersistencia;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public static StatusOrdemServico porCodigo(String codigo) {
-        for (var status : values()) {
-            if (status.codigo.equals(codigo))
-                return status;
-        }
-        throw new IllegalArgumentException("Código de status de ordem de serviço inválido: " + codigo);
+    public static StatusOrdemServico deCodigoPersistencia(Integer codigo) {
+        if (codigo == null) return null;
+        return java.util.Arrays.stream(values())
+                .filter(status -> status.codigoPersistencia == codigo)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Código de status de OS desconhecido: " + codigo));
     }
 
     private static final Map<StatusOrdemServico, Set<StatusOrdemServico>> TRANSICOES = Map.of(

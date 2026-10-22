@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/indicadores")
 @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-public class ControladorIndicadores {
+public class IndicadoresController {
     private final ServicoIndicadores servico;
 
-    public ControladorIndicadores(ServicoIndicadores servico) {
+    public IndicadoresController(ServicoIndicadores servico) {
         this.servico = servico;
     }
 

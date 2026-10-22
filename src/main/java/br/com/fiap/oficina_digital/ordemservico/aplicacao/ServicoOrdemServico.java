@@ -16,7 +16,7 @@ import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrcamento;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.ItemMaterialOSJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.ItemServicoOSJpa;
-import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.HistoricoStatusOSJpa;
+import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.EventoHistoricoStatusOS;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrcamentoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrdemServicoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.RepositorioOrdemServicoJpa;
@@ -308,15 +308,10 @@ public class ServicoOrdemServico {
     }
 
     private static void registrarHistorico(OrdemServicoJpa os, StatusOrdemServico status) {
-        var h = new HistoricoStatusOSJpa();
-        h.id = UUID.randomUUID();
-        h.ordemServico = os;
-        h.status = status;
-        h.atualizadoEm = Instant.now();
         var autenticacao = SecurityContextHolder.getContext().getAuthentication();
-        h.ator = autenticacao == null || !autenticacao.isAuthenticated()
+        String ator = autenticacao == null || !autenticacao.isAuthenticated()
                 || "anonymousUser".equals(autenticacao.getPrincipal()) ? "SISTEMA" : autenticacao.getName();
-        os.historicoStatus.add(h);
+        os.historicoStatus.add(new EventoHistoricoStatusOS(status, Instant.now(), ator));
     }
 
     private static void exigir(OrdemServicoJpa os, StatusOrdemServico estado) {
@@ -348,8 +343,8 @@ public class ServicoOrdemServico {
                 .toList();
         var b = o.orcamentos.stream().sorted(Comparator.comparingInt(x -> x.versaoOrcamento))
                 .map(ServicoOrdemServico::orcamento).toList();
-        var h = o.historicoStatus.stream().sorted(Comparator.comparing(x -> x.atualizadoEm))
-                .map(x -> new HistoricoStatus(x.status, x.atualizadoEm, x.ator)).toList();
+        var h = o.historicoStatus.stream().sorted(Comparator.comparing(x -> x.ocorridoEm))
+                .map(x -> new HistoricoStatus(x.status, x.ocorridoEm, x.ator)).toList();
         return new DetalheOrdem(o.id, o.numero, o.clienteId, o.veiculoId, o.descricaoInicial, o.diagnostico, o.status,
                 o.atualizadoEm, s, m, b, h);
     }

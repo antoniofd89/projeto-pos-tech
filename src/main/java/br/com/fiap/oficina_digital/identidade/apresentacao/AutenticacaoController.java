@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/autenticacao")
-public class ControladorAutenticacao {
+public class AutenticacaoController {
     private final ServicoAutenticacao servico;
 
-    public ControladorAutenticacao(ServicoAutenticacao servico) {
+    public AutenticacaoController(ServicoAutenticacao servico) {
         this.servico = servico;
     }
 

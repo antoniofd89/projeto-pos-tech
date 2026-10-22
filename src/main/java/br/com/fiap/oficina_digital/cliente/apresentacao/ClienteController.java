@@ -26,10 +26,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @Validated
 @RequestMapping("/clientes")
-public class ControladorCliente {
+public class ClienteController {
     private final ServicoCliente servicoCliente;
 
-    public ControladorCliente(ServicoCliente servicoCliente) {
+    public ClienteController(ServicoCliente servicoCliente) {
         this.servicoCliente = servicoCliente;
     }
 
