@@ -24,8 +24,8 @@ public class HistoricoStatusOSJpa {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     public StatusOrdemServico status;
-    @Column(name = "ocorrido_em", nullable = false)
-    public Instant ocorridoEm;
+    @Column(name = "atualizado_em", nullable = false)
+    public Instant atualizadoEm;
     @Column(nullable = false, length = 254)
     public String ator;
 

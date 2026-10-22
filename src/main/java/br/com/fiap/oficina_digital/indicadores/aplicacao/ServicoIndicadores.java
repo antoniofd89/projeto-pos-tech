@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
+import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrdemServicoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.RepositorioOrdemServicoJpa;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +22,14 @@ public class ServicoIndicadores {
     public List<TempoMedioServico> tempoMedio(Instant inicio, Instant fim) {
         if (inicio == null || fim == null || !fim.isAfter(inicio))
             throw new IllegalArgumentException("Informe período válido, com fim posterior ao início.");
-        var concluidas = ordens.findAllByFinalizadaEmBetween(inicio, fim);
+        var concluidas = ordens.buscarPorStatusNoHistoricoEntre(StatusOrdemServico.FINALIZADA, inicio, fim);
         var tempos = new java.util.HashMap<UUID, long[]>();
         for (var os : concluidas) {
-            if (os.execucaoIniciadaEm == null || os.finalizadaEm == null)
+            var execucaoIniciadaEm = dataDoStatus(os, StatusOrdemServico.EM_EXECUCAO);
+            var finalizadaEm = dataDoStatus(os, StatusOrdemServico.FINALIZADA);
+            if (execucaoIniciadaEm == null || finalizadaEm == null)
                 continue;
-            long segundos = java.time.Duration.between(os.execucaoIniciadaEm, os.finalizadaEm).toSeconds();
+            long segundos = java.time.Duration.between(execucaoIniciadaEm, finalizadaEm).toSeconds();
             if (segundos < 0)
                 continue;
             for (var item : os.servicos) {
@@ -37,6 +41,14 @@ public class ServicoIndicadores {
         return tempos.entrySet().stream()
                 .map(e -> new TempoMedioServico(e.getKey(), e.getValue()[1], e.getValue()[0] / e.getValue()[1]))
                 .sorted(java.util.Comparator.comparing(TempoMedioServico::servicoId)).toList();
+    }
+
+    private static Instant dataDoStatus(OrdemServicoJpa os, StatusOrdemServico status) {
+        return os.historicoStatus.stream()
+                .filter(h -> h.status == status)
+                .map(h -> h.atualizadoEm)
+                .min(Instant::compareTo)
+                .orElse(null);
     }
 
     public record TempoMedioServico(UUID servicoId, long ordensConcluidas, long tempoMedioSegundos) {

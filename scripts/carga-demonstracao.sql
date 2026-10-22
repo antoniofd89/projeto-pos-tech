@@ -40,20 +40,18 @@ ON CONFLICT (id) DO NOTHING;
 -- Cada OS fica em um status para testar a ação seguinte daquele ponto.
 INSERT INTO ordens_servico
     (id, versao, numero, codigo_acompanhamento, cliente_id, veiculo_id,
-     descricao_inicial, diagnostico, status, recebida_em, diagnostico_iniciado_em,
-     orcamento_disponibilizado_em, execucao_iniciada_em, finalizada_em,
-     entregue_em, cancelada_em, ativa)
+     descricao_inicial, diagnostico, status, atualizado_em, ativa)
 VALUES
-    ('50000000-0000-4000-8000-000000000001', 0, 'DEMO-OS-001', 'DEMO-CODIGO-RECEBIDA-001', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração no status RECEBIDA.', NULL, 'RECEBIDA', now() - interval '7 days', NULL, NULL, NULL, NULL, NULL, NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000002', 0, 'DEMO-OS-002', 'DEMO-CODIGO-DIAGNOSTICO-002', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração no status EM_DIAGNOSTICO.', 'Aguardando composição do orçamento.', 'EM_DIAGNOSTICO', now() - interval '6 days', now() - interval '5 days', NULL, NULL, NULL, NULL, NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000003', 0, 'DEMO-OS-003', 'DEMO-CODIGO-APROVACAO-003', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração aguardando decisão do cliente.', 'Revisão e troca do filtro de óleo.', 'AGUARDANDO_APROVACAO', now() - interval '4 days', now() - interval '3 days', now() - interval '2 days', NULL, NULL, NULL, NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000004', 0, 'DEMO-OS-004', 'DEMO-CODIGO-EXECUCAO-004', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração no status EM_EXECUCAO.', 'Revisão aprovada; veículo em execução.', 'EM_EXECUCAO', now() - interval '5 days', now() - interval '4 days', now() - interval '3 days', now() - interval '2 days', NULL, NULL, NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000005', 0, 'DEMO-OS-005', 'DEMO-CODIGO-FINALIZADA-005', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração pronta para entrega.', 'Serviços concluídos.', 'FINALIZADA', now() - interval '8 days', now() - interval '7 days', now() - interval '6 days', now() - interval '5 days', now() - interval '1 day', NULL, NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000006', 0, 'DEMO-OS-006', 'DEMO-CODIGO-ENTREGUE-006', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração já entregue.', 'Serviços concluídos e veículo entregue.', 'ENTREGUE', now() - interval '10 days', now() - interval '9 days', now() - interval '8 days', now() - interval '7 days', now() - interval '2 days', now() - interval '1 day', NULL, TRUE),
-    ('50000000-0000-4000-8000-000000000007', 0, 'DEMO-OS-007', 'DEMO-CODIGO-CANCELADA-007', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração cancelada.', NULL, 'CANCELADA', now() - interval '3 days', NULL, NULL, NULL, NULL, NULL, now() - interval '2 days', FALSE)
+    ('50000000-0000-4000-8000-000000000001', 0, 'DEMO-OS-001', 'DEMO-CODIGO-RECEBIDA-001', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração no status RECEBIDA.', NULL, '01', now() - interval '7 days', TRUE),
+    ('50000000-0000-4000-8000-000000000002', 0, 'DEMO-OS-002', 'DEMO-CODIGO-DIAGNOSTICO-002', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração no status EM_DIAGNOSTICO.', 'Aguardando composição do orçamento.', '02', now() - interval '5 days', TRUE),
+    ('50000000-0000-4000-8000-000000000003', 0, 'DEMO-OS-003', 'DEMO-CODIGO-APROVACAO-003', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', 'OS de demonstração aguardando decisão do cliente.', 'Revisão e troca do filtro de óleo.', '03', now() - interval '2 days', TRUE),
+    ('50000000-0000-4000-8000-000000000004', 0, 'DEMO-OS-004', 'DEMO-CODIGO-EXECUCAO-004', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração no status EM_EXECUCAO.', 'Revisão aprovada; veículo em execução.', '04', now() - interval '2 days', TRUE),
+    ('50000000-0000-4000-8000-000000000005', 0, 'DEMO-OS-005', 'DEMO-CODIGO-FINALIZADA-005', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração pronta para entrega.', 'Serviços concluídos.', '05', now() - interval '1 day', TRUE),
+    ('50000000-0000-4000-8000-000000000006', 0, 'DEMO-OS-006', 'DEMO-CODIGO-ENTREGUE-006', '10000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000003', 'OS de demonstração já entregue.', 'Serviços concluídos e veículo entregue.', '06', now() - interval '1 day', TRUE),
+    ('50000000-0000-4000-8000-000000000007', 0, 'DEMO-OS-007', 'DEMO-CODIGO-CANCELADA-007', '10000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'OS de demonstração cancelada.', NULL, '07', now() - interval '2 days', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO historico_status_os (id, ordem_servico_id, status, ocorrido_em, ator)
+INSERT INTO historico_status_os (id, ordem_servico_id, status, atualizado_em, ator)
 VALUES
     ('60000000-0000-4000-8000-000000000001', '50000000-0000-4000-8000-000000000001', 'RECEBIDA', now() - interval '7 days', 'CARGA_DEMO'),
     ('60000000-0000-4000-8000-000000000002', '50000000-0000-4000-8000-000000000002', 'RECEBIDA', now() - interval '6 days', 'CARGA_DEMO'),
@@ -109,7 +107,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Saldo inicial 20; 0,5 reservado para a OS 003 e 0,5 consumido pela OS 004.
 INSERT INTO movimentacoes_estoque
-    (id, item_estoque_id, ordem_servico_id, tipo, quantidade, ocorrido_em, observacao)
+    (id, item_estoque_id, ordem_servico_id, tipo, quantidade, atualizado_em, observacao)
 VALUES
     ('90000000-0000-4000-8000-000000000001', '40000000-0000-4000-8000-000000000001', NULL, 'ENTRADA', 20.000, now() - interval '10 days', 'Carga demonstrativa - saldo inicial'),
     ('90000000-0000-4000-8000-000000000002', '40000000-0000-4000-8000-000000000001', '50000000-0000-4000-8000-000000000003', 'RESERVA', 0.500, now() - interval '2 days', 'Reserva demonstrativa da OS 003'),

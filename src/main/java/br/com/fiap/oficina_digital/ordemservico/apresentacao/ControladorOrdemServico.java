@@ -38,30 +38,42 @@ public class ControladorOrdemServico {
         return ResponseEntity.created(URI.create("/ordens-servico/" + criada.ordemServico().id())).body(criada);
     }
 
+    /* vamos atualizar essa rota passando o código de acompanhamento como parâmetro,
+       assim o cliente consegue acompanhar a ordem de serviço, caso não seja passado o código,
+       a rota vai retornar todas as ordens de serviço do cliente logado
+
+       pra filtrar por usuário, podemos passar o id do cliente logado no token
+       e filtrar as ordens de serviço por esse id, assim o cliente só vai ver as ordens de serviço dele,
+       caso seja administrador, atendente ou mecânico, ele vai ver todas as ordens de serviço
+     */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
+    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')") //Como o cliente vai ter acesso a essa rota?
     public List<ServicoOrdemServico.DetalheOrdem> listar(@RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
         return servico.listar(pagina, tamanho);
     }
 
+    //Remover esse aqui porque o anterior já garante o retorno da ordem de serviço
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
+    @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')") //Como o cliente vai ter acesso a essa rota?
     public ServicoOrdemServico.DetalheOrdem buscar(@PathVariable UUID id) {
         return servico.buscar(id);
     }
 
+    //qual seria a função desse aqui?
     @GetMapping("/acompanhamento/{codigo}")
     public ServicoOrdemServico.DetalheOrdem acompanhar(@PathVariable String codigo) {
         return servico.acompanhar(codigo);
     }
 
+    //Não seria válido aqui passar como parâmetro no update?
     @PostMapping("/acompanhamento/{codigo}/orcamento/aprovar")
     public ServicoOrdemServico.DetalheOrdem aprovarComCodigo(@PathVariable String codigo,
             @Valid @RequestBody DecisaoOrcamento req) {
         return servico.aprovarPorCodigo(codigo, req.versao());
     }
 
+    //Não seria válido aqui passar como parâmetro no update?
     @PostMapping("/acompanhamento/{codigo}/orcamento/rejeitar")
     public ServicoOrdemServico.DetalheOrdem rejeitarComCodigo(@PathVariable String codigo,
             @Valid @RequestBody DecisaoOrcamento req) {
