@@ -26,7 +26,11 @@ public interface RepositorioOrdemServicoJpa extends JpaRepository<OrdemServicoJp
                 select 1
                 from jsonb_array_elements(o.historico_status) as evento
                 where (evento ->> 'status')::integer = :status
-                  and (evento ->> 'ocorridoEm')::timestamptz between :inicio and :fim
+                  and case jsonb_typeof(evento -> 'ocorridoEm')
+                      when 'number' then to_timestamp((evento ->> 'ocorridoEm')::double precision)
+                      when 'string' then (evento ->> 'ocorridoEm')::timestamptz
+                      else null
+                  end between :inicio and :fim
             )
             """, nativeQuery = true)
     List<OrdemServicoJpa> buscarPorStatusNoHistoricoEntre(@Param("status") int status,

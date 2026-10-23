@@ -54,6 +54,8 @@ public class TratadorErrosApi {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ProblemDetail tratarIntegridade(DataIntegrityViolationException erro, HttpServletRequest requisicao) {
+        LOG.error("Violação de integridade na API: {} {}. Causa: {}",
+                requisicao.getMethod(), requisicao.getRequestURI(), erro.getMostSpecificCause().getMessage(), erro);
         return problema(HttpStatus.CONFLICT, "Conflito de dados",
                 "Um registro com os mesmos dados já existe ou viola uma regra.", requisicao);
     }

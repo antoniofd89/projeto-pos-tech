@@ -158,7 +158,9 @@ async function carregarInicio() {
     const [clientes, ordens, estoque] = await Promise.all([
       requisicao('/clientes?pagina=0&tamanho=100'), requisicao('/ordens-servico?pagina=0&tamanho=100'), requisicao('/estoque/itens').catch(() => null),
     ]);
+    dadosEmCache.clientes = clientes;
     const veiculos = (await Promise.all(clientes.map((c) => requisicao(`/veiculos?clienteId=${c.id}`).catch(() => [])))).flat();
+    dadosEmCache.veiculos = veiculos;
     document.querySelector('#metric-clients').textContent = clientes.length;
     document.querySelector('#metric-orders').textContent = ordens.length;
     document.querySelector('#metric-vehicles').textContent = veiculos.length;
@@ -315,16 +317,19 @@ async function abrirFormularioOrdem() {
 async function abrirDetalheOS(id, codigoAcompanhamento = null) {
   try {
     const os = await requisicao(codigoAcompanhamento ? `/ordens-servico/acompanhamento/${encodeURIComponent(codigoAcompanhamento)}` : `/ordens-servico/${id}`);
-    const cliente = await requisicao(`/clientes/${os.clienteId}`).catch(() => null);
-    const veiculo = await requisicao(`/veiculos/${os.veiculoId}`).catch(() => null);
+    const servicosOS = Array.isArray(os.servicos) ? os.servicos : [];
+    const materiaisOS = Array.isArray(os.materiais) ? os.materiais : [];
+    const historicoOS = Array.isArray(os.historicoStatus) ? os.historicoStatus : [];
+    const orcamentoAtual = os.orcamento || null;
+    const cliente = (dadosEmCache.clientes || []).find((item) => item.id === os.clienteId) || null;
+    const veiculo = (dadosEmCache.veiculos || []).find((item) => item.id === os.veiculoId) || null;
     let botoes = '';
     if (os.status === 'RECEBIDA') botoes += `<button class="button button-primary" data-os-action="diagnostico/iniciar">Iniciar diagnóstico</button>`;
     if (os.status === 'EM_DIAGNOSTICO') {
       botoes += `<button class="button button-quiet" data-os-action="diagnostico">Registrar diagnóstico</button><button class="button button-quiet" data-os-action="servicos">Adicionar serviço</button><button class="button button-quiet" data-os-action="materiais">Adicionar material</button>`;
-      botoes += os.orcamentos.at(-1)?.status === 'GERADO' ? `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Disponibilizar orçamento</button>` : `<button class="button button-primary" data-os-action="orcamentos">Gerar orçamento</button>`;
+      botoes += orcamentoAtual?.status === 'GERADO' ? `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Disponibilizar orçamento</button>` : `<button class="button button-primary" data-os-action="orcamentos">Gerar orçamento</button>`;
     }
     if (os.status === 'AGUARDANDO_APROVACAO') {
-      const orcamentoAtual = os.orcamentos.at(-1);
       const codigoDisponivel = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
       if (orcamentoAtual?.status === 'GERADO') botoes += `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Enviar orçamento</button>`;
       else if (orcamentoAtual?.status === 'APROVADO') botoes += `<button class="button button-primary" data-os-action="execucao/iniciar">Iniciar execução</button>`;
@@ -334,7 +339,11 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
     if (os.status === 'EM_EXECUCAO') botoes += `<button class="button button-primary" data-os-action="finalizar">Finalizar serviço</button>`;
     if (os.status === 'FINALIZADA') botoes += `<button class="button button-primary" data-os-action="entrega">Registrar entrega</button>`;
     if (!['CANCELADA', 'ENTREGUE', 'EM_EXECUCAO', 'FINALIZADA'].includes(os.status)) botoes += `<button class="button button-danger" data-os-action="cancelar">Cancelar OS</button>`;
-    const detalhe = document.createElement('dialog'); detalhe.className = 'order-dialog detail-dialog'; detalhe.innerHTML = `<div class="dialog-card"><button class="dialog-close" aria-label="Fechar">×</button><p class="eyebrow">ORDEM DE SERVIÇO · ${esc(os.numero)}</p><h2>${esc(cliente?.nome || 'Cliente')} · ${esc(statusNome(os.status))}</h2><p class="dialog-copy">${esc(veiculo ? `${veiculo.marca} ${veiculo.modelo} · ${valorPlaca(veiculo)}` : os.veiculoId)}</p><div class="detail-description"><strong>Relato inicial</strong><p>${esc(os.descricaoInicial)}</p>${os.diagnostico ? `<strong>Diagnóstico</strong><p>${esc(os.diagnostico)}</p>` : ''}</div><div class="detail-list"><strong>Serviços e materiais</strong>${[...os.servicos.map((x) => `<span>${esc(x.nome)} · ${moeda(x.valorUnitario)}</span>`), ...os.materiais.map((x) => `<span>${esc(x.descricao)} · ${x.quantidade} ${esc(x.unidadeMedida)}</span>`)].join('') || '<span>Sem itens adicionados.</span>'}</div><div class="detail-list"><strong>Orçamentos</strong>${os.orcamentos.map((x) => `<span>Versão ${x.versao} · ${esc(statusNome(x.status))} · ${moeda(x.valorTotal)}</span>`).join('') || '<span>Nenhum orçamento gerado.</span>'}</div><div class="detail-timeline"><strong>Histórico</strong>${os.historicoStatus.map((x) => `<span><i></i>${esc(statusNome(x.status))} · ${formatarData(x.ocorridoEm)} · ${esc(x.ator)}</span>`).join('')}</div><div class="dialog-actions detail-actions">${botoes}</div></div>`;
+    const itensOS = [...servicosOS.map((x) => `<span>${esc(x.nome)} · ${moeda(x.valorUnitario)}</span>`), ...materiaisOS.map((x) => `<span>${esc(x.descricao)} · ${x.quantidade} ${esc(x.unidadeMedida)}</span>`)].join('') || '<span>Sem itens adicionados.</span>';
+    const resumoOrcamento = orcamentoAtual
+      ? `<span>${esc(statusNome(orcamentoAtual.status))} · ${moeda(orcamentoAtual.valorTotal)} · gerado em ${formatarData(orcamentoAtual.geradoEm)}</span>`
+      : '<span>Nenhum orçamento gerado.</span>';
+    const detalhe = document.createElement('dialog'); detalhe.className = 'order-dialog detail-dialog'; detalhe.innerHTML = `<div class="dialog-card"><button class="dialog-close" aria-label="Fechar">×</button><p class="eyebrow">ORDEM DE SERVIÇO · ${esc(os.numero)}</p><h2>${esc(cliente?.nome || 'Cliente')} · ${esc(statusNome(os.status))}</h2><p class="dialog-copy">${esc(veiculo ? `${veiculo.marca} ${veiculo.modelo} · ${valorPlaca(veiculo)}` : os.veiculoId)}</p><div class="detail-description"><strong>Relato inicial</strong><p>${esc(os.descricaoInicial)}</p>${os.diagnostico ? `<strong>Diagnóstico</strong><p>${esc(os.diagnostico)}</p>` : ''}</div><div class="detail-list"><strong>Serviços e materiais</strong>${itensOS}</div><div class="detail-list"><strong>Orçamento</strong>${resumoOrcamento}</div><div class="detail-timeline"><strong>Histórico</strong>${historicoOS.map((x) => `<span><i></i>${esc(statusNome(x.status))} · ${formatarData(x.atualizadoEm)} · ${esc(x.ator)}</span>`).join('')}</div><div class="dialog-actions detail-actions">${botoes}</div></div>`;
     const codigoExibido = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
     if (codigoExibido) {
       const caixaCodigo = document.createElement('div'); caixaCodigo.className = 'detail-code';
@@ -348,9 +357,8 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
     detalhe.querySelectorAll('[data-os-decision]').forEach((b) => b.addEventListener('click', async () => {
       const codigo = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
       if (!codigo) { aviso('Para aprovar ou rejeitar, informe o código de acompanhamento recebido na abertura da OS.', true); return; }
-      const versao = os.orcamentos.at(-1).versao;
       try {
-        await requisicao(`/ordens-servico/acompanhamento/${encodeURIComponent(codigo)}/orcamento/${b.dataset.osDecision}`, { method: 'POST', body: JSON.stringify({ versao }) });
+        await requisicao(`/ordens-servico/acompanhamento/${encodeURIComponent(codigo)}/orcamento/${b.dataset.osDecision}`, { method: 'POST' });
         detalhe.close(); aviso(`Orçamento ${b.dataset.osDecision === 'aprovar' ? 'aprovado' : 'rejeitado'} pelo fluxo de acompanhamento.`); await carregarOrdens(); await abrirDetalheOS(os.id, codigoAcompanhamento);
       } catch (e) { aviso(e.message, true); }
     }));
