@@ -172,21 +172,15 @@
           "name": "Listar clientes",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/clientes?pagina=0&tamanho=20"
+            "url": "{{baseUrl}}/clientes"
           }
         },
         {
-          "name": "Buscar cliente por ID",
+          "name": "Filtrar clientes por CPF/CNPJ",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/clientes/{{clienteId}}"
-          }
-        },
-        {
-          "name": "Buscar cliente por CPF/CNPJ",
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/clientes/por-documento?documento=52998224725"
+            "url": "{{baseUrl}}/clientes?documento=52998224725",
+            "description": "O controller aceita o parâmetro opcional documento na própria listagem."
           }
         },
         {
@@ -639,6 +633,22 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/disponibilizar"
+          }
+        },
+        {
+          "name": "Aprovar orçamento por ID",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/aprovar",
+            "description": "Ação autenticada disponível no controller para aprovar o orçamento pelo ID da OS."
+          }
+        },
+        {
+          "name": "Rejeitar orçamento por ID",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/ordens-servico/{{ordemServicoId}}/orcamentos/rejeitar",
+            "description": "Ação autenticada disponível no controller para rejeitar o orçamento pelo ID da OS."
           }
         },
         {
