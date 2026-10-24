@@ -6,10 +6,7 @@ import java.util.UUID;
 
 public interface RepositorioCliente {
     Cliente salvar(Cliente cliente);
-
     Optional<Cliente> buscarPorId(UUID id);
-
     Optional<Cliente> buscarPorDocumento(Documento documento);
-
-    List<Cliente> listar();
+    List<Cliente> listar(int pagina, int tamanho);
 }

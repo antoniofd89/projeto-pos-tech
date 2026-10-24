@@ -8,13 +8,14 @@ import jakarta.validation.constraints.Size;
  * EnderecoRequisicao
  */
 public record EnderecoRequisicao(
-        @NotBlank @Size(max = 9) String cep,
-        @NotBlank @Size(max = 200) String logradouro,
-        @NotBlank @Size(max = 20) String numero,
-        @Size(max = 100) String complemento,
-        @NotBlank @Size(max = 100) String bairro,
-        @NotBlank @Size(max = 100) String cidade,
-        @NotBlank @Size(min = 2, max = 2) String uf) {
+    @NotBlank @Size(max = 9) String cep,
+    @NotBlank @Size(max = 200) String logradouro,
+    @NotBlank @Size(max = 20) String numero,
+    @Size(max = 100) String complemento,
+    @NotBlank @Size(max = 100) String bairro,
+    @NotBlank @Size(max = 100) String cidade,
+    @NotBlank @Size(min = 2, max = 2) String uf
+) {
     public Endereco paraDominio() {
         return new Endereco(cep, logradouro, numero, complemento, bairro, cidade, uf);
     }
