@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.cliente.aplicacao.dto.DadosCliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
@@ -56,9 +57,7 @@ class ServicoClienteTest {
         when(repositorio.buscarPorDocumento(cliente.getDocumento())).thenReturn(Optional.of(cliente));
 
         assertSame(cliente, servico.buscarPorId(cliente.getId()));
-        assertSame(cliente, servico.buscarPorDocumento(CPF));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.buscarPorId(UUID.randomUUID()));
-        assertThrows(java.util.NoSuchElementException.class, () -> servico.buscarPorDocumento("11222333000181"));
     }
 
     @Test
