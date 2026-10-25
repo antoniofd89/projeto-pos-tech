@@ -21,7 +21,7 @@ public class ItemServicoOSJpa {
     @Column(name = "servico_catalogo_id", nullable = false)
     public UUID servicoCatalogoId;
     @Column(name = "nome_snapshot", nullable = false, length = 120)
-    public String nome; //não tem necessidade de ter um nome aqui caso tenha uma tabela de serviço a relacao do id já basta ainda mais que a tabela e pequena
+    public String nome;
     @Column(name = "valor_unitario", nullable = false, precision = 12, scale = 2)
     public BigDecimal valorUnitario;
     //aqui eu entendo que deveria ser medido em dias ou pelo menos em horas, minutos acaba sendo muito granular, só se na aplicação o servico seja em horas e
