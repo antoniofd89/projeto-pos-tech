@@ -35,4 +35,8 @@ public interface RepositorioOrdemServicoJpa extends JpaRepository<OrdemServicoJp
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from OrdemServicoJpa o where o.id=:id")
     Optional<OrdemServicoJpa> buscarParaAtualizacao(@Param("id") UUID id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select o from OrdemServicoJpa o where o.codigoAcompanhamento = :codigo")
+    Optional<OrdemServicoJpa> buscarParaAtualizacaoPorCodigo(@Param("codigo") String codigo);
 }

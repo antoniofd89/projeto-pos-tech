@@ -55,17 +55,9 @@ public class OrdemServicoController {
         return servico.acompanhar(codigo);
     }
 
-    //aqui podemos evoluir para um endpoint só que receba também uma decisao
-    //ai temos um único endpoint e uma funcao dentro do servico que estamos
-    //duplicando muito codigo que faz a mesma coisa
-    @PostMapping("/acompanhamento/{codigo}/orcamento/aprovar")
-    public ServicoOrdemServico.DetalheOrdem aprovarComCodigo(@PathVariable String codigo) {
-        return servico.aprovarPorCodigo(codigo);
-    }
-
-    @PostMapping("/acompanhamento/{codigo}/orcamento/rejeitar")
-    public ServicoOrdemServico.DetalheOrdem rejeitarComCodigo(@PathVariable String codigo) {
-        return servico.rejeitarPorCodigo(codigo);
+    @PostMapping("/orcamento/{codigo}/aprovar")
+    public ServicoOrdemServico.DetalheOrdem aprovarOrcamento(@PathVariable String codigo, @RequestParam boolean aprovar) {
+        return servico.aprovarPorCodigo(codigo, aprovar);
     }
 
     @PostMapping("/{id}/diagnostico/iniciar")
@@ -106,17 +98,6 @@ public class OrdemServicoController {
         return servico.disponibilizarOrcamento(id);
     }
 
-    //aqui está com o código duplicado, podemos usar um único endpoint para aprovar/reprovar
-    @PostMapping("/{id}/orcamentos/aprovar")
-    public ServicoOrdemServico.DetalheOrdem aprovar(@PathVariable UUID id) {
-        return servico.aprovarOrcamento(id);
-    }
-
-    @PostMapping("/{id}/orcamentos/rejeitar")
-    public ServicoOrdemServico.DetalheOrdem rejeitar(@PathVariable UUID id) {
-        return servico.rejeitarOrcamento(id);
-    }
-
     @PostMapping("/{id}/execucao/iniciar")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
     public ServicoOrdemServico.DetalheOrdem iniciarExecucao(@PathVariable UUID id) {
@@ -125,12 +106,14 @@ public class OrdemServicoController {
 
     @PostMapping("/{id}/finalizar")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
+    //aqui tem que adicionar quem fez a acao de entrega e um motivo
     public ServicoOrdemServico.DetalheOrdem finalizar(@PathVariable UUID id) {
         return servico.finalizar(id);
     }
 
     @PostMapping("/{id}/entrega")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
+    //aqui tem que adicionar quem fez a acao de entrega e um motivo
     public ServicoOrdemServico.DetalheOrdem entregar(@PathVariable UUID id) {
         return servico.entregar(id);
     }
