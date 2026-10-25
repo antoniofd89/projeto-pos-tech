@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.catalogo.aplicacao.dto.DadosServico;
 import br.com.fiap.oficina_digital.catalogo.infraestrutura.persistencia.RepositorioServicoJpa;
 import br.com.fiap.oficina_digital.catalogo.infraestrutura.persistencia.ServicoCatalogoJpa;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +68,7 @@ class ServicoCatalogoAplicacaoTest {
         when(repositorio.findById(entidade.id)).thenReturn(Optional.of(entidade));
 
         var atualizado = servico.atualizar(entidade.id,
-                new ServicoCatalogoAplicacao.DadosServico("Revisão completa", "Com filtros", "Preventiva",
+                new DadosServico("Revisão completa", "Com filtros", "Preventiva",
                         new BigDecimal("180.50"), 90));
 
         assertEquals("Revisão completa", atualizado.nome());
@@ -88,8 +89,8 @@ class ServicoCatalogoAplicacaoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.inativar(UUID.randomUUID()));
     }
 
-    private static ServicoCatalogoAplicacao.DadosServico dados() {
-        return new ServicoCatalogoAplicacao.DadosServico("Revisão", "Troca de óleo", "Preventiva",
+    private static DadosServico dados() {
+        return new DadosServico("Revisão", "Troca de óleo", "Preventiva",
                 new BigDecimal("120"), 60);
     }
 

@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import br.com.fiap.oficina_digital.estoque.dominio.TipoItemEstoque;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.DadosItem;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.ItemResposta;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.Material;
 import br.com.fiap.oficina_digital.estoque.dominio.TipoMovimentacao;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.ItemEstoqueJpa;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.MovimentacaoEstoqueJpa;
@@ -193,17 +195,5 @@ public class ServicoEstoque {
         return new ItemResposta(e.id, e.codigo, e.descricao, e.tipo, e.unidadeMedida, e.precoUnitario,
                 e.quantidadeFisica, e.quantidadeReservada, e.quantidadeFisica.subtract(e.quantidadeReservada),
                 e.estoqueMinimo, e.ativo);
-    }
-
-    public record DadosItem(String codigo, String descricao, TipoItemEstoque tipo, String unidadeMedida,
-            BigDecimal precoUnitario, BigDecimal quantidadeInicial, BigDecimal estoqueMinimo) {
-    }
-
-    public record Material(UUID itemId, BigDecimal quantidade) {
-    }
-
-    public record ItemResposta(UUID id, String codigo, String descricao, TipoItemEstoque tipo, String unidadeMedida,
-            BigDecimal precoUnitario, BigDecimal quantidadeFisica, BigDecimal quantidadeReservada,
-            BigDecimal quantidadeDisponivel, BigDecimal estoqueMinimo, boolean ativo) {
     }
 }

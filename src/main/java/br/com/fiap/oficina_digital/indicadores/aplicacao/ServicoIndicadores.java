@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.indicadores.aplicacao.dto.TempoMedioServico;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrdemServicoJpa;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.RepositorioOrdemServicoJpa;
@@ -50,8 +51,5 @@ public class ServicoIndicadores {
                 .map(h -> h.ocorridoEm)
                 .min(Instant::compareTo)
                 .orElse(null);
-    }
-
-    public record TempoMedioServico(UUID servicoId, long ordensConcluidas, long tempoMedioSegundos) {
     }
 }

@@ -16,6 +16,7 @@ import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 import br.com.fiap.oficina_digital.estoque.aplicacao.ServicoEstoque;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.ItemEstoqueJpa;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.RepositorioItemEstoqueJpa;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DadosAbertura;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrcamento;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrcamentoJpa;
@@ -68,7 +69,7 @@ class ServicoOrdemServicoTest {
     @Test
     void abreOrdemComHistoricoEIdentificadorDeAcompanhamento() {
         var resposta = servico
-                .abrir(new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
+                .abrir(new DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
         assertEquals(StatusOrdemServico.RECEBIDA, resposta.ordemServico().status());
         assertEquals("Barulho no motor", resposta.ordemServico().descricaoInicial());
         assertNotNull(resposta.codigoAcompanhamento());
@@ -218,8 +219,8 @@ class ServicoOrdemServicoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.iniciarDiagnostico(UUID.randomUUID()));
     }
 
-    private ServicoOrdemServico.DadosAbertura entrada(String descricao) {
-        return new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, descricao);
+    private DadosAbertura entrada(String descricao) {
+        return new DadosAbertura(clienteId, veiculoId, descricao);
     }
 
     private static OrdemServicoJpa ordem(StatusOrdemServico status) {

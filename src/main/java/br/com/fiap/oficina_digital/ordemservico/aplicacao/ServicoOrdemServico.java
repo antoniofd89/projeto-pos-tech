@@ -13,6 +13,14 @@ import java.util.UUID;
 import br.com.fiap.oficina_digital.catalogo.aplicacao.ServicoCatalogoAplicacao;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 import br.com.fiap.oficina_digital.estoque.aplicacao.ServicoEstoque;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.Material;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.CriacaoResposta;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DadosAbertura;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DetalheOrdem;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.HistoricoStatus;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.ItemMaterial;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.ItemServico;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.OrcamentoResposta;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrcamento;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.ItemMaterialOSJpa;
@@ -217,7 +225,7 @@ public class ServicoOrdemServico {
         exigirOrcamentoVigente(os);
         if (!os.materiais.isEmpty())
             estoque.reservar(os.id, os.materiais.stream()
-                    .map(i -> new ServicoEstoque.Material(i.itemEstoqueId, i.quantidade)).toList());
+                    .map(i -> new Material(i.itemEstoqueId, i.quantidade)).toList());
         o.status = aprovar ? StatusOrcamento.APROVADO : StatusOrcamento.REJEITADO;
         registrarAtualizacaoOrcamento(o, Instant.now());
 
@@ -372,31 +380,5 @@ public class ServicoOrdemServico {
         return new DetalheOrdem(o.id, o.numero, o.clienteId, o.veiculoId, o.descricaoInicial, o.diagnostico, o.status,
                 o.criadoEm, o.atualizadoEm, o.validadeAte, o.prazoServico, s, m,
                 o.orcamento == null ? null : orcamento(o.orcamento), h);
-    }
-
-    public record DadosAbertura(UUID clienteId, UUID veiculoId, String descricaoInicial) {
-    }
-
-    public record CriacaoResposta(DetalheOrdem ordemServico, String codigoAcompanhamento) {
-    }
-
-    public record DetalheOrdem(UUID id, String numero, UUID clienteId, UUID veiculoId, String descricaoInicial,
-            String diagnostico, StatusOrdemServico status, Instant criadoEm, Instant atualizadoEm,
-            Instant validadeAte, Instant prazoServico, List<ItemServico> servicos, List<ItemMaterial> materiais,
-            OrcamentoResposta orcamento, List<HistoricoStatus> historicoStatus) {
-    }
-
-    public record HistoricoStatus(StatusOrdemServico status, Instant atualizadoEm, String ator) {
-    }
-
-    public record ItemServico(UUID servicoId, String nome, BigDecimal valorUnitario, int duracaoMinutos) {
-    }
-
-    public record ItemMaterial(UUID itemEstoqueId, String descricao, BigDecimal quantidade, String unidadeMedida,
-            BigDecimal valorUnitario) {
-    }
-
-    public record OrcamentoResposta(BigDecimal valorServicos, BigDecimal valorMateriais, BigDecimal valorTotal,
-            StatusOrcamento status, Instant geradoEm, Instant atualizadoEm) {
     }
 }

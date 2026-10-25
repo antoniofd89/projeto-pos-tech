@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.ordemservico.aplicacao.ServicoOrdemServico;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.CriacaoResposta;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DetalheOrdem;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.OrcamentoResposta;
+import br.com.fiap.oficina_digital.ordemservico.apresentacao.dto.AberturaOrdemRequisicao;
+import br.com.fiap.oficina_digital.ordemservico.apresentacao.dto.AdicaoMaterialRequisicao;
+import br.com.fiap.oficina_digital.ordemservico.apresentacao.dto.AdicaoServicoRequisicao;
+import br.com.fiap.oficina_digital.ordemservico.apresentacao.dto.DiagnosticoRequisicao;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,111 +35,96 @@ public class OrdemServicoController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-    public ResponseEntity<ServicoOrdemServico.CriacaoResposta> abrir(@Valid @RequestBody RequisicaoAbertura req) {
-        var criada = servico
-                .abrir(new ServicoOrdemServico.DadosAbertura(req.clienteId(), req.veiculoId(), req.descricaoInicial()));
+    public ResponseEntity<CriacaoResposta> abrir(@Valid @RequestBody AberturaOrdemRequisicao req) {
+        var criada = servico.abrir(req.paraDados());
         return ResponseEntity.created(URI.create("/ordens-servico/" + criada.ordemServico().id())).body(criada);
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public List<ServicoOrdemServico.DetalheOrdem> listar(@RequestParam(defaultValue = "0") int pagina,
+    public List<DetalheOrdem> listar(@RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "20") int tamanho) {
         return servico.listar(pagina, tamanho);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem buscar(@PathVariable UUID id) {
+    public DetalheOrdem buscar(@PathVariable UUID id) {
         return servico.buscar(id);
     }
 
     @GetMapping("/acompanhamento/{codigo}")
-    public ServicoOrdemServico.DetalheOrdem acompanhar(@PathVariable String codigo) {
+    public DetalheOrdem acompanhar(@PathVariable String codigo) {
         return servico.acompanhar(codigo);
     }
 
     @PostMapping("/orcamento/{codigo}/aprovar")
-    public ServicoOrdemServico.DetalheOrdem aprovarOrcamento(@PathVariable String codigo, @RequestParam boolean aprovar) {
+    public DetalheOrdem aprovarOrcamento(@PathVariable String codigo, @RequestParam boolean aprovar) {
         return servico.aprovarPorCodigo(codigo, aprovar);
     }
 
     @PostMapping("/{id}/diagnostico/iniciar")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem iniciarDiagnostico(@PathVariable UUID id) {
+    public DetalheOrdem iniciarDiagnostico(@PathVariable UUID id) {
         return servico.iniciarDiagnostico(id);
     }
 
     @PostMapping("/{id}/diagnostico")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem registrarDiagnostico(@PathVariable UUID id, @Valid @RequestBody Texto req) {
+    public DetalheOrdem registrarDiagnostico(@PathVariable UUID id,
+            @Valid @RequestBody DiagnosticoRequisicao req) {
         return servico.registrarDiagnostico(id, req.texto());
     }
 
     @PostMapping("/{id}/servicos")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem adicionarServico(@PathVariable UUID id,
-            @Valid @RequestBody RequisicaoServico req) {
+    public DetalheOrdem adicionarServico(@PathVariable UUID id,
+            @Valid @RequestBody AdicaoServicoRequisicao req) {
         return servico.adicionarServico(id, req.servicoId());
     }
 
     @PostMapping("/{id}/materiais")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem adicionarMaterial(@PathVariable UUID id,
-            @Valid @RequestBody RequisicaoMaterial req) {
+    public DetalheOrdem adicionarMaterial(@PathVariable UUID id,
+            @Valid @RequestBody AdicaoMaterialRequisicao req) {
         return servico.adicionarMaterial(id, req.itemEstoqueId(), req.quantidade());
     }
 
     @PostMapping("/{id}/orcamentos")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.OrcamentoResposta gerarOrcamento(@PathVariable UUID id) {
+    public OrcamentoResposta gerarOrcamento(@PathVariable UUID id) {
         return servico.gerarOrcamento(id);
     }
 
     @PostMapping("/{id}/orcamentos/disponibilizar")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-    public ServicoOrdemServico.OrcamentoResposta disponibilizarOrcamento(@PathVariable UUID id) {
+    public OrcamentoResposta disponibilizarOrcamento(@PathVariable UUID id) {
         return servico.disponibilizarOrcamento(id);
     }
 
     @PostMapping("/{id}/execucao/iniciar")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    public ServicoOrdemServico.DetalheOrdem iniciarExecucao(@PathVariable UUID id) {
+    public DetalheOrdem iniciarExecucao(@PathVariable UUID id) {
         return servico.iniciarExecucao(id);
     }
 
     @PostMapping("/{id}/finalizar")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
     //aqui tem que adicionar quem fez a acao de entrega e um motivo
-    public ServicoOrdemServico.DetalheOrdem finalizar(@PathVariable UUID id) {
+    public DetalheOrdem finalizar(@PathVariable UUID id) {
         return servico.finalizar(id);
     }
 
     @PostMapping("/{id}/entrega")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     //aqui tem que adicionar quem fez a acao de entrega e um motivo
-    public ServicoOrdemServico.DetalheOrdem entregar(@PathVariable UUID id) {
+    public DetalheOrdem entregar(@PathVariable UUID id) {
         return servico.entregar(id);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-    public ServicoOrdemServico.DetalheOrdem cancelar(@PathVariable UUID id) {
+    public DetalheOrdem cancelar(@PathVariable UUID id) {
         return servico.cancelar(id);
     }
-
-    public record RequisicaoAbertura(@NotNull UUID clienteId, @NotNull UUID veiculoId,
-            @NotBlank @Size(max = 1000) String descricaoInicial) {
-    }
-
-    public record Texto(@NotBlank @Size(max = 3000) String texto) {
-    }
-
-    public record RequisicaoServico(@NotNull UUID servicoId) {
-    }
-
-    public record RequisicaoMaterial(@NotNull UUID itemEstoqueId,
-            @NotNull @jakarta.validation.constraints.DecimalMin("0.001") java.math.BigDecimal quantidade) {
-    }
-
 }

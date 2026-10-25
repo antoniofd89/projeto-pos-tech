@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.Duration;
 import java.util.List;
 
+import br.com.fiap.oficina_digital.identidade.aplicacao.dto.TokenResposta;
 import br.com.fiap.oficina_digital.identidade.infraestrutura.persistencia.RepositorioUsuarioJpa;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,8 +46,5 @@ public class ServicoAutenticacao {
         var cabecalho = JwsHeader.with(MacAlgorithm.HS256).type("JWT").build();
         String token = emissorJwt.encode(JwtEncoderParameters.from(cabecalho, claims)).getTokenValue();
         return new TokenResposta("Bearer", token, duracao.toSeconds());
-    }
-
-    public record TokenResposta(String tipo, String token, long expiraEmSegundos) {
     }
 }

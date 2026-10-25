@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import br.com.fiap.oficina_digital.indicadores.aplicacao.ServicoIndicadores;
+import br.com.fiap.oficina_digital.indicadores.aplicacao.dto.TempoMedioServico;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class IndicadoresController {
     }
 
     @GetMapping("/tempo-medio-servicos")
-    public List<ServicoIndicadores.TempoMedioServico> tempoMedio(
+    public List<TempoMedioServico> tempoMedio(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
         return servico.tempoMedio(inicio.atStartOfDay().toInstant(ZoneOffset.UTC),
