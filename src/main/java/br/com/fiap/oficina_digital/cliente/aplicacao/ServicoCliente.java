@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.fiap.oficina_digital.cliente.aplicacao.dto.DadosCliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
@@ -34,12 +35,6 @@ public class ServicoCliente {
     @Transactional(readOnly = true)
     public Cliente buscarPorId(UUID id) {
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
-    }
-
-    @Transactional(readOnly = true)
-    public Cliente buscarPorDocumento(String numeroDocumento) {
-        return repositorio.buscarPorDocumento(new Documento(numeroDocumento))
                 .orElseThrow(() -> new java.util.NoSuchElementException("Cliente não encontrado."));
     }
 

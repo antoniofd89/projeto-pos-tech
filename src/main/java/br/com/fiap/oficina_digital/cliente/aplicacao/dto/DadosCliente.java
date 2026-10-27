@@ -1,4 +1,4 @@
-package br.com.fiap.oficina_digital.cliente.aplicacao;
+package br.com.fiap.oficina_digital.cliente.aplicacao.dto;
 
 import br.com.fiap.oficina_digital.cliente.dominio.Endereco;
 

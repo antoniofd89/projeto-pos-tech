@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.DadosItem;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.Material;
 import br.com.fiap.oficina_digital.estoque.dominio.TipoItemEstoque;
 import br.com.fiap.oficina_digital.estoque.dominio.TipoMovimentacao;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.ItemEstoqueJpa;
@@ -33,7 +35,7 @@ class ServicoEstoqueTest {
     @Test
     void cadastraItemERegistraSaldoInicial() {
         when(itens.findByCodigo("OLEO")).thenReturn(Optional.empty());
-        var resposta = servico.cadastrar(new ServicoEstoque.DadosItem(" OLEO ", " Óleo ", TipoItemEstoque.INSUMO,
+        var resposta = servico.cadastrar(new DadosItem(" OLEO ", " Óleo ", TipoItemEstoque.INSUMO,
                 " litro ", bd("12.345"), bd("4"), bd("1")));
 
         assertEquals("OLEO", resposta.codigo());
@@ -49,7 +51,7 @@ class ServicoEstoqueTest {
     void validaCadastroEDetectaDuplicidade() {
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(null));
         assertThrows(IllegalArgumentException.class,
-                () -> servico.cadastrar(new ServicoEstoque.DadosItem("X", "Y", null, "un", bd("1"), bd("0"), bd("0"))));
+                () -> servico.cadastrar(new DadosItem("X", "Y", null, "un", bd("1"), bd("0"), bd("0"))));
         when(itens.findByCodigo("X")).thenReturn(Optional.of(item("X", "1", "0")));
         assertThrows(IllegalStateException.class, () -> servico.cadastrar(dados("X", "0")));
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(dados("Y", "-1")));
@@ -74,7 +76,7 @@ class ServicoEstoqueTest {
         when(movimentacoes.existsByOrdemServicoIdAndTipo(any(), any())).thenReturn(false);
         when(itens.buscarParaMovimentar(item.id)).thenReturn(Optional.of(item));
         servico.reservar(os,
-                List.of(new ServicoEstoque.Material(item.id, bd("2")), new ServicoEstoque.Material(item.id, bd("1"))));
+                List.of(new Material(item.id, bd("2")), new Material(item.id, bd("1"))));
         assertEquals(bd("3.000"), item.quantidadeReservada);
         verify(movimentacoes)
                 .save(argThat(m -> m.tipo == TipoMovimentacao.RESERVA && m.quantidade.equals(bd("3.000"))));
@@ -96,9 +98,9 @@ class ServicoEstoqueTest {
         when(movimentacoes.existsByOrdemServicoIdAndTipo(any(), any())).thenReturn(false);
         when(itens.buscarParaMovimentar(item.id)).thenReturn(Optional.of(item));
         assertThrows(IllegalStateException.class,
-                () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("3")))));
+                () -> servico.reservar(os, List.of(new Material(item.id, bd("3")))));
         assertThrows(IllegalArgumentException.class,
-                () -> servico.reservar(os, List.of(new ServicoEstoque.Material(item.id, bd("0")))));
+                () -> servico.reservar(os, List.of(new Material(item.id, bd("0")))));
 
         item.quantidadeReservada = bd("1");
         var reserva = new MovimentacaoEstoqueJpa();
@@ -113,8 +115,8 @@ class ServicoEstoqueTest {
         verify(movimentacoes, times(1)).save(argThat(m -> m.tipo == TipoMovimentacao.ESTORNO));
     }
 
-    private static ServicoEstoque.DadosItem dados(String codigo, String inicial) {
-        return new ServicoEstoque.DadosItem(codigo, "Item", TipoItemEstoque.PECA, "un", bd("10"), bd(inicial), bd("0"));
+    private static DadosItem dados(String codigo, String inicial) {
+        return new DadosItem(codigo, "Item", TipoItemEstoque.PECA, "un", bd("10"), bd(inicial), bd("0"));
     }
 
     private static ItemEstoqueJpa item(String codigo, String fisica, String reservada) {

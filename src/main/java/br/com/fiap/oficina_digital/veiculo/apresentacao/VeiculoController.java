@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.veiculo.aplicacao.ServicoVeiculo;
+import br.com.fiap.oficina_digital.veiculo.apresentacao.dto.AtualizacaoVeiculoRequisicao;
+import br.com.fiap.oficina_digital.veiculo.apresentacao.dto.CadastroVeiculoRequisicao;
 import br.com.fiap.oficina_digital.veiculo.dominio.Veiculo;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +34,8 @@ public class VeiculoController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-    public ResponseEntity<Veiculo> cadastrar(@Valid @RequestBody RequisicaoVeiculo req) {
-        var v = servico.cadastrar(req.clienteId(), req.dados());
+    public ResponseEntity<Veiculo> cadastrar(@Valid @RequestBody CadastroVeiculoRequisicao req) {
+        var v = servico.cadastrar(req.clienteId(), req.paraDados());
         return ResponseEntity.created(URI.create("/veiculos/" + v.id())).body(v);
     }
 
@@ -55,8 +53,8 @@ public class VeiculoController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
-    public Veiculo atualizar(@PathVariable UUID id, @Valid @RequestBody AtualizacaoVeiculo req) {
-        return servico.atualizar(id, req.dados());
+    public Veiculo atualizar(@PathVariable UUID id, @Valid @RequestBody AtualizacaoVeiculoRequisicao req) {
+        return servico.atualizar(id, req.paraDados());
     }
 
     @DeleteMapping("/{id}")
@@ -64,21 +62,5 @@ public class VeiculoController {
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {
         servico.inativar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    public record RequisicaoVeiculo(UUID clienteId, @NotBlank @Size(max = 7) String placa,
-            @NotBlank @Size(max = 80) String marca, @NotBlank @Size(max = 100) String modelo,
-            @Min(1950) @Max(2100) int anoFabricacao, @Size(max = 40) String categoria) {
-        public ServicoVeiculo.DadosVeiculo dados() {
-            return new ServicoVeiculo.DadosVeiculo(placa, marca, modelo, anoFabricacao, categoria);
-        }
-    }
-
-    public record AtualizacaoVeiculo(@NotBlank @Size(max = 80) String marca,
-            @NotBlank @Size(max = 100) String modelo, @Min(1950) @Max(2100) int anoFabricacao,
-            @Size(max = 40) String categoria) {
-        public ServicoVeiculo.DadosVeiculo dados() {
-            return new ServicoVeiculo.DadosVeiculo(null, marca, modelo, anoFabricacao, categoria);
-        }
     }
 }
