@@ -1,6 +1,6 @@
 package br.com.fiap.oficina_digital.cliente.apresentacao.dto;
 
-import br.com.fiap.oficina_digital.cliente.aplicacao.DadosCliente;
+import br.com.fiap.oficina_digital.cliente.aplicacao.dto.DadosCliente;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -16,6 +16,7 @@ import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 import br.com.fiap.oficina_digital.estoque.aplicacao.ServicoEstoque;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.ItemEstoqueJpa;
 import br.com.fiap.oficina_digital.estoque.infraestrutura.persistencia.RepositorioItemEstoqueJpa;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DadosAbertura;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrcamento;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.OrcamentoJpa;
@@ -68,7 +69,7 @@ class ServicoOrdemServicoTest {
     @Test
     void abreOrdemComHistoricoEIdentificadorDeAcompanhamento() {
         var resposta = servico
-                .abrir(new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
+                .abrir(new DadosAbertura(clienteId, veiculoId, "  Barulho no motor  "));
         assertEquals(StatusOrdemServico.RECEBIDA, resposta.ordemServico().status());
         assertEquals("Barulho no motor", resposta.ordemServico().descricaoInicial());
         assertNotNull(resposta.codigoAcompanhamento());
@@ -122,7 +123,7 @@ class ServicoOrdemServicoTest {
 
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id);
+        servico.aprovarOrcamento(os.codigoAcompanhamento, true);
         Instant atualizadoOrcamentoAposAprovacao = os.orcamento.atualizadoEm;
         servico.iniciarExecucao(os.id);
         servico.finalizar(os.id);
@@ -152,7 +153,7 @@ class ServicoOrdemServicoTest {
         servico.disponibilizarOrcamento(os.id);
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of(() -> "ROLE_ADMIN")));
-        servico.aprovarOrcamento(os.id);
+        servico.aprovarPorCodigo(os.codigoAcompanhamento, true);
         verify(estoque).reservar(eq(os.id),
                 argThat(m -> m.size() == 1 && m.getFirst().quantidade().equals(bd("2.000"))));
         servico.iniciarExecucao(os.id);
@@ -165,10 +166,10 @@ class ServicoOrdemServicoTest {
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
         prepararBusca(os);
         assertThrows(org.springframework.security.access.AccessDeniedException.class,
-                () -> servico.aprovarOrcamento(os.id));
+                () -> servico.aprovarOrcamento(os.codigoAcompanhamento, true));
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token").status());
-        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token"));
+        assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token", true).status());
+        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token", true));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.acompanhar("invalido"));
     }
 
@@ -180,7 +181,7 @@ class ServicoOrdemServicoTest {
         Instant prazoOriginal = os.prazoServico;
         prepararBusca(os);
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        var resultado = servico.rejeitarPorCodigo("token");
+        var resultado = servico.aprovarPorCodigo("token", false);
         assertEquals(StatusOrdemServico.EM_DIAGNOSTICO, resultado.status());
         assertEquals(StatusOrcamento.REJEITADO, os.orcamento.status);
         assertEquals(validadeOriginal, os.validadeAte);
@@ -192,10 +193,10 @@ class ServicoOrdemServicoTest {
     void recusaAprovacaoDeOrcamentoVencido() {
         var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
-        os.validadeAte = Instant.now().minusSeconds(1);
+        os.validadeAte = Instant.now().minus(java.time.Duration.ofDays(8));
         prepararBusca(os);
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token"));
+        assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token", false));
     }
 
     @Test
@@ -218,8 +219,8 @@ class ServicoOrdemServicoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.iniciarDiagnostico(UUID.randomUUID()));
     }
 
-    private ServicoOrdemServico.DadosAbertura entrada(String descricao) {
-        return new ServicoOrdemServico.DadosAbertura(clienteId, veiculoId, descricao);
+    private DadosAbertura entrada(String descricao) {
+        return new DadosAbertura(clienteId, veiculoId, descricao);
     }
 
     private static OrdemServicoJpa ordem(StatusOrdemServico status) {
@@ -241,6 +242,7 @@ class ServicoOrdemServicoTest {
 
     private void prepararBusca(OrdemServicoJpa os) {
         when(ordens.buscarParaAtualizacao(os.id)).thenReturn(Optional.of(os));
+        when(ordens.buscarParaAtualizacaoPorCodigo(os.codigoAcompanhamento)).thenReturn(Optional.of(os));
         when(ordens.findById(os.id)).thenReturn(Optional.of(os));
     }
 

@@ -1,9 +1,9 @@
 package br.com.fiap.oficina_digital.catalogo.aplicacao;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.fiap.oficina_digital.catalogo.aplicacao.dto.DadosServico;
 import br.com.fiap.oficina_digital.catalogo.dominio.ServicoCatalogo;
 import br.com.fiap.oficina_digital.catalogo.infraestrutura.persistencia.RepositorioServicoJpa;
 import br.com.fiap.oficina_digital.catalogo.infraestrutura.persistencia.ServicoCatalogoJpa;
@@ -77,9 +77,5 @@ public class ServicoCatalogoAplicacao {
     private static ServicoCatalogo dominio(ServicoCatalogoJpa e) {
         return new ServicoCatalogo(e.id, e.nome, e.descricao, e.categoria, e.valorBase, e.duracaoEstimadaMinutos,
                 e.ativo);
-    }
-
-    public record DadosServico(String nome, String descricao, String categoria, BigDecimal valorBase,
-            int duracaoEstimadaMinutos) {
     }
 }

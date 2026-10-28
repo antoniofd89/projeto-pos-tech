@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
+import br.com.fiap.oficina_digital.veiculo.aplicacao.dto.DadosVeiculo;
 import br.com.fiap.oficina_digital.veiculo.dominio.Placa;
 import br.com.fiap.oficina_digital.veiculo.dominio.Veiculo;
 import br.com.fiap.oficina_digital.veiculo.infraestrutura.persistencia.RepositorioVeiculoJpa;
@@ -90,8 +91,5 @@ public class ServicoVeiculo {
     public static Veiculo dominio(VeiculoJpa e) {
         return new Veiculo(e.id, e.clienteId, new Placa(e.placa), e.marca, e.modelo,
                 e.anoFabricacao, e.categoria, e.ativo, e.dataCadastro);
-    }
-
-    public record DadosVeiculo(String placa, String marca, String modelo, int anoFabricacao, String categoria) {
     }
 }

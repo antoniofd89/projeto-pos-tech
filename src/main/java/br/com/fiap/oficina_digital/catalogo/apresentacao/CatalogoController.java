@@ -1,18 +1,13 @@
 package br.com.fiap.oficina_digital.catalogo.apresentacao;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 import br.com.fiap.oficina_digital.catalogo.aplicacao.ServicoCatalogoAplicacao;
+import br.com.fiap.oficina_digital.catalogo.apresentacao.dto.ServicoCatalogoRequisicao;
 import br.com.fiap.oficina_digital.catalogo.dominio.ServicoCatalogo;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +30,8 @@ public class CatalogoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ServicoCatalogo> cadastrar(@Valid @RequestBody RequisicaoServico req) {
-        var s = servico.cadastrar(req.dados());
+    public ResponseEntity<ServicoCatalogo> cadastrar(@Valid @RequestBody ServicoCatalogoRequisicao req) {
+        var s = servico.cadastrar(req.paraDados());
         return ResponseEntity.created(URI.create("/servicos/" + s.id())).body(s);
     }
 
@@ -54,8 +49,8 @@ public class CatalogoController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ServicoCatalogo atualizar(@PathVariable UUID id, @Valid @RequestBody RequisicaoServico req) {
-        return servico.atualizar(id, req.dados());
+    public ServicoCatalogo atualizar(@PathVariable UUID id, @Valid @RequestBody ServicoCatalogoRequisicao req) {
+        return servico.atualizar(id, req.paraDados());
     }
 
     @DeleteMapping("/{id}")
@@ -63,14 +58,5 @@ public class CatalogoController {
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {
         servico.inativar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    public record RequisicaoServico(@NotBlank @Size(max = 120) String nome, @Size(max = 500) String descricao,
-            @NotBlank @Size(max = 80) String categoria, @NotNull @DecimalMin("0.00") BigDecimal valorBase,
-            @Min(1) int duracaoEstimadaMinutos) {
-        ServicoCatalogoAplicacao.DadosServico dados() {
-            return new ServicoCatalogoAplicacao.DadosServico(nome, descricao, categoria, valorBase,
-                    duracaoEstimadaMinutos);
-        }
     }
 }

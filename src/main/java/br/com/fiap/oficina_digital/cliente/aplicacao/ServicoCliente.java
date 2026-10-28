@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.fiap.oficina_digital.cliente.aplicacao.dto.DadosCliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;

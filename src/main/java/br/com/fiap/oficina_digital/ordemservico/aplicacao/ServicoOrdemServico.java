@@ -13,6 +13,14 @@ import java.util.UUID;
 import br.com.fiap.oficina_digital.catalogo.aplicacao.ServicoCatalogoAplicacao;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 import br.com.fiap.oficina_digital.estoque.aplicacao.ServicoEstoque;
+import br.com.fiap.oficina_digital.estoque.aplicacao.dto.Material;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.CriacaoResposta;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DadosAbertura;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DetalheOrdem;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.HistoricoStatus;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.ItemMaterial;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.ItemServico;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.OrcamentoResposta;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrcamento;
 import br.com.fiap.oficina_digital.ordemservico.dominio.StatusOrdemServico;
 import br.com.fiap.oficina_digital.ordemservico.infraestrutura.persistencia.ItemMaterialOSJpa;
@@ -197,42 +205,35 @@ public class ServicoOrdemServico {
     }
 
     @Transactional
-    public DetalheOrdem aprovarOrcamento(UUID id) {
+    public DetalheOrdem aprovarOrcamento(String codigo, boolean aprovar) {
         if (SecurityContextHolder.getContext().getAuthentication() == null
                 || SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .noneMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()))) {
+                .noneMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()))) {
             throw new org.springframework.security.access.AccessDeniedException(
                     "A aprovação de orçamento é exclusiva do cliente pelo código de acompanhamento.");
         }
-        return aprovarOrcamentoValidado(id);
-    }
-
-    private DetalheOrdem aprovarOrcamentoValidado(UUID id) {
-        var os = bloquear(id);
-        exigir(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
-        var o = orcamentoAtual(os);
-        if (o.status != StatusOrcamento.DISPONIBILIZADO)
-            throw new IllegalStateException("Somente o orçamento vigente pode ser aprovado.");
-        exigirOrcamentoVigente(os);
-        if (!os.materiais.isEmpty())
-            estoque.reservar(os.id, os.materiais.stream()
-                    .map(i -> new ServicoEstoque.Material(i.itemEstoqueId, i.quantidade)).toList());
-        o.status = StatusOrcamento.APROVADO;
-        registrarAtualizacaoOrcamento(o, Instant.now());
-        return detalhe(salvar(os));
+        return aprovarOrcamentoVigente(codigo, aprovar);
     }
 
     @Transactional
-    public DetalheOrdem rejeitarOrcamento(UUID id) {
-        var os = bloquear(id);
-        exigir(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
+    private DetalheOrdem aprovarOrcamentoVigente(String codigo, boolean aprovar) {
+        var os = bloquearOS(codigo);
+        validarStatusOs(os.status, StatusOrdemServico.AGUARDANDO_APROVACAO);
         var o = orcamentoAtual(os);
         if (o.status != StatusOrcamento.DISPONIBILIZADO)
-            throw new IllegalStateException("Somente o orçamento vigente pode ser rejeitado.");
-        o.status = StatusOrcamento.REJEITADO;
+            throw new IllegalStateException("Somente um orçamento vigente pode ser %s.".formatted(aprovar ? "aprovado" : "reprovado"));
+        exigirOrcamentoVigente(os);
+        if (!os.materiais.isEmpty())
+            estoque.reservar(os.id, os.materiais.stream()
+                    .map(i -> new Material(i.itemEstoqueId, i.quantidade)).toList());
+        o.status = aprovar ? StatusOrcamento.APROVADO : StatusOrcamento.REJEITADO;
         registrarAtualizacaoOrcamento(o, Instant.now());
-        estoque.estornar(os.id);
-        transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
+
+        if(!aprovar)  {
+            estoque.estornar(os.id);
+            transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
+        }
+
         return detalhe(salvar(os));
     }
 
@@ -276,17 +277,8 @@ public class ServicoOrdemServico {
     }
 
     @Transactional
-    public DetalheOrdem aprovarPorCodigo(String codigo) {
-        var os = ordens.findByCodigoAcompanhamento(codigo)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Código de acompanhamento inválido."));
-        return aprovarOrcamentoValidado(os.id);
-    }
-
-    @Transactional
-    public DetalheOrdem rejeitarPorCodigo(String codigo) {
-        var os = ordens.findByCodigoAcompanhamento(codigo)
-                .orElseThrow(() -> new java.util.NoSuchElementException("Código de acompanhamento inválido."));
-        return rejeitarOrcamento(os.id);
+    public DetalheOrdem aprovarPorCodigo(String codigo, boolean aprovar) {
+        return aprovarOrcamentoVigente(codigo, aprovar);
     }
 
     private OrdemServicoJpa obter(UUID id) {
@@ -315,6 +307,18 @@ public class ServicoOrdemServico {
         }).orElseThrow(() -> new java.util.NoSuchElementException("Ordem de serviço não encontrada."));
     }
 
+    private OrdemServicoJpa bloquearOS(String codigo) {
+        return ordens.buscarParaAtualizacaoPorCodigo(codigo).map(os -> {
+            os.servicos.size();
+            os.materiais.size();
+            if (os.orcamento != null) {
+                os.orcamento.status.name();
+            }
+            os.historicoStatus.size();
+            return os;
+        }).orElseThrow(() -> new java.util.NoSuchElementException("Ordem de serviço não encontrada."));
+    }
+
     private static void transicionar(OrdemServicoJpa os, StatusOrdemServico proximo) {
         os.status = os.status.transicionarPara(proximo);
         registrarHistorico(os, proximo);
@@ -330,6 +334,11 @@ public class ServicoOrdemServico {
     private static void exigir(OrdemServicoJpa os, StatusOrdemServico estado) {
         if (os.status != estado)
             throw new IllegalStateException("Ação não permitida para OS no estado " + os.status + ".");
+    }
+
+    private static void validarStatusOs(StatusOrdemServico statusAtualOS, StatusOrdemServico statusRequeridoOS) {
+        if (statusAtualOS != statusRequeridoOS)
+            throw new IllegalStateException("Ação não permitida para OS no estado %s.".formatted(statusAtualOS));
     }
 
     private static OrcamentoJpa orcamentoAtual(OrdemServicoJpa os) {
@@ -371,31 +380,5 @@ public class ServicoOrdemServico {
         return new DetalheOrdem(o.id, o.numero, o.clienteId, o.veiculoId, o.descricaoInicial, o.diagnostico, o.status,
                 o.criadoEm, o.atualizadoEm, o.validadeAte, o.prazoServico, s, m,
                 o.orcamento == null ? null : orcamento(o.orcamento), h);
-    }
-
-    public record DadosAbertura(UUID clienteId, UUID veiculoId, String descricaoInicial) {
-    }
-
-    public record CriacaoResposta(DetalheOrdem ordemServico, String codigoAcompanhamento) {
-    }
-
-    public record DetalheOrdem(UUID id, String numero, UUID clienteId, UUID veiculoId, String descricaoInicial,
-            String diagnostico, StatusOrdemServico status, Instant criadoEm, Instant atualizadoEm,
-            Instant validadeAte, Instant prazoServico, List<ItemServico> servicos, List<ItemMaterial> materiais,
-            OrcamentoResposta orcamento, List<HistoricoStatus> historicoStatus) {
-    }
-
-    public record HistoricoStatus(StatusOrdemServico status, Instant atualizadoEm, String ator) {
-    }
-
-    public record ItemServico(UUID servicoId, String nome, BigDecimal valorUnitario, int duracaoMinutos) {
-    }
-
-    public record ItemMaterial(UUID itemEstoqueId, String descricao, BigDecimal quantidade, String unidadeMedida,
-            BigDecimal valorUnitario) {
-    }
-
-    public record OrcamentoResposta(BigDecimal valorServicos, BigDecimal valorMateriais, BigDecimal valorTotal,
-            StatusOrcamento status, Instant geradoEm, Instant atualizadoEm) {
     }
 }

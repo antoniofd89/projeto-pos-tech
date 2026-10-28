@@ -12,6 +12,7 @@ import java.util.UUID;
 import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
+import br.com.fiap.oficina_digital.veiculo.aplicacao.dto.DadosVeiculo;
 import br.com.fiap.oficina_digital.veiculo.infraestrutura.persistencia.RepositorioVeiculoJpa;
 import br.com.fiap.oficina_digital.veiculo.infraestrutura.persistencia.VeiculoJpa;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class ServicoVeiculoTest {
         when(veiculos.findByPlaca("ABC1D23")).thenReturn(Optional.empty());
 
         var criado = servico.cadastrar(clienteId,
-                new ServicoVeiculo.DadosVeiculo("abc-1d23", "Honda", "Civic", 2022, "Sedã"));
+                new DadosVeiculo("abc-1d23", "Honda", "Civic", 2022, "Sedã"));
 
         assertEquals("ABC1D23", criado.placa().valor());
         assertEquals(clienteId, criado.clienteId());
@@ -51,7 +52,7 @@ class ServicoVeiculoTest {
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(clienteId, null));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.cadastrar(UUID.randomUUID(), dados()));
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(clienteId,
-                new ServicoVeiculo.DadosVeiculo("INVÁLIDA", "Honda", "Civic", 2022, null)));
+                new DadosVeiculo("INVÁLIDA", "Honda", "Civic", 2022, null)));
         verify(veiculos, never()).save(any());
     }
 
@@ -84,7 +85,7 @@ class ServicoVeiculoTest {
         when(veiculos.findById(entidade.id)).thenReturn(Optional.of(entidade));
 
         var atualizado = servico.atualizar(entidade.id,
-                new ServicoVeiculo.DadosVeiculo(null, "Honda", "Civic Touring", 2023, "Sedã"));
+                new DadosVeiculo(null, "Honda", "Civic Touring", 2023, "Sedã"));
 
         assertEquals("Civic Touring", atualizado.modelo());
         assertEquals("ABC1D23", atualizado.placa().valor());
@@ -107,8 +108,8 @@ class ServicoVeiculoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.inativar(UUID.randomUUID()));
     }
 
-    private ServicoVeiculo.DadosVeiculo dados() {
-        return new ServicoVeiculo.DadosVeiculo("ABC1D23", "Honda", "Civic", 2022, "Sedã");
+    private DadosVeiculo dados() {
+        return new DadosVeiculo("ABC1D23", "Honda", "Civic", 2022, "Sedã");
     }
 
     private Cliente cliente() {

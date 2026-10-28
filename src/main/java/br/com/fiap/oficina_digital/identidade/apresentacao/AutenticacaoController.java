@@ -1,9 +1,9 @@
 package br.com.fiap.oficina_digital.identidade.apresentacao;
 
 import br.com.fiap.oficina_digital.identidade.aplicacao.ServicoAutenticacao;
+import br.com.fiap.oficina_digital.identidade.aplicacao.dto.TokenResposta;
+import br.com.fiap.oficina_digital.identidade.apresentacao.dto.LoginRequisicao;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +19,7 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/login")
-    public ServicoAutenticacao.TokenResposta login(@Valid @RequestBody LoginRequisicao requisicao) {
+    public TokenResposta login(@Valid @RequestBody LoginRequisicao requisicao) {
         return servico.autenticar(requisicao.email(), requisicao.senha());
-    }
-
-    public record LoginRequisicao(@NotBlank @Email String email, @NotBlank String senha) {
     }
 }
