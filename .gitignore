@@ -1,5 +1,8 @@
 HELP.md
 target/
+.env
+.env.*
+!.env.example
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -32,4 +35,6 @@ build/
 ### VS Code ###
 .vscode/
 
-/docs
+## docs
+/docs/
+.DS_Store
