@@ -8,11 +8,8 @@ import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Repository;
-
 
 @Repository
 public class AdaptadorRepositorioCliente implements RepositorioCliente {
@@ -31,11 +28,13 @@ public class AdaptadorRepositorioCliente implements RepositorioCliente {
 
     @Override
     public Optional<Cliente> buscarPorId(UUID id) {
-        // Escritas carregam e bloqueiam antes de alterar o dominio, evitando lost update.
+        // Escritas carregam e bloqueiam antes de alterar o dominio, evitando lost
+        // update.
         boolean escrita = TransactionSynchronizationManager.isActualTransactionActive()
-            && !TransactionSynchronizationManager.isCurrentTransactionReadOnly();
+                && !TransactionSynchronizationManager.isCurrentTransactionReadOnly();
         var resultado = escrita ? jpa.buscarParaAtualizacao(id) : jpa.findById(id);
-        return resultado.map(MapeadorCliente::paraDominio);    }
+        return resultado.map(MapeadorCliente::paraDominio);
+    }
 
     @Override
     public Optional<Cliente> buscarPorDocumento(Documento documento) {
@@ -43,7 +42,7 @@ public class AdaptadorRepositorioCliente implements RepositorioCliente {
     }
 
     @Override
-    public List<Cliente> listar(int pagina, int tamanho) {
-        return jpa.findAll(PageRequest.of(pagina,tamanho, Sort.by("nome"))).getContent().stream().map(MapeadorCliente::paraDominio).toList();
+    public List<Cliente> listar() {
+        return jpa.findAll().stream().map(MapeadorCliente::paraDominio).toList();
     }
 }

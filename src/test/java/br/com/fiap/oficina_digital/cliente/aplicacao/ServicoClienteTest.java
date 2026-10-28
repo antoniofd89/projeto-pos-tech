@@ -1,5 +1,6 @@
 package br.com.fiap.oficina_digital.cliente.aplicacao;
 
+import br.com.fiap.oficina_digital.cliente.aplicacao.dto.DadosCliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Cliente;
 import br.com.fiap.oficina_digital.cliente.dominio.Documento;
 import br.com.fiap.oficina_digital.cliente.dominio.Endereco;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -109,39 +111,13 @@ class ServicoClienteTest {
         }
 
         @Test
-        @DisplayName("deve lançar IllegalArgumentException quando ID não existir")
+        @DisplayName("deve lançar NoSuchElementException quando ID não existir")
         void deveLancarExcecaoQuandoIdNaoExistir() {
             var idInexistente = UUID.randomUUID();
             when(repositorio.buscarPorId(idInexistente)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> servico.buscarPorId(idInexistente))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("não encontrado");
-        }
-    }
-
-    @Nested
-    @DisplayName("buscarPorDocumento")
-    class BuscarPorDocumento {
-
-        @Test
-        @DisplayName("deve retornar cliente quando documento existir")
-        void deveRetornarClienteQuandoDocumentoExistir() {
-            var fake = clienteFake();
-            when(repositorio.buscarPorDocumento(any())).thenReturn(Optional.of(fake));
-
-            var resultado = servico.buscarPorDocumento(CPF_VALIDO);
-
-            assertThat(resultado.getDocumento().numero()).isEqualTo("52998224725");
-        }
-
-        @Test
-        @DisplayName("deve lançar IllegalArgumentException quando documento não existir")
-        void deveLancarExcecaoQuandoDocumentoNaoExistir() {
-            when(repositorio.buscarPorDocumento(any())).thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> servico.buscarPorDocumento(CPF_VALIDO))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(NoSuchElementException.class)
                     .hasMessageContaining("não encontrado");
         }
     }
@@ -151,55 +127,37 @@ class ServicoClienteTest {
     class Listar {
 
         @Test
-        @DisplayName("deve delegar ao repositório com paginação válida")
-        void deveDelegarAoRepositorioComPaginacaoValida() {
-            when(repositorio.listar(0, 20)).thenReturn(List.of(clienteFake()));
+        @DisplayName("deve retornar todos os clientes quando documento não for informado")
+        void deveRetornarTodosQuandoDocumentoNulo() {
+            when(repositorio.listar()).thenReturn(List.of(clienteFake()));
 
-            var resultado = servico.listar(0, 20);
+            var resultado = servico.listar(null);
 
             assertThat(resultado).hasSize(1);
-            verify(repositorio, times(1)).listar(0, 20);
+            verify(repositorio, times(1)).listar();
         }
 
         @Test
-        @DisplayName("deve lançar IllegalArgumentException para página negativa")
-        void deveLancarExcecaoParaPaginaNegativa() {
-            assertThatThrownBy(() -> servico.listar(-1, 20))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Paginação");
+        @DisplayName("deve filtrar por documento quando informado")
+        void deveFiltrarPorDocumentoQuandoInformado() {
+            var fake = clienteFake();
+            when(repositorio.buscarPorDocumento(any())).thenReturn(Optional.of(fake));
 
-            verifyNoInteractions(repositorio);
+            var resultado = servico.listar(CPF_VALIDO);
+
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado.get(0).getDocumento().numero()).isEqualTo("52998224725");
+            verify(repositorio, never()).listar();
         }
 
         @Test
-        @DisplayName("deve lançar IllegalArgumentException para tamanho zero")
-        void deveLancarExcecaoParaTamanhoZero() {
-            assertThatThrownBy(() -> servico.listar(0, 0))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Paginação");
+        @DisplayName("deve retornar lista vazia quando documento não for encontrado")
+        void deveRetornarVazioQuandoDocumentoNaoEncontrado() {
+            when(repositorio.buscarPorDocumento(any())).thenReturn(Optional.empty());
 
-            verifyNoInteractions(repositorio);
-        }
-
-        @Test
-        @DisplayName("deve lançar IllegalArgumentException para tamanho acima de 100")
-        void deveLancarExcecaoParaTamanhoAcimaDe100() {
-            assertThatThrownBy(() -> servico.listar(0, 101))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Paginação");
-
-            verifyNoInteractions(repositorio);
-        }
-
-        @Test
-        @DisplayName("deve aceitar tamanho exatamente igual a 100")
-        void deveAceitarTamanhoIgualA100() {
-            when(repositorio.listar(0, 100)).thenReturn(List.of());
-
-            var resultado = servico.listar(0, 100);
+            var resultado = servico.listar(CPF_VALIDO);
 
             assertThat(resultado).isEmpty();
-            verify(repositorio).listar(0, 100);
         }
     }
 
@@ -228,7 +186,38 @@ class ServicoClienteTest {
             when(repositorio.buscarPorId(idInexistente)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> servico.atualizar(idInexistente, dadosValidos()))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(NoSuchElementException.class)
+                    .hasMessageContaining("não encontrado");
+
+            verify(repositorio, never()).salvar(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("inativar")
+    class Inativar {
+
+        @Test
+        @DisplayName("deve inativar e salvar o cliente")
+        void deveInativarESalvarCliente() {
+            var fake = clienteFake();
+            when(repositorio.buscarPorId(fake.getId())).thenReturn(Optional.of(fake));
+            when(repositorio.salvar(any())).thenReturn(fake);
+
+            servico.inativar(fake.getId());
+
+            verify(repositorio, times(1)).buscarPorId(fake.getId());
+            verify(repositorio, times(1)).salvar(fake);
+        }
+
+        @Test
+        @DisplayName("deve lançar exceção se o cliente não for encontrado para inativação")
+        void deveLancarExcecaoSeClienteNaoEncontrado() {
+            var idInexistente = UUID.randomUUID();
+            when(repositorio.buscarPorId(idInexistente)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> servico.inativar(idInexistente))
+                    .isInstanceOf(NoSuchElementException.class)
                     .hasMessageContaining("não encontrado");
 
             verify(repositorio, never()).salvar(any());

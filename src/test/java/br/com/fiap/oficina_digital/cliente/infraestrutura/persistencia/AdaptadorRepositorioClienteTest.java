@@ -64,7 +64,7 @@ class AdaptadorRepositorioClienteTest {
 
             adaptador.salvar(clienteSalvo);
 
-            var lista = adaptador.listar(0, 100);
+            var lista = adaptador.listar();
             long qtdComMesmoId = lista.stream()
                     .filter(c -> c.getId().equals(clienteSalvo.getId()))
                     .count();
@@ -127,35 +127,22 @@ class AdaptadorRepositorioClienteTest {
     class Listar {
 
         @Test
-        @DisplayName("deve retornar clientes paginados ordenados por nome")
-        void deveRetornarClientesPaginadosOrdenadosPorNome() {
-            // Salva um segundo cliente com nome anterior na ordenação
-            adaptador.salvar(novoCliente("11.222.333/0001-81", "Ana Costa"));
+        @DisplayName("deve retornar todos os clientes salvos")
+        void deveRetornarTodosOsClientes() {
+            adaptador.salvar(novoCliente("111.444.777-35", "Ana Costa"));
 
-            var pagina0 = adaptador.listar(0, 10);
+            var lista = adaptador.listar();
 
-            assertThat(pagina0).hasSizeGreaterThanOrEqualTo(2);
-            // Ana vem antes de João na ordenação por nome
-            assertThat(pagina0.get(0).getNome()).isEqualTo("Ana Costa");
-            assertThat(pagina0.get(1).getNome()).isEqualTo("João Silva");
+            assertThat(lista).hasSizeGreaterThanOrEqualTo(2);
         }
 
         @Test
-        @DisplayName("deve respeitar o tamanho da página")
-        void deveRespeitarTamanhoDaPagina() {
-            adaptador.salvar(novoCliente("11.222.333/0001-81", "Ana Costa"));
+        @DisplayName("deve retornar lista com pelo menos o cliente do setUp")
+        void deveRetornarPeloMenosUmCliente() {
+            var lista = adaptador.listar();
 
-            var pagina = adaptador.listar(0, 1);
-
-            assertThat(pagina).hasSize(1);
-        }
-
-        @Test
-        @DisplayName("deve retornar lista vazia para página além do total")
-        void deveRetornarVazioParaPaginaAlemDoTotal() {
-            var pagina = adaptador.listar(999, 10);
-
-            assertThat(pagina).isEmpty();
+            assertThat(lista).isNotEmpty();
+            assertThat(lista.stream().anyMatch(c -> c.getNome().equals("João Silva"))).isTrue();
         }
     }
 }
