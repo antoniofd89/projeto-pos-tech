@@ -8,13 +8,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CadastroClienteRequisicao(
-        @NotBlank @Size(max = 150) String nome,
-        @NotBlank @Size(max = 18) String documento,
-        @NotBlank @Email @Size(max = 254) String email,
-        @NotBlank @Size(max = 15) String telefone,
-        @Valid EnderecoRequisicao endereco,
-        @Pattern(regexp = "^$|^\\d{4}-\\d{2}-\\d{2}$", message = "Nascimento deve usar o formato AAAA-MM-DD") String nascimento
-
+    @NotBlank @Size(max = 150) String nome,
+    @NotBlank @Size(max = 18) String documento,
+    @NotBlank @Email @Size(max = 254) String email,
+    @NotBlank @Size(max = 15) String telefone,
+    @Valid EnderecoRequisicao endereco,
+    @Pattern(regexp = "^$|^\\d{4}-\\d{2}-\\d{2}$", message = "Nascimento deve usar o formato AAAA-MM-DD") String nascimento
 ) {
     public DadosCliente paraDados() {
         return new DadosCliente(nome, email, telefone, endereco != null ? endereco.paraDominio() : null, nascimento);

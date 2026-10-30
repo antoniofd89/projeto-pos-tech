@@ -44,14 +44,14 @@ public final class Cliente {
 
         boolean pessoaFisica = documento.numero().length() == 11;
         if (pessoaFisica && nascimento == null)
-            throw new IllegalArgumentException("Data de nascimento obrigatória para CPF.");
+            throw new IllegalArgumentException("Nascimento obrigatório para pessoa física (CPF).");
         if (!pessoaFisica && nascimento != null)
-            throw new IllegalArgumentException("Data de nascimento não se aplica a CNPJ.");
+            throw new IllegalArgumentException("Nascimento não se aplica a CNPJ.");
         LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         if (nascimento != null && nascimento.isAfter(hoje))
             throw new IllegalArgumentException("Nascimento não pode ser no futuro.");
-        if (nascimento != null && !nascimento.isBefore(hoje.minusYears(18)))
-            throw new IllegalArgumentException("Cliente pessoa física deve ter mais de 18 anos.");
+        if (nascimento != null && nascimento.isAfter(hoje.minusYears(18)))
+            throw new IllegalArgumentException("Cliente pessoa física deve ter pelo menos 18 anos.");
         // Validar tudo antes de alterar o objeto.
         this.nome = nome.trim();
         this.email = novoEmail;
