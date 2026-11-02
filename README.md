@@ -173,4 +173,3 @@ Os artefatos de DDD estão versionados no repositório:
 - [Mapa de contextos](docs/ddd/diagrama-contextos.mmd)
 - [Linguagem ubíqua](docs/ddd/linguagem-ubiqua.md)
 - [Regras de negócio](docs/ddd/regras-de-negocio.md)
-- [Checklist técnico e de entrega](docs/ddd/TODO-PROJETO.md)
