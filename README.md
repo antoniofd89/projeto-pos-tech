@@ -1,23 +1,55 @@
 # Oficina Digital
 
-API para atendimento e execução de serviços de uma oficina automotiva, desenvolvida para o Tech Challenge da Fase 1. O projeto é um monólito modular organizado por contextos de negócio.
+Sistema para apoiar o atendimento e a execução de serviços de uma oficina automotiva, desenvolvido para o Tech Challenge da Fase 1.
 
-## Stack
+## Objetivo do projeto
+
+Centralizar o fluxo de atendimento da oficina: cadastrar clientes e veículos, compor ordens de serviço, registrar diagnóstico, serviços e materiais, gerar orçamento, permitir a decisão do cliente por código de acompanhamento e concluir a entrega do veículo. O sistema também oferece controle básico de estoque e indicadores operacionais.
+
+## Descrição resumida da solução
+
+A solução é composta por uma API REST em Java/Spring Boot, uma interface web independente e um banco PostgreSQL. A API aplica regras de negócio e autorização por perfil; a interface consome a API com JWT; o Docker Compose sobe API, interface, banco e uma carga fictícia de demonstração.
+
+## Arquitetura utilizada
+
+O backend segue um **monólito modular**, separado por contextos de negócio: Cliente, Veículo, Catálogo, Estoque, Ordem de Serviço, Identidade e Indicadores. Dentro de cada contexto, o código é organizado em camadas de domínio, aplicação, apresentação e infraestrutura/persistência.
+
+```text
+Interface web (HTML/CSS/JavaScript)
+             │ HTTP + JWT
+             ▼
+API REST (Spring Boot)
+ ├── apresentação: controllers e DTOs
+ ├── aplicação: casos de uso e orquestração
+ ├── domínio: entidades e regras de negócio
+ └── infraestrutura: JPA, PostgreSQL, JWT e configurações
+             │
+             ▼
+PostgreSQL + migrations Flyway
+```
+
+## Tecnologias utilizadas
 
 - Java 25, Maven Wrapper e Spring Boot 4.1.1.
 - Spring Web MVC, Validation, Data JPA e Spring Security.
-- JWT Bearer HS256 para autenticação stateless.
-- PostgreSQL 17, Flyway, Docker Compose e Springdoc OpenAPI.
+- JWT Bearer HS256 e BCrypt para autenticação stateless e senhas.
+- PostgreSQL 17, Flyway e Docker Compose.
+- Springdoc OpenAPI/Swagger UI e Spring Boot Actuator.
+- HTML, CSS, JavaScript puro e Nginx na interface web.
+- JUnit, Mockito e JaCoCo para testes e cobertura.
 
-O PostgreSQL foi escolhido por oferecer transações ACID, integridade referencial e constraints adequadas ao fluxo de atendimento, orçamento e movimentação de estoque. Também integra-se bem com Spring/JPA e é simples de disponibilizar em container para desenvolvimento e avaliação.
+## Decisão do banco de dados
 
-## Requisitos
+O PostgreSQL foi escolhido por oferecer transações ACID, integridade referencial, constraints e tipos adequados ao fluxo de atendimento, orçamento, reserva e movimentação de estoque. Ele se integra ao Spring Data JPA, é versionado por migrations Flyway e pode ser disponibilizado de forma reproduzível em container para desenvolvimento e avaliação.
 
-- JDK 25 (necessário para o build normal do projeto).
-- Docker com Docker Compose para subir API e PostgreSQL.
-- Maven não precisa ser instalado; use `./mvnw` ou `mvnw.cmd`.
+## Pré-requisitos
 
-## Iniciar com Docker Compose
+- JDK 25 para executar o projeto fora do Docker.
+- Docker e Docker Compose para subir o ambiente completo.
+- Git para clonar o repositório.
+- Maven não precisa ser instalado: use `./mvnw` no Linux/macOS ou `mvnw.cmd` no Windows.
+
+## Execução com Docker Compose
 
 ```bash
 cp .env.example .env
@@ -29,7 +61,13 @@ Edite `.env`: configure senhas locais e um `JWT_SECRET` aleatório com pelo meno
 docker compose up --build
 ```
 
-O PostgreSQL é publicado na porta `5432` e a API na `8080`. A migration inicial do Flyway cria o schema automaticamente. Para parar mantendo os dados:
+Após a inicialização:
+
+- Interface web: <http://localhost:4173>
+- API: <http://localhost:8080>
+- PostgreSQL: porta `5432`
+
+O Flyway cria e atualiza o schema automaticamente. A carga de demonstração é executada após a API e o banco ficarem prontos. Para parar mantendo os dados:
 
 ```bash
 docker compose down
@@ -41,7 +79,7 @@ Para apagar também o volume local do banco (operação destrutiva):
 docker compose down -v
 ```
 
-## Executar a aplicação sem container
+## Execução sem container
 
 Garanta um PostgreSQL acessível e configure `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` no ambiente. Então:
 
@@ -56,7 +94,9 @@ Garanta um PostgreSQL acessível e configure `SPRING_DATASOURCE_URL`, `SPRING_DA
 - Health: <http://localhost:8080/actuator/health>
 - Login: `POST /autenticacao/login` com `{"email":"admin@oficina.local","senha":"senha-configurada"}`.
 
-O login retorna um access token. Envie-o às rotas administrativas como `Authorization: Bearer <token>`. O usuário inicial é criado apenas quando as variáveis administrativas estiverem configuradas; não há credencial padrão embutida.
+O login retorna um access token. Envie-o às rotas administrativas como `Authorization: Bearer <token>`. O usuário inicial é criado apenas quando as variáveis `ADMIN_EMAIL` e `ADMIN_PASSWORD` estiverem configuradas; não há credencial padrão embutida no código.
+
+Para testar pelo Swagger, acesse a interface, execute `POST /autenticacao/login`, copie o `accessToken` retornado e use o botão **Authorize** com `Bearer <token>`. As rotas de login e acompanhamento por código são públicas; as demais exigem o perfil descrito na própria documentação.
 
 Principais recursos:
 
@@ -83,7 +123,7 @@ Obtenha o token usando a senha configurada localmente e cadastre um cliente com 
 
 Não incluímos tokens, senhas ou CPFs reais nos exemplos/documentos versionados.
 
-## Testes e cobertura
+## Execução dos testes
 
 ```bash
 ./mvnw test
@@ -91,6 +131,8 @@ Não incluímos tokens, senhas ou CPFs reais nos exemplos/documentos versionados
 ```
 
 O projeto contém testes unitários de regras de domínio e JaCoCo verifica 80% de cobertura de linhas do domínio na fase `verify`. A cobertura e integração com o PostgreSQL devem ser confirmadas com JDK 25 antes da entrega. O perfil H2 local é temporário e não substitui validação de migrations contra PostgreSQL.
+
+O relatório HTML de cobertura é gerado em `target/site/jacoco/index.html`. Mais detalhes estão em [docs/testes/cobertura.md](docs/testes/cobertura.md).
 
 ## Carga de demonstração
 
@@ -102,17 +144,33 @@ Para conferir as OS e os códigos de acompanhamento:
 docker compose exec postgres psql -U oficina -d oficina_digital -c "SELECT numero, id, status, codigo_acompanhamento FROM ordens_servico WHERE numero LIKE 'DEMO-OS-%' ORDER BY numero"
 ```
 
-## Organização
+## Estrutura dos principais diretórios
 
 ```text
-src/main/java/br/com/fiap/oficina_digital/
-├── cliente/          # atendimento e cadastro do cliente
-├── veiculo/          # veículos
-├── catalogo/         # serviços ofertados
-├── estoque/          # peças, insumos e movimentações
-├── ordemservico/     # diagnóstico, orçamento e ciclo da OS
-├── identidade/       # usuários, JWT e autorização
-├── indicadores/      # consultas operacionais
-└── comum/            # infraestrutura compartilhada da API
+.
+├── src/main/java/br/com/fiap/oficina_digital/
+│   ├── cliente/          # atendimento e cadastro do cliente
+│   ├── veiculo/          # veículos vinculados a clientes
+│   ├── catalogo/         # serviços ofertados
+│   ├── estoque/          # peças, insumos e movimentações
+│   ├── ordemservico/     # diagnóstico, orçamento e ciclo da OS
+│   ├── identidade/       # usuários, JWT e autorização
+│   ├── indicadores/      # consultas operacionais
+│   └── comum/            # configurações e infraestrutura compartilhada
+├── src/main/resources/   # propriedades e migrations Flyway
+├── src/test/             # testes unitários e de integração
+├── interface-oficina/    # interface web independente
+├── postman/              # coleção e ambiente Postman
+├── scripts/              # espera e carga de demonstração
+└── docs/                 # DDD e documentação de testes
 ```
 
+## Documentação DDD
+
+Os artefatos de DDD estão versionados no repositório:
+
+- [Event Storming](docs/ddd/event-storming.mmd)
+- [Mapa de contextos](docs/ddd/diagrama-contextos.mmd)
+- [Linguagem ubíqua](docs/ddd/linguagem-ubiqua.md)
+- [Regras de negócio](docs/ddd/regras-de-negocio.md)
+- [Checklist técnico e de entrega](docs/ddd/TODO-PROJETO.md)
