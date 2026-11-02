@@ -164,12 +164,3 @@ docker compose exec postgres psql -U oficina -d oficina_digital -c "SELECT numer
 ├── scripts/              # espera e carga de demonstração
 └── docs/                 # DDD e documentação de testes
 ```
-
-## Documentação DDD
-
-Os artefatos de DDD estão versionados no repositório:
-
-- [Event Storming](docs/ddd/event-storming.mmd)
-- [Mapa de contextos](docs/ddd/diagrama-contextos.mmd)
-- [Linguagem ubíqua](docs/ddd/linguagem-ubiqua.md)
-- [Regras de negócio](docs/ddd/regras-de-negocio.md)
