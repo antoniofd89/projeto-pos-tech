@@ -8,13 +8,12 @@
 
 CREATE TABLE IF NOT EXISTS clientes (
     id               UUID         NOT NULL,
-    versao           BIGINT       NOT NULL DEFAULT 0,
     nome             VARCHAR(150) NOT NULL,
     documento        VARCHAR(14)  NOT NULL UNIQUE,
     email            VARCHAR(254) NOT NULL,
     telefone         VARCHAR(15)  NOT NULL,
     endereco         JSON,
-    nascimento       DATE         NOT NULL,
+    nascimento       DATE         NULL,
     data_cadastro    TIMESTAMP    NOT NULL,
     ativo            BOOLEAN      NOT NULL DEFAULT TRUE,
     PRIMARY KEY (id)
@@ -35,7 +34,6 @@ CREATE TABLE IF NOT EXISTS veiculos (
 
 CREATE TABLE IF NOT EXISTS servicos (
     id                           UUID           NOT NULL,
-    versao                       BIGINT         NOT NULL DEFAULT 0,
     nome                         VARCHAR(120)   NOT NULL,
     descricao                    VARCHAR(500),
     categoria                    VARCHAR(80)    NOT NULL,
@@ -47,7 +45,6 @@ CREATE TABLE IF NOT EXISTS servicos (
 
 CREATE TABLE IF NOT EXISTS itens_estoque (
     id                   UUID           NOT NULL,
-    versao               BIGINT         NOT NULL DEFAULT 0,
     codigo               VARCHAR(40)    NOT NULL UNIQUE,
     descricao            VARCHAR(160)   NOT NULL,
     tipo                 VARCHAR(20)    NOT NULL,

@@ -8,7 +8,7 @@ public class MapeadorCliente {
     static Cliente paraDominio(ClienteJpa entidade) {
         return Cliente.reconstituir(entidade.id, new Documento(entidade.documento),
                 entidade.nome, entidade.email, entidade.telefone, entidade.endereco,
-                entidade.nascimento.toLocalDate(), entidade.dataCadastro);
+                entidade.nascimento == null ? null : entidade.nascimento.toLocalDate(), entidade.dataCadastro);
     }
 
     static void preencher(ClienteJpa entidade, Cliente cliente) {
@@ -18,7 +18,7 @@ public class MapeadorCliente {
         entidade.email = cliente.getEmail();
         entidade.telefone = cliente.getTelefone();
         entidade.endereco = cliente.getEndereco();
-        entidade.nascimento = java.sql.Date.valueOf(cliente.getNascimento());
+        entidade.nascimento = cliente.getNascimento() == null ? null : java.sql.Date.valueOf(cliente.getNascimento());
         entidade.dataCadastro = cliente.getDataCadastro();
     }
 }

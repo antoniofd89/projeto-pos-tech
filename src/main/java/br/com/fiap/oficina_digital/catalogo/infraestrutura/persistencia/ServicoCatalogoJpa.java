@@ -16,8 +16,6 @@ import org.hibernate.annotations.SQLRestriction;
 public class ServicoCatalogoJpa {
     @Id
     public UUID id;
-    @Version
-    public Long versao;
     @Column(nullable = false, length = 120)
     public String nome;
     @Column(length = 500)

@@ -316,13 +316,17 @@ async function abrirFormularioOrdem() {
 
 async function abrirDetalheOS(id, codigoAcompanhamento = null) {
   try {
-    const os = await requisicao(codigoAcompanhamento ? `/ordens-servico/acompanhamento/${encodeURIComponent(codigoAcompanhamento)}` : `/ordens-servico/${id}`);
+    const [os, respostaCodigo] = await Promise.all([
+      requisicao(codigoAcompanhamento ? `/ordens-servico/acompanhamento/${encodeURIComponent(codigoAcompanhamento)}` : `/ordens-servico/${id}`),
+      codigoAcompanhamento ? Promise.resolve(null) : requisicao(`/ordens-servico/${id}/codigo-acompanhamento`).catch(() => null),
+    ]);
     const servicosOS = Array.isArray(os.servicos) ? os.servicos : [];
     const materiaisOS = Array.isArray(os.materiais) ? os.materiais : [];
     const historicoOS = Array.isArray(os.historicoStatus) ? os.historicoStatus : [];
     const orcamentoAtual = os.orcamento || null;
     const cliente = (dadosEmCache.clientes || []).find((item) => item.id === os.clienteId) || null;
     const veiculo = (dadosEmCache.veiculos || []).find((item) => item.id === os.veiculoId) || null;
+    const codigoExibido = codigoAcompanhamento || respostaCodigo?.codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
     let botoes = '';
     if (os.status === 'RECEBIDA') botoes += `<button class="button button-primary" data-os-action="diagnostico/iniciar">Iniciar diagnóstico</button>`;
     if (os.status === 'EM_DIAGNOSTICO') {
@@ -330,7 +334,7 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
       botoes += orcamentoAtual?.status === 'GERADO' ? `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Disponibilizar orçamento</button>` : `<button class="button button-primary" data-os-action="orcamentos">Gerar orçamento</button>`;
     }
     if (os.status === 'AGUARDANDO_APROVACAO') {
-      const codigoDisponivel = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
+      const codigoDisponivel = codigoExibido;
       if (orcamentoAtual?.status === 'GERADO') botoes += `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Enviar orçamento</button>`;
       else if (orcamentoAtual?.status === 'APROVADO') botoes += `<button class="button button-primary" data-os-action="execucao/iniciar">Iniciar execução</button>`;
       else if (orcamentoAtual?.status === 'DISPONIBILIZADO' && codigoDisponivel) botoes += `<button class="button button-quiet" data-os-decision="aprovar">Aprovar orçamento (cliente)</button><button class="button button-quiet" data-os-decision="rejeitar">Rejeitar orçamento (cliente)</button>`;
@@ -344,7 +348,6 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
       ? `<span>${esc(statusNome(orcamentoAtual.status))} · ${moeda(orcamentoAtual.valorTotal)} · gerado em ${formatarData(orcamentoAtual.geradoEm)}</span>`
       : '<span>Nenhum orçamento gerado.</span>';
     const detalhe = document.createElement('dialog'); detalhe.className = 'order-dialog detail-dialog'; detalhe.innerHTML = `<div class="dialog-card"><button class="dialog-close" aria-label="Fechar">×</button><p class="eyebrow">ORDEM DE SERVIÇO · ${esc(os.numero)}</p><h2>${esc(cliente?.nome || 'Cliente')} · ${esc(statusNome(os.status))}</h2><p class="dialog-copy">${esc(veiculo ? `${veiculo.marca} ${veiculo.modelo} · ${valorPlaca(veiculo)}` : os.veiculoId)}</p><div class="detail-description"><strong>Relato inicial</strong><p>${esc(os.descricaoInicial)}</p>${os.diagnostico ? `<strong>Diagnóstico</strong><p>${esc(os.diagnostico)}</p>` : ''}</div><div class="detail-list"><strong>Serviços e materiais</strong>${itensOS}</div><div class="detail-list"><strong>Orçamento</strong>${resumoOrcamento}</div><div class="detail-timeline"><strong>Histórico</strong>${historicoOS.map((x) => `<span><i></i>${esc(statusNome(x.status))} · ${formatarData(x.atualizadoEm)} · ${esc(x.ator)}</span>`).join('')}</div><div class="dialog-actions detail-actions">${botoes}</div></div>`;
-    const codigoExibido = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
     if (codigoExibido) {
       const caixaCodigo = document.createElement('div'); caixaCodigo.className = 'detail-code';
       caixaCodigo.innerHTML = `<span><strong>Código de acompanhamento</strong><small>Compartilhe com o cliente para consultar e decidir o orçamento.</small><code>${esc(codigoExibido)}</code></span><button type="button" class="button button-quiet">Copiar</button>`;
@@ -377,7 +380,7 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
         if (acao === 'orcamentos') path = `/ordens-servico/${id}/orcamentos`;
         if (acao === 'cancelar') { if (!confirm('Cancelar esta ordem de serviço?')) return; method = 'DELETE'; }
         const resultado = await requisicao(path, { method, ...(body ? { body: JSON.stringify(body) } : {}) });
-        if (acao === 'orcamentos') aviso(`Orçamento versão ${resultado.versao} gerado.`);
+        if (acao === 'orcamentos') aviso(`Orçamento gerado.`);
         detalhe.close(); aviso('Etapa da ordem atualizada.'); await abrirDetalheOS(id); await carregarOrdens();
       } catch (e) { aviso(e.message, true); }
     }));

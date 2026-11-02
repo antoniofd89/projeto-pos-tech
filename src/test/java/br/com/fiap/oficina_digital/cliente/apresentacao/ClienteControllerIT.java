@@ -219,6 +219,30 @@ class ClienteControllerIT {
         }
 
         @Test
+        @DisplayName("🟢 deve listar empresa sem nascimento")
+        void deveListarEmpresaSemNascimento() throws Exception {
+            var empresa = """
+                    {
+                      "nome": "Oficina Exemplo Ltda.",
+                      "documento": "11222333000181",
+                      "email": "contato@oficinaexemplo.com",
+                      "telefone": "1133334444"
+                    }
+                    """;
+
+            mockMvc.perform(post("/clientes")
+                    .with(atendente())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(empresa))
+                    .andExpect(status().isCreated());
+
+            mockMvc.perform(get("/clientes")
+                    .with(atendente()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].nascimento").doesNotExist());
+        }
+
+        @Test
         @DisplayName("🟢 deve filtrar por documento")
         void deveFiltrarPorDocumento() throws Exception {
             mockMvc.perform(post("/clientes")
