@@ -15,6 +15,7 @@ import br.com.fiap.oficina_digital.cliente.dominio.RepositorioCliente;
 import br.com.fiap.oficina_digital.estoque.aplicacao.ServicoEstoque;
 import br.com.fiap.oficina_digital.estoque.aplicacao.dto.Material;
 import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.CriacaoResposta;
+import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.CodigoAcompanhamentoResposta;
 import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DadosAbertura;
 import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.DetalheOrdem;
 import br.com.fiap.oficina_digital.ordemservico.aplicacao.dto.HistoricoStatus;
@@ -91,6 +92,11 @@ public class ServicoOrdemServico {
     @Transactional(readOnly = true)
     public DetalheOrdem buscar(UUID id) {
         return detalhe(obter(id));
+    }
+
+    @Transactional(readOnly = true)
+    public CodigoAcompanhamentoResposta buscarCodigoAcompanhamento(UUID id) {
+        return new CodigoAcompanhamentoResposta(obter(id).codigoAcompanhamento);
     }
 
     @Transactional(readOnly = true)

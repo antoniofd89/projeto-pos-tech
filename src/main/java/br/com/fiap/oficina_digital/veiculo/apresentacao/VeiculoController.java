@@ -8,6 +8,8 @@ import br.com.fiap.oficina_digital.veiculo.aplicacao.ServicoVeiculo;
 import br.com.fiap.oficina_digital.veiculo.apresentacao.dto.AtualizacaoVeiculoRequisicao;
 import br.com.fiap.oficina_digital.veiculo.apresentacao.dto.CadastroVeiculoRequisicao;
 import br.com.fiap.oficina_digital.veiculo.dominio.Veiculo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Validated
 @RequestMapping("/veiculos")
+@Tag(name = "Veículos", description = "Veículos vinculados aos clientes da oficina.")
 public class VeiculoController {
     private final ServicoVeiculo servico;
 
@@ -33,6 +36,7 @@ public class VeiculoController {
     }
 
     @PostMapping
+    @Operation(summary = "Cadastrar veículo", description = "Vincula um veículo a um cliente existente. Acesso: ADMIN ou ATENDENTE.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     public ResponseEntity<Veiculo> cadastrar(@Valid @RequestBody CadastroVeiculoRequisicao req) {
         var v = servico.cadastrar(req.clienteId(), req.paraDados());
@@ -40,24 +44,28 @@ public class VeiculoController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Consultar veículo", description = "Retorna os dados de um veículo ativo pelo identificador. Acesso: ADMIN, ATENDENTE ou MECÂNICO.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
     public Veiculo buscar(@PathVariable UUID id) {
         return servico.buscar(id);
     }
 
     @GetMapping
+    @Operation(summary = "Listar veículos de um cliente", description = "Retorna os veículos ativos associados ao cliente informado. Acesso: ADMIN, ATENDENTE ou MECÂNICO.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
     public List<Veiculo> listar(@RequestParam UUID clienteId) {
         return servico.listar(clienteId);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar veículo", description = "Altera os dados de um veículo ativo. Acesso: ADMIN ou ATENDENTE.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     public Veiculo atualizar(@PathVariable UUID id, @Valid @RequestBody AtualizacaoVeiculoRequisicao req) {
         return servico.atualizar(id, req.paraDados());
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Inativar veículo", description = "Inativa o veículo sem apagar seu histórico. Acesso: ADMIN.")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {
         servico.inativar(id);

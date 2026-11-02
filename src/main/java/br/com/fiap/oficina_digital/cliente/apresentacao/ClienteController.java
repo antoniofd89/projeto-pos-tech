@@ -20,12 +20,15 @@ import br.com.fiap.oficina_digital.cliente.aplicacao.ServicoCliente;
 import br.com.fiap.oficina_digital.cliente.apresentacao.dto.AtualizacaoClienteRequisicao;
 import br.com.fiap.oficina_digital.cliente.apresentacao.dto.CadastroClienteRequisicao;
 import br.com.fiap.oficina_digital.cliente.apresentacao.dto.ClienteResposta;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @Validated
 @RequestMapping("/clientes")
+@Tag(name = "Clientes", description = "Cadastro e manutenção de pessoas físicas e empresas atendidas pela oficina.")
 public class ClienteController {
     private final ServicoCliente servicoCliente;
 
@@ -34,6 +37,7 @@ public class ClienteController {
     }
 
     @PostMapping
+    @Operation(summary = "Cadastrar cliente", description = "Cria um cliente. CPF exige data de nascimento; CNPJ não deve informá-la. Acesso: ADMIN ou ATENDENTE.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     public ResponseEntity<ClienteResposta> cadastrar(@Valid @RequestBody CadastroClienteRequisicao requisicao) {
         ClienteResposta cliente = ClienteResposta.de(
@@ -42,12 +46,14 @@ public class ClienteController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar clientes", description = "Lista clientes ativos ou filtra pelo CPF/CNPJ informado. Acesso: ADMIN, ATENDENTE ou MECÂNICO.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE','MECANICO')")
     public List<ClienteResposta> buscarClientes(@RequestParam(required = false) String documento) {
         return servicoCliente.listar(documento).stream().map(ClienteResposta::de).toList();
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar cliente", description = "Altera dados cadastrais de um cliente ativo. Acesso: ADMIN ou ATENDENTE.")
     @PreAuthorize("hasAnyRole('ADMIN','ATENDENTE')")
     public ClienteResposta atualizar(@PathVariable UUID id,
             @Valid @RequestBody AtualizacaoClienteRequisicao requisicao) {
@@ -55,6 +61,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Inativar cliente", description = "Inativa o cliente; o registro é preservado para histórico. Acesso: ADMIN.")
     @PreAuthorize("hasRole('ADMIN')")
     //Incluir motivo para inativação do cliente para auditoria futura
     public ResponseEntity<Void> inativar(@PathVariable UUID id) {

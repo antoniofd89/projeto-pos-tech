@@ -19,8 +19,6 @@ import org.hibernate.annotations.SQLRestriction;
 public class ItemEstoqueJpa {
     @Id
     public UUID id;
-    @Version
-    public Long versao;
     @Column(nullable = false, unique = true, length = 40)
     public String codigo;
     @Column(nullable = false, length = 160)

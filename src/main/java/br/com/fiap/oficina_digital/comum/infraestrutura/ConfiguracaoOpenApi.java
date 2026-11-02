@@ -14,7 +14,7 @@ public class ConfiguracaoOpenApi {
         OpenAPI oficinaDigitalOpenApi() {
                 return new OpenAPI()
                                 .info(new Info().title("Oficina Digital API")
-                                                .description("API do Sistema Integrado de Atendimento e Execução de Serviços")
+                                                .description("API para atendimento de clientes, gestão de veículos, ordens de serviço, catálogo, estoque e indicadores. Todas as rotas, exceto login e acompanhamento por código, exigem um JWT Bearer.")
                                                 .version("v1"))
                                 .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
                                 .components(new Components().addSecuritySchemes("bearer-jwt",

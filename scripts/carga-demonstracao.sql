@@ -23,18 +23,18 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO servicos
-    (id, versao, nome, descricao, categoria, valor_base, duracao_estimada_minutos, ativo)
+    (id, nome, descricao, categoria, valor_base, duracao_estimada_minutos, ativo)
 VALUES
-    ('30000000-0000-4000-8000-000000000001', 0, 'Revisão demonstrativa', 'Serviço fictício para testar o fluxo da OS.', 'MANUTENCAO', 250.00, 120, TRUE),
-    ('30000000-0000-4000-8000-000000000002', 0, 'Diagnóstico demonstrativo', 'Serviço fictício para testes de API.', 'DIAGNOSTICO', 100.00, 60, TRUE)
+    ('30000000-0000-4000-8000-000000000001', 'Revisão demonstrativa', 'Serviço fictício para testar o fluxo da OS.', 'MANUTENCAO', 250.00, 120, TRUE),
+    ('30000000-0000-4000-8000-000000000002', 'Diagnóstico demonstrativo', 'Serviço fictício para testes de API.', 'DIAGNOSTICO', 100.00, 60, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO itens_estoque
-    (id, versao, codigo, descricao, tipo, unidade_medida, preco_unitario,
+    (id, codigo, descricao, tipo, unidade_medida, preco_unitario,
      quantidade_fisica, quantidade_reservada, estoque_minimo, ativo)
 VALUES
-    ('40000000-0000-4000-8000-000000000001', 0, 'DEMO-FILTRO-001', 'Filtro de óleo demonstrativo', 'PECA', 'UN', 45.00, 19.500, 0.500, 2.000, TRUE),
-    ('40000000-0000-4000-8000-000000000002', 0, 'DEMO-INSUMO-001', 'Óleo demonstrativo', 'INSUMO', 'L', 38.00, 12.000, 0.000, 3.000, TRUE)
+    ('40000000-0000-4000-8000-000000000001', 'DEMO-FILTRO-001', 'Filtro de óleo demonstrativo', 'PECA', 'UN', 45.00, 19.500, 0.500, 2.000, TRUE),
+    ('40000000-0000-4000-8000-000000000002', 'DEMO-INSUMO-001', 'Óleo demonstrativo', 'INSUMO', 'L', 38.00, 12.000, 0.000, 3.000, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 -- Cada OS fica em um status para testar a ação seguinte daquele ponto.
