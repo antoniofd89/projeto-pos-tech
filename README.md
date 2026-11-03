@@ -132,7 +132,7 @@ Não incluímos tokens, senhas ou CPFs reais nos exemplos/documentos versionados
 
 O projeto contém testes unitários de regras de domínio e JaCoCo verifica 80% de cobertura de linhas do domínio na fase `verify`. A cobertura e integração com o PostgreSQL devem ser confirmadas com JDK 25 antes da entrega. O perfil H2 local é temporário e não substitui validação de migrations contra PostgreSQL.
 
-O relatório HTML de cobertura é gerado em `target/site/jacoco/index.html`. Mais detalhes estão em [docs/testes/cobertura.md](docs/testes/cobertura.md).
+O relatório HTML de cobertura é gerado em `target/site/jacoco/index.html`.
 
 ## Carga de demonstração
 
@@ -162,15 +162,5 @@ docker compose exec postgres psql -U oficina -d oficina_digital -c "SELECT numer
 ├── interface-oficina/    # interface web independente
 ├── postman/              # coleção e ambiente Postman
 ├── scripts/              # espera e carga de demonstração
-└── docs/                 # DDD e documentação de testes
+└── docs/                 # documentação local (não versionada)
 ```
-
-## Documentação DDD
-
-Os artefatos de DDD estão versionados no repositório:
-
-- [Event Storming](docs/ddd/event-storming.mmd)
-- [Mapa de contextos](docs/ddd/diagrama-contextos.mmd)
-- [Linguagem ubíqua](docs/ddd/linguagem-ubiqua.md)
-- [Regras de negócio](docs/ddd/regras-de-negocio.md)
-- [Checklist técnico e de entrega](docs/ddd/TODO-PROJETO.md)

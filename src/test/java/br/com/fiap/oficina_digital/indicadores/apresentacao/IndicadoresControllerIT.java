@@ -1,7 +1,6 @@
 package br.com.fiap.oficina_digital.indicadores.apresentacao;
 
 import br.com.fiap.oficina_digital.indicadores.aplicacao.ServicoIndicadores;
-import br.com.fiap.oficina_digital.indicadores.aplicacao.dto.TempoMedioServico;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
