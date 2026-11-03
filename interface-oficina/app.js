@@ -86,10 +86,32 @@ function renderLogin(mensagem = '') {
     if (erro) erro.textContent = campo.validity.valid ? '' : campo.validationMessage;
     if (campo.validity.valid) document.querySelector('#login-error').textContent = '';
   });
+  document.querySelector('.login-card form').insertAdjacentHTML('afterend', '<button class="customer-access-link" id="customer-access">Sou cliente · acompanhar orçamento <span>→</span></button>');
+  document.querySelector('#customer-access').addEventListener('click', renderPortalCliente);
   document.querySelector('#api-config').addEventListener('click', () => {
     const novaUrl = window.prompt('URL base da API (ex.: http://localhost:8080)', baseApi());
     if (novaUrl?.trim()) { localStorage.setItem(apiKey, novaUrl.trim()); renderLogin(); }
   });
+}
+
+function renderPortalCliente() {
+  document.querySelector('#login-screen')?.remove();
+  const tela = document.createElement('section');
+  tela.className = 'customer-portal';
+  tela.innerHTML = `<div class="customer-card glass-card"><button class="portal-back">← Voltar para o login</button><p class="eyebrow">ÁREA DO CLIENTE</p><h1>Acompanhe seu <em>veículo.</em></h1><p>Informe o código de acompanhamento para consultar e decidir o orçamento.</p><form><label>Código de acompanhamento<input name="codigo" required placeholder="Ex.: ABCD-1234"/></label><button class="button button-primary">Consultar orçamento</button></form><p class="login-error" aria-live="assertive"></p><div class="customer-result"></div></div>`;
+  document.body.append(tela);
+  const form = tela.querySelector('form'), resultado = tela.querySelector('.customer-result'), erro = tela.querySelector('.login-error');
+  async function carregar(codigo) {
+    erro.textContent = ''; resultado.innerHTML = 'Consultando sua ordem…';
+    try {
+      const os = await requisicao(`/ordens-servico/acompanhamento/${encodeURIComponent(codigo)}`), o = os.orcamento;
+      const decidir = os.status === 'AGUARDANDO_APROVACAO' && o?.status === 'DISPONIBILIZADO';
+      resultado.innerHTML = `<div class="customer-order"><span class="status-pill">${esc(statusNome(os.status))}</span><h2>${esc(os.numero)}</h2><p>Orçamento: <strong>${esc(statusNome(o?.status || 'não gerado'))}</strong></p>${o ? `<div class="customer-total"><small>Valor total</small><strong>${moeda(o.valorTotal)}</strong></div>` : ''}${decidir ? '<div class="customer-decisions"><button class="button button-primary" data-decisao="true">Aprovar orçamento</button><button class="button button-danger" data-decisao="false">Recusar orçamento</button></div>' : '<p class="customer-note">Não há uma decisão pendente para esta ordem.</p>'}</div>`;
+      resultado.querySelectorAll('[data-decisao]').forEach((b) => b.addEventListener('click', async () => { if (!confirm(b.dataset.decisao === 'true' ? 'Confirmar aprovação?' : 'Confirmar recusa?')) return; try { await requisicao(`/ordens-servico/orcamento/${encodeURIComponent(codigo)}/aprovar?aprovar=${b.dataset.decisao}`, { method: 'POST' }); await carregar(codigo); } catch (e) { erro.textContent = e.message; } }));
+    } catch (e) { resultado.innerHTML = ''; erro.textContent = e.message; }
+  }
+  form.addEventListener('submit', (e) => { e.preventDefault(); if (validarFormulario(form)) carregar(new FormData(form).get('codigo').trim()); });
+  tela.querySelector('.portal-back').addEventListener('click', () => { tela.remove(); renderLogin(); });
 }
 
 function lerPerfil(jwt) {
@@ -336,10 +358,10 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
     if (os.status === 'AGUARDANDO_APROVACAO') {
       const codigoDisponivel = codigoExibido;
       if (orcamentoAtual?.status === 'GERADO') botoes += `<button class="button button-primary" data-os-action="orcamentos/disponibilizar">Enviar orçamento</button>`;
-      else if (orcamentoAtual?.status === 'APROVADO') botoes += `<button class="button button-primary" data-os-action="execucao/iniciar">Iniciar execução</button>`;
       else if (orcamentoAtual?.status === 'DISPONIBILIZADO' && codigoDisponivel) botoes += `<button class="button button-quiet" data-os-decision="aprovar">Aprovar orçamento (cliente)</button><button class="button button-quiet" data-os-decision="rejeitar">Rejeitar orçamento (cliente)</button>`;
       else botoes += '<span class="approval-wait">Aguardando decisão do cliente pelo código de acompanhamento.</span>';
     }
+    if (os.status === 'AGUARDANDO_EXECUCAO') botoes += `<button class="button button-primary" data-os-action="execucao/iniciar">Iniciar execução</button>`;
     if (os.status === 'EM_EXECUCAO') botoes += `<button class="button button-primary" data-os-action="finalizar">Finalizar serviço</button>`;
     if (os.status === 'FINALIZADA') botoes += `<button class="button button-primary" data-os-action="entrega">Registrar entrega</button>`;
     if (!['CANCELADA', 'ENTREGUE', 'EM_EXECUCAO', 'FINALIZADA'].includes(os.status)) botoes += `<button class="button button-danger" data-os-action="cancelar">Cancelar OS</button>`;
@@ -361,7 +383,7 @@ async function abrirDetalheOS(id, codigoAcompanhamento = null) {
       const codigo = codigoAcompanhamento || sessionStorage.getItem(`oficina.os.${os.id}`);
       if (!codigo) { aviso('Para aprovar ou rejeitar, informe o código de acompanhamento recebido na abertura da OS.', true); return; }
       try {
-        await requisicao(`/ordens-servico/acompanhamento/${encodeURIComponent(codigo)}/orcamento/${b.dataset.osDecision}`, { method: 'POST' });
+        await requisicao(`/ordens-servico/orcamento/${encodeURIComponent(codigo)}/aprovar?aprovar=${b.dataset.osDecision === 'aprovar'}`, { method: 'POST' });
         detalhe.close(); aviso(`Orçamento ${b.dataset.osDecision === 'aprovar' ? 'aprovado' : 'rejeitado'} pelo fluxo de acompanhamento.`); await carregarOrdens(); await abrirDetalheOS(os.id, codigoAcompanhamento);
       } catch (e) { aviso(e.message, true); }
     }));

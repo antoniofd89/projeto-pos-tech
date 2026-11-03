@@ -874,7 +874,7 @@ class OrdemServicoControllerIT {
     // registra a decisão do cliente que aprovou por telefone ou e-mail).
     // Não está em permitAll() na SecurityFilterChain → requer token.
     // Serviço: aprovarPorCodigo → aprovarOrcamentoVigente
-    //   aprovar=true  → orcamento.status=APROVADO, OS permanece AGUARDANDO_APROVACAO
+    //   aprovar=true  → orcamento.status=APROVADO, OS vai para AGUARDANDO_EXECUCAO
     //   aprovar=false → orcamento.status=REJEITADO, OS volta para EM_DIAGNOSTICO
     // =========================================================================
 
@@ -883,7 +883,7 @@ class OrdemServicoControllerIT {
     class AprovarOrcamento {
 
         @Test
-        @DisplayName("🟢 deve aprovar orçamento — orcamento.status=APROVADO, OS permanece em AGUARDANDO_APROVACAO")
+        @DisplayName("🟢 deve aprovar orçamento — orcamento.status=APROVADO, OS vai para AGUARDANDO_EXECUCAO")
         void deveAprovarOrcamento() throws Exception {
             var ctx = criarContexto();
             var os  = abrirOS(ctx);
@@ -897,8 +897,7 @@ class OrdemServicoControllerIT {
                     .with(atendente())
                     .param("aprovar", "true"))
                     .andExpect(status().isOk())
-                    // OS permanece em AGUARDANDO_APROVACAO até iniciarExecucao
-                    .andExpect(jsonPath("$.status").value("AGUARDANDO_APROVACAO"));
+                    .andExpect(jsonPath("$.status").value("AGUARDANDO_EXECUCAO"));
         }
 
         @Test
@@ -933,7 +932,7 @@ class OrdemServicoControllerIT {
     // =========================================================================
     // POST /{id}/execucao/iniciar
     // @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")
-    // Exige: OS em AGUARDANDO_APROVACAO + orcamento APROVADO
+    // Exige: OS em AGUARDANDO_EXECUCAO + orcamento APROVADO
     // Transição: → EM_EXECUCAO + estoque.consumir()
     // =========================================================================
 

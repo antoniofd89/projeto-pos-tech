@@ -8,10 +8,11 @@ public enum StatusOrdemServico {
     RECEBIDA(1),
     EM_DIAGNOSTICO(2),
     AGUARDANDO_APROVACAO(3),
-    EM_EXECUCAO(4),
-    FINALIZADA(5),
-    ENTREGUE(6),
-    CANCELADA(7);
+    AGUARDANDO_EXECUCAO(4),
+    EM_EXECUCAO(5),
+    FINALIZADA(6),
+    ENTREGUE(7),
+    CANCELADA(8);
 
     private final int codigoPersistencia;
 
@@ -34,7 +35,8 @@ public enum StatusOrdemServico {
     private static final Map<StatusOrdemServico, Set<StatusOrdemServico>> TRANSICOES = Map.of(
             RECEBIDA, Set.of(EM_DIAGNOSTICO, CANCELADA),
             EM_DIAGNOSTICO, Set.of(AGUARDANDO_APROVACAO, CANCELADA),
-            AGUARDANDO_APROVACAO, Set.of(EM_DIAGNOSTICO, EM_EXECUCAO, CANCELADA),
+            AGUARDANDO_APROVACAO, Set.of(EM_DIAGNOSTICO, AGUARDANDO_EXECUCAO, CANCELADA),
+            AGUARDANDO_EXECUCAO, Set.of(EM_EXECUCAO, CANCELADA),
             EM_EXECUCAO, Set.of(FINALIZADA),
             FINALIZADA, Set.of(ENTREGUE),
             ENTREGUE, Set.of(),

@@ -17,7 +17,8 @@ class StatusOrdemServicoTest {
     @Test
     void recuperaStatusPeloCodigo() {
         assertEquals(1, StatusOrdemServico.RECEBIDA.codigoPersistencia());
-        assertEquals(StatusOrdemServico.EM_EXECUCAO, StatusOrdemServico.deCodigoPersistencia(4));
+        assertEquals(StatusOrdemServico.AGUARDANDO_EXECUCAO, StatusOrdemServico.deCodigoPersistencia(4));
+        assertEquals(StatusOrdemServico.EM_EXECUCAO, StatusOrdemServico.deCodigoPersistencia(5));
         assertThrows(IllegalArgumentException.class, () -> StatusOrdemServico.deCodigoPersistencia(99));
     }
 
@@ -29,8 +30,10 @@ class StatusOrdemServicoTest {
                 StatusOrdemServico.EM_DIAGNOSTICO.transicionarPara(StatusOrdemServico.AGUARDANDO_APROVACAO));
         assertEquals(StatusOrdemServico.EM_DIAGNOSTICO,
                 StatusOrdemServico.AGUARDANDO_APROVACAO.transicionarPara(StatusOrdemServico.EM_DIAGNOSTICO));
+        assertEquals(StatusOrdemServico.AGUARDANDO_EXECUCAO,
+                StatusOrdemServico.AGUARDANDO_APROVACAO.transicionarPara(StatusOrdemServico.AGUARDANDO_EXECUCAO));
         assertEquals(StatusOrdemServico.EM_EXECUCAO,
-                StatusOrdemServico.AGUARDANDO_APROVACAO.transicionarPara(StatusOrdemServico.EM_EXECUCAO));
+                StatusOrdemServico.AGUARDANDO_EXECUCAO.transicionarPara(StatusOrdemServico.EM_EXECUCAO));
         assertEquals(StatusOrdemServico.FINALIZADA,
                 StatusOrdemServico.EM_EXECUCAO.transicionarPara(StatusOrdemServico.FINALIZADA));
         assertEquals(StatusOrdemServico.ENTREGUE,
