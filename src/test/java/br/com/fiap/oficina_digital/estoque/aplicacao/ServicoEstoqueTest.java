@@ -55,6 +55,10 @@ class ServicoEstoqueTest {
         when(itens.findByCodigo("X")).thenReturn(Optional.of(item("X", "1", "0")));
         assertThrows(IllegalStateException.class, () -> servico.cadastrar(dados("X", "0")));
         assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(dados("Y", "-1")));
+        assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(
+                new DadosItem("PRECO", "Item", TipoItemEstoque.PECA, "un", bd("-0.01"), bd("0"), bd("0"))));
+        assertThrows(IllegalArgumentException.class, () -> servico.cadastrar(
+                new DadosItem("", "Item", TipoItemEstoque.PECA, "un", bd("1"), bd("0"), bd("0"))));
     }
 
     @Test
@@ -113,6 +117,55 @@ class ServicoEstoqueTest {
         servico.estornar(os);
         assertEquals(0, item.quantidadeReservada.compareTo(bd("0.000")));
         verify(movimentacoes, times(1)).save(argThat(m -> m.tipo == TipoMovimentacao.ESTORNO));
+    }
+
+    @Test
+    void reservaIgnoraListaVaziaOuReservaAindaAtiva() {
+        UUID os = UUID.randomUUID();
+
+        servico.reservar(os, null);
+        servico.reservar(os, List.of());
+        verifyNoInteractions(itens, movimentacoes);
+
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(os, TipoMovimentacao.RESERVA)).thenReturn(true);
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(os, TipoMovimentacao.ESTORNO)).thenReturn(false);
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(os, TipoMovimentacao.CONSUMO)).thenReturn(false);
+        servico.reservar(os, List.of(new Material(UUID.randomUUID(), bd("1"))));
+
+        verify(itens, never()).buscarParaMovimentar(any());
+        verify(movimentacoes).existsByOrdemServicoIdAndTipo(os, TipoMovimentacao.RESERVA);
+    }
+
+    @Test
+    void consumoEIdempotenteERequerReservaConsistente() {
+        UUID osConsumida = UUID.randomUUID();
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(osConsumida, TipoMovimentacao.CONSUMO)).thenReturn(true);
+        servico.consumir(osConsumida);
+        verify(movimentacoes, never()).findAllByOrdemServicoIdAndTipo(any(), any());
+
+        UUID osSemReserva = UUID.randomUUID();
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(osSemReserva, TipoMovimentacao.CONSUMO)).thenReturn(false);
+        when(movimentacoes.findAllByOrdemServicoIdAndTipo(osSemReserva, TipoMovimentacao.RESERVA))
+                .thenReturn(List.of());
+        assertThrows(IllegalStateException.class, () -> servico.consumir(osSemReserva));
+
+        UUID osSaldoInconsistente = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+        var reserva = new MovimentacaoEstoqueJpa();
+        reserva.itemEstoqueId = itemId;
+        reserva.quantidade = bd("2");
+        var item = item("FILTRO", "10", "1");
+        item.id = itemId;
+        when(movimentacoes.existsByOrdemServicoIdAndTipo(osSaldoInconsistente, TipoMovimentacao.CONSUMO))
+                .thenReturn(false);
+        when(movimentacoes.findAllByOrdemServicoIdAndTipo(osSaldoInconsistente, TipoMovimentacao.RESERVA))
+                .thenReturn(List.of(reserva));
+        when(movimentacoes.existsByOrdemServicoIdAndItemEstoqueIdAndTipo(
+                osSaldoInconsistente, itemId, TipoMovimentacao.ESTORNO)).thenReturn(false);
+        when(itens.buscarParaMovimentar(itemId)).thenReturn(Optional.of(item));
+
+        assertThrows(IllegalStateException.class, () -> servico.consumir(osSaldoInconsistente));
+        verify(movimentacoes, never()).save(argThat(m -> m.tipo == TipoMovimentacao.CONSUMO));
     }
 
     private static DadosItem dados(String codigo, String inicial) {

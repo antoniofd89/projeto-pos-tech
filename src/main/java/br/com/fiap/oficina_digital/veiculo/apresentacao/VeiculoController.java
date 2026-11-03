@@ -64,6 +64,14 @@ public class VeiculoController {
         return servico.atualizar(id, req.paraDados());
     }
 
+    @PutMapping("/{id}/ativar")
+    @Operation(summary = "Ativar veículo", description = "Ativa um veículo inativo. Acesso: ADMIN.")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> ativar(@PathVariable UUID id) {
+        servico.ativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Inativar veículo", description = "Inativa o veículo sem apagar seu histórico. Acesso: ADMIN.")
     @PreAuthorize("hasRole('ADMIN')")

@@ -920,12 +920,12 @@ class OrdemServicoControllerIT {
         }
 
         @Test
-        @DisplayName("🔴 deve retornar 401 sem token")
-        void deveRetornar401SemToken() throws Exception {
-            // Fora da lista de permitAll() → exige autenticação
+        @DisplayName("🟢 endpoint público deve responder sem token e retornar 404 para código inválido")
+        void deveRetornar404SemTokenQuandoCodigoInvalido() throws Exception {
+            // O endpoint é público; sem uma OS associada ao código, o resultado correto é 404.
             mockMvc.perform(post("/ordens-servico/orcamento/codigo-qualquer/aprovar")
                     .param("aprovar", "true"))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(status().isNotFound());
         }
     }
 

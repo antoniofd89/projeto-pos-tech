@@ -79,6 +79,20 @@ public class OrdemServicoController {
         return servico.aprovarPorCodigo(codigo, aprovar);
     }
 
+    @PostMapping("/{id}/orcamentos/aprovar")
+    @Operation(summary = "Aprovar orçamento por ID", description = "Registra administrativamente a aprovação do orçamento vigente. Acesso: ADMIN.")
+    @PreAuthorize("hasRole('ADMIN')")
+    public DetalheOrdem aprovarOrcamentoPorId(@PathVariable UUID id) {
+        return servico.decidirOrcamentoPorId(id, true);
+    }
+
+    @PostMapping("/{id}/orcamentos/rejeitar")
+    @Operation(summary = "Rejeitar orçamento por ID", description = "Registra administrativamente a rejeição do orçamento vigente. Acesso: ADMIN.")
+    @PreAuthorize("hasRole('ADMIN')")
+    public DetalheOrdem rejeitarOrcamentoPorId(@PathVariable UUID id) {
+        return servico.decidirOrcamentoPorId(id, false);
+    }
+
     @PostMapping("/{id}/diagnostico/iniciar")
     @Operation(summary = "Iniciar diagnóstico", description = "Move uma OS recebida para EM_DIAGNOSTICO. Acesso: ADMIN ou MECÂNICO.")
     @PreAuthorize("hasAnyRole('ADMIN','MECANICO')")

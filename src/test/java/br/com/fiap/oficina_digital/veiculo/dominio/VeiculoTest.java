@@ -24,6 +24,17 @@ class VeiculoTest {
     }
 
     @Test
+    void reativaVeiculoInativoEImpedeAtivarDuasVezes() {
+        var inativo = Veiculo.criar(UUID.randomUUID(), "ABC1234", "Fiat", "Argo", 2022, null).inativar();
+
+        var ativo = inativo.ativar();
+
+        assertTrue(ativo.ativo());
+        assertEquals(inativo.id(), ativo.id());
+        assertThrows(IllegalStateException.class, ativo::ativar);
+    }
+
+    @Test
     void rejeitaAnoInvalido() {
         assertThrows(IllegalArgumentException.class,
                 () -> Veiculo.criar(UUID.randomUUID(), "ABC1234", "Fiat", "Argo", 1800, null));

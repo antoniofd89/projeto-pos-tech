@@ -242,6 +242,14 @@
           }
         },
         {
+          "name": "Ativar cliente (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/clientes/{{clienteId}}/ativar",
+            "description": "Reativa um cliente inativo. Exige perfil ADMIN."
+          }
+        },
+        {
           "name": "Inativar cliente (ADMIN)",
           "request": {
             "method": "DELETE",
@@ -322,6 +330,14 @@
               }
             },
             "url": "{{baseUrl}}/veiculos/{{veiculoId}}"
+          }
+        },
+        {
+          "name": "Ativar veículo (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/veiculos/{{veiculoId}}/ativar",
+            "description": "Reativa um veículo inativo. Exige perfil ADMIN."
           }
         },
         {

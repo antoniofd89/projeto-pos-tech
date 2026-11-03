@@ -295,6 +295,43 @@ class ClienteTest {
     }
 
     @Nested
+    @DisplayName("Ativação e documento de pessoa jurídica")
+    class AtivacaoEDocumentoPessoaJuridica {
+
+        @Test
+        @DisplayName("deve reativar cliente inativo e impedir transições repetidas")
+        void deveReativarClienteInativo() {
+            var cliente = clienteValido();
+            assertThat(cliente.isAtivo()).isTrue();
+
+            cliente.inativar();
+            assertThat(cliente.isAtivo()).isFalse();
+            assertThatThrownBy(() -> cliente.atualizarDados("Maria Souza", "maria@email.com",
+                    "21988887777", ENDERECO, LocalDate.now().minusYears(30)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("inativo");
+            assertThatThrownBy(cliente::inativar)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("já está inativo");
+
+            assertThat(cliente.ativar()).isSameAs(cliente);
+            assertThat(cliente.isAtivo()).isTrue();
+            assertThatThrownBy(cliente::ativar)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("já está ativo");
+        }
+
+        @Test
+        @DisplayName("deve rejeitar data de nascimento para CNPJ")
+        void deveRejeitarNascimentoParaCnpj() {
+            assertThatThrownBy(() -> Cliente.criar(new Documento("11222333000181"), "Oficina Exemplo",
+                    "oficina@exemplo.com", "1133334444", null, LocalDate.now().minusYears(30)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("não se aplica a CNPJ");
+        }
+    }
+
+    @Nested
     @DisplayName("Reconstituição")
     class Reconstituicao {
 

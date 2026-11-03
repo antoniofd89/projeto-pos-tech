@@ -34,6 +34,12 @@ public record Veiculo(UUID id, UUID clienteId, Placa placa, String marca, String
         return new Veiculo(id, clienteId, placa, marca, modelo, anoFabricacao, categoria, false, dataCadastro);
     }
 
+    public Veiculo ativar() {
+        if (ativo)
+            throw new IllegalStateException("Veículo já está ativo.");
+        return new Veiculo(id, clienteId, placa, marca, modelo, anoFabricacao, categoria, true, dataCadastro);
+    }
+
     private static String texto(String valor, String campo, int limite) {
         if (valor == null || valor.isBlank() || valor.trim().length() > limite)
             throw new IllegalArgumentException(campo + " obrigatório e limitado a " + limite + " caracteres.");

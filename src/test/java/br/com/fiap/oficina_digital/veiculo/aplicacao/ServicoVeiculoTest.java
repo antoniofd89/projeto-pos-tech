@@ -108,6 +108,20 @@ class ServicoVeiculoTest {
         assertThrows(java.util.NoSuchElementException.class, () -> servico.inativar(UUID.randomUUID()));
     }
 
+    @Test
+    void ativaVeiculoInativoEPersisteEstado() {
+        var entidade = entidade(UUID.randomUUID());
+        entidade.ativo = false;
+        when(veiculos.findById(entidade.id)).thenReturn(Optional.of(entidade));
+
+        servico.ativar(entidade.id);
+
+        assertTrue(entidade.ativo);
+        verify(veiculos).save(entidade);
+        assertThrows(IllegalStateException.class, () -> servico.ativar(entidade.id));
+        assertThrows(java.util.NoSuchElementException.class, () -> servico.ativar(UUID.randomUUID()));
+    }
+
     private DadosVeiculo dados() {
         return new DadosVeiculo("ABC1D23", "Honda", "Civic", 2022, "Sedã");
     }
