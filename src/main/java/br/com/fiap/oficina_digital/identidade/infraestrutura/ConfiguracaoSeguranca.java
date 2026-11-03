@@ -84,8 +84,14 @@ public class ConfiguracaoSeguranca {
                 .sessionManagement(sessao -> sessao.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(usuarios)
                 .authorizeHttpRequests(regras -> regras
-                        .requestMatchers("/autenticacao/login", "/ordens-servico/acompanhamento/**",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health/**")
+                        .requestMatchers(
+                            "/autenticacao/login", 
+                            "/ordens-servico/acompanhamento/**",
+                            "/ordens-servico/orcamento/*/aprovar",
+                            "/v3/api-docs/**", 
+                            "/swagger-ui/**", 
+                            "/swagger-ui.html", 
+                            "/actuator/health/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(conversorJwt())))

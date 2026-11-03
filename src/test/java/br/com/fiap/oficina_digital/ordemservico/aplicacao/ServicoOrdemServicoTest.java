@@ -129,7 +129,7 @@ class ServicoOrdemServicoTest {
         servico.finalizar(os.id);
         var entregue = servico.entregar(os.id);
         assertEquals(StatusOrdemServico.ENTREGUE, entregue.status());
-        assertEquals(5, entregue.historicoStatus().size());
+        assertEquals(6, entregue.historicoStatus().size());
         assertEquals(atualizadoOrcamentoAposAprovacao, os.orcamento.atualizadoEm);
         assertEquals(os.atualizadoEm, entregue.atualizadoEm());
         assertEquals(validadeEnviada, entregue.validadeAte());
@@ -168,7 +168,7 @@ class ServicoOrdemServicoTest {
         assertThrows(org.springframework.security.access.AccessDeniedException.class,
                 () -> servico.aprovarOrcamento(os.codigoAcompanhamento, true));
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
-        assertEquals(StatusOrdemServico.AGUARDANDO_APROVACAO, servico.aprovarPorCodigo("token", true).status());
+        assertEquals(StatusOrdemServico.AGUARDANDO_EXECUCAO, servico.aprovarPorCodigo("token", true).status());
         assertThrows(IllegalStateException.class, () -> servico.aprovarPorCodigo("token", true));
         assertThrows(java.util.NoSuchElementException.class, () -> servico.acompanhar("invalido"));
     }

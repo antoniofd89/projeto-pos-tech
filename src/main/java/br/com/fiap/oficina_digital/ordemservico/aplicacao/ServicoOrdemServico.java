@@ -235,7 +235,9 @@ public class ServicoOrdemServico {
         o.status = aprovar ? StatusOrcamento.APROVADO : StatusOrcamento.REJEITADO;
         registrarAtualizacaoOrcamento(o, Instant.now());
 
-        if(!aprovar)  {
+        if (aprovar) {
+            transicionar(os, StatusOrdemServico.AGUARDANDO_EXECUCAO);
+        } else {
             estoque.estornar(os.id);
             transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
         }
@@ -246,7 +248,7 @@ public class ServicoOrdemServico {
     @Transactional
     public DetalheOrdem iniciarExecucao(UUID id) {
         var os = bloquear(id);
-        exigir(os, StatusOrdemServico.AGUARDANDO_APROVACAO);
+        exigir(os, StatusOrdemServico.AGUARDANDO_EXECUCAO);
         if (orcamentoAtual(os).status != StatusOrcamento.APROVADO)
             throw new IllegalStateException("O orçamento precisa estar aprovado para iniciar a execução.");
         if (!os.materiais.isEmpty())
