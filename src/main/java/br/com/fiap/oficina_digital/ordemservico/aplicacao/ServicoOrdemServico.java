@@ -222,6 +222,12 @@ public class ServicoOrdemServico {
     }
 
     @Transactional
+    public DetalheOrdem decidirOrcamentoPorId(UUID id, boolean aprovar) {
+        var os = obter(id);
+        return aprovarOrcamentoVigente(os.codigoAcompanhamento, aprovar);
+    }
+
+    @Transactional
     private DetalheOrdem aprovarOrcamentoVigente(String codigo, boolean aprovar) {
         var os = bloquearOS(codigo);
         validarStatusOs(os.status, StatusOrdemServico.AGUARDANDO_APROVACAO);
@@ -239,7 +245,7 @@ public class ServicoOrdemServico {
             transicionar(os, StatusOrdemServico.AGUARDANDO_EXECUCAO);
         } else {
             estoque.estornar(os.id);
-            transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
+            transicionar(os, StatusOrdemServico.CANCELADA);
         }
 
         return detalhe(salvar(os));

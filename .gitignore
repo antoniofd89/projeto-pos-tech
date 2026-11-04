@@ -36,5 +36,5 @@ build/
 .vscode/
 
 ## docs
-/docs/
+/docs/*
 .DS_Store

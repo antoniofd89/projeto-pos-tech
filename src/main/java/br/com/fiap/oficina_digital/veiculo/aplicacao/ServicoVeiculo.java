@@ -65,6 +65,15 @@ public class ServicoVeiculo {
         veiculos.save(entidade);
     }
 
+        @Transactional
+    public void ativar(UUID id) {
+        var entidade = veiculos.findById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Veículo não encontrado."));
+        var veiculo = dominio(entidade).ativar();
+        preencher(entidade, veiculo);
+        veiculos.save(entidade);
+    }
+
     private Veiculo salvar(Veiculo veiculo) {
         var entidade = veiculos.findById(veiculo.id()).orElseGet(VeiculoJpa::new);
         preencher(entidade, veiculo);

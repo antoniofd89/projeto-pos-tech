@@ -212,8 +212,9 @@ function botaoNovo(legenda, id = 'new-record') { return `<button class="button b
 function ligarNovo(callback, id = 'new-record') { document.querySelector(`#${id}`)?.addEventListener('click', callback); }
 
 async function carregarClientes() {
-  estruturaView('Clientes', 'Cadastros de pessoas e empresas que atendemos.', botaoNovo('Novo cliente'));
+  estruturaView('Clientes', 'Cadastros de pessoas e empresas que atendemos.', `<button class="button button-quiet" id="activate-client">Ativar por ID</button>${botaoNovo('Novo cliente')}`);
   ligarNovo(() => formularioCliente());
+  document.querySelector('#activate-client').addEventListener('click', async () => { const id = prompt('ID do cliente a ativar:'); if (!id?.trim()) return; try { await requisicao(`/clientes/${id.trim()}/ativar`, { method: 'PUT' }); aviso('Cliente ativado.'); carregarClientes(); } catch (e) { aviso(e.message, true); } });
   try {
     const dados = await requisicao('/clientes?pagina=0&tamanho=100'); dadosEmCache.clientes = dados;
     mostrarTabela(['Nome', 'Documento', 'E-mail', 'Telefone', 'Nascimento', 'Ações'], dados.map((c) => `<tr><td><strong>${esc(c.nome)}</strong></td><td>${esc(c.documento)}</td><td>${esc(c.email)}</td><td>${esc(c.telefone)}</td><td>${formatarData(c.nascimento)}</td><td class="row-actions"><button data-edit-client="${c.id}">Editar</button><button data-delete-client="${c.id}" class="danger-link">Inativar</button></td></tr>`));
@@ -243,8 +244,9 @@ function formularioCliente(cliente) {
 }
 
 async function carregarVeiculos() {
-  estruturaView('Veículos', 'Veículos cadastrados e associados aos seus clientes.', botaoNovo('Novo veículo'));
+  estruturaView('Veículos', 'Veículos cadastrados e associados aos seus clientes.', `<button class="button button-quiet" id="activate-vehicle">Ativar por ID</button>${botaoNovo('Novo veículo')}`);
   ligarNovo(() => formularioVeiculo());
+  document.querySelector('#activate-vehicle').addEventListener('click', async () => { const id = prompt('ID do veículo a ativar:'); if (!id?.trim()) return; try { await requisicao(`/veiculos/${id.trim()}/ativar`, { method: 'PUT' }); aviso('Veículo ativado.'); carregarVeiculos(); } catch (e) { aviso(e.message, true); } });
   try {
     const clientes = await requisicao('/clientes?pagina=0&tamanho=100');
     const grupos = await Promise.all(clientes.map(async (c) => (await requisicao(`/veiculos?clienteId=${c.id}`)).map((v) => ({ ...v, clienteNome: c.nome }))));

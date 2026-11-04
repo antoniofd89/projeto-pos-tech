@@ -174,7 +174,7 @@ class ServicoOrdemServicoTest {
     }
 
     @Test
-    void rejeitaOrcamentoEstornaEVoltaAoDiagnostico() {
+    void rejeitaOrcamentoEstornaECancelaOrdem() {
         var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
         Instant validadeOriginal = os.validadeAte;
@@ -182,7 +182,7 @@ class ServicoOrdemServicoTest {
         prepararBusca(os);
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
         var resultado = servico.aprovarPorCodigo("token", false);
-        assertEquals(StatusOrdemServico.EM_DIAGNOSTICO, resultado.status());
+        assertEquals(StatusOrdemServico.CANCELADA, resultado.status());
         assertEquals(StatusOrcamento.REJEITADO, os.orcamento.status);
         assertEquals(validadeOriginal, os.validadeAte);
         assertEquals(prazoOriginal, resultado.prazoServico());
@@ -217,6 +217,42 @@ class ServicoOrdemServicoTest {
         assertTrue(servico.listar(0, 20).isEmpty());
         when(ordens.buscarParaAtualizacao(any())).thenReturn(Optional.empty());
         assertThrows(java.util.NoSuchElementException.class, () -> servico.iniciarDiagnostico(UUID.randomUUID()));
+    }
+
+    @Test
+    void consultaCodigoEValidaDiagnosticoEMaterial() {
+        var os = ordem(StatusOrdemServico.EM_DIAGNOSTICO);
+        prepararBusca(os);
+
+        assertEquals("token", servico.buscarCodigoAcompanhamento(os.id).codigoAcompanhamento());
+        assertThrows(IllegalArgumentException.class, () -> servico.registrarDiagnostico(os.id, null));
+        assertThrows(IllegalArgumentException.class, () -> servico.registrarDiagnostico(os.id, "   "));
+        assertThrows(IllegalArgumentException.class, () -> servico.registrarDiagnostico(os.id, "x".repeat(3001)));
+        assertThrows(IllegalArgumentException.class, () -> servico.adicionarMaterial(os.id, UUID.randomUUID(), null));
+        assertThrows(IllegalArgumentException.class,
+                () -> servico.adicionarMaterial(os.id, UUID.randomUUID(), bd("0")));
+        assertThrows(IllegalArgumentException.class,
+                () -> servico.adicionarMaterial(os.id, UUID.randomUUID(), bd("-1")));
+    }
+
+    @Test
+    void validaDisponibilizacaoAprovacaoPorIdEInicioDeExecucao() {
+        var os = ordem(StatusOrdemServico.EM_DIAGNOSTICO);
+        adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
+        prepararBusca(os);
+        assertThrows(IllegalStateException.class, () -> servico.disponibilizarOrcamento(os.id));
+
+        os.status = StatusOrdemServico.AGUARDANDO_APROVACAO;
+        var aprovado = servico.decidirOrcamentoPorId(os.id, true);
+        assertEquals(StatusOrdemServico.AGUARDANDO_EXECUCAO, aprovado.status());
+        assertEquals(StatusOrcamento.APROVADO, os.orcamento.status);
+
+        var semOrcamento = ordem(StatusOrdemServico.AGUARDANDO_EXECUCAO);
+        prepararBusca(semOrcamento);
+        assertThrows(IllegalStateException.class, () -> servico.iniciarExecucao(semOrcamento.id));
+
+        adicionarOrcamento(semOrcamento, StatusOrcamento.DISPONIBILIZADO);
+        assertThrows(IllegalStateException.class, () -> servico.iniciarExecucao(semOrcamento.id));
     }
 
     private DadosAbertura entrada(String descricao) {

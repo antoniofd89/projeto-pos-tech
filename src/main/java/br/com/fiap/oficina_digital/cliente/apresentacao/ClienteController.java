@@ -60,6 +60,13 @@ public class ClienteController {
         return ClienteResposta.de(servicoCliente.atualizar(id, requisicao.paraDados()));
     }
 
+    @PutMapping("/{id}/ativar")
+    @Operation(summary = "Ativar cliente", description = "Ativa um cliente inativo. Acesso: ADMIN.")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ClienteResposta ativar(@PathVariable UUID id) {
+        return ClienteResposta.de(servicoCliente.ativar(id));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Inativar cliente", description = "Inativa o cliente; o registro é preservado para histórico. Acesso: ADMIN.")
     @PreAuthorize("hasRole('ADMIN')")

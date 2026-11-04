@@ -66,6 +66,12 @@ public class ServicoCliente {
     }
 
     @Transactional
+    public Cliente ativar(UUID id) {
+        Cliente cliente = buscarPorId(id);
+        return repositorio.salvar(cliente.ativar());
+    }
+
+    @Transactional
     public void inativar(UUID id) {
         Cliente cliente = buscarPorId(id);
         cliente.inativar();

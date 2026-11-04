@@ -73,6 +73,13 @@ public final class Cliente {
         definirDados(nome, email, telefone, endereco, nascimento);
     }
 
+    public Cliente ativar() {
+        if (ativo)
+            throw new IllegalStateException("Cliente já está ativo.");
+        ativo = true;
+        return this;
+    }
+
     public void inativar() {
         if (!ativo)
             throw new IllegalStateException("Cliente já está inativo.");

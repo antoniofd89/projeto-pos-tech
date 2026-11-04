@@ -875,7 +875,7 @@ class OrdemServicoControllerIT {
     // Não está em permitAll() na SecurityFilterChain → requer token.
     // Serviço: aprovarPorCodigo → aprovarOrcamentoVigente
     //   aprovar=true  → orcamento.status=APROVADO, OS vai para AGUARDANDO_EXECUCAO
-    //   aprovar=false → orcamento.status=REJEITADO, OS volta para EM_DIAGNOSTICO
+    //   aprovar=false → orcamento.status=REJEITADO, OS vai para CANCELADA
     // =========================================================================
 
     @Nested
@@ -901,8 +901,8 @@ class OrdemServicoControllerIT {
         }
 
         @Test
-        @DisplayName("🟢 deve reprovar orçamento e retornar OS para EM_DIAGNOSTICO")
-        void deveReprovarOrcamentoEVoltarParaDiagnostico() throws Exception {
+        @DisplayName("🟢 deve reprovar orçamento e cancelar a OS")
+        void deveReprovarOrcamentoECancelarOS() throws Exception {
             var ctx = criarContexto();
             var os  = abrirOS(ctx);
             avancarParaDiagnostico(os.osId());
@@ -911,21 +911,21 @@ class OrdemServicoControllerIT {
             gerarOrcamento(os.osId());
             disponibilizarOrcamento(os.osId());
 
-            // Reprova — OS volta para EM_DIAGNOSTICO para novo ciclo de diagnóstico
+            // A recusa do cliente encerra o fluxo da OS como cancelada.
             mockMvc.perform(post("/ordens-servico/orcamento/" + os.codigoAcompanhamento() + "/aprovar")
                     .with(atendente())
                     .param("aprovar", "false"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.status").value("EM_DIAGNOSTICO"));
+                    .andExpect(jsonPath("$.status").value("CANCELADA"));
         }
 
         @Test
-        @DisplayName("🔴 deve retornar 401 sem token")
-        void deveRetornar401SemToken() throws Exception {
-            // Fora da lista de permitAll() → exige autenticação
+        @DisplayName("🟢 endpoint público deve responder sem token e retornar 404 para código inválido")
+        void deveRetornar404SemTokenQuandoCodigoInvalido() throws Exception {
+            // O endpoint é público; sem uma OS associada ao código, o resultado correto é 404.
             mockMvc.perform(post("/ordens-servico/orcamento/codigo-qualquer/aprovar")
                     .param("aprovar", "true"))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(status().isNotFound());
         }
     }
 
