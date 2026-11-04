@@ -245,7 +245,7 @@ public class ServicoOrdemServico {
             transicionar(os, StatusOrdemServico.AGUARDANDO_EXECUCAO);
         } else {
             estoque.estornar(os.id);
-            transicionar(os, StatusOrdemServico.EM_DIAGNOSTICO);
+            transicionar(os, StatusOrdemServico.CANCELADA);
         }
 
         return detalhe(salvar(os));

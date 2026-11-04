@@ -174,7 +174,7 @@ class ServicoOrdemServicoTest {
     }
 
     @Test
-    void rejeitaOrcamentoEstornaEVoltaAoDiagnostico() {
+    void rejeitaOrcamentoEstornaECancelaOrdem() {
         var os = ordem(StatusOrdemServico.AGUARDANDO_APROVACAO);
         adicionarOrcamento(os, StatusOrcamento.DISPONIBILIZADO);
         Instant validadeOriginal = os.validadeAte;
@@ -182,7 +182,7 @@ class ServicoOrdemServicoTest {
         prepararBusca(os);
         when(ordens.findByCodigoAcompanhamento("token")).thenReturn(Optional.of(os));
         var resultado = servico.aprovarPorCodigo("token", false);
-        assertEquals(StatusOrdemServico.EM_DIAGNOSTICO, resultado.status());
+        assertEquals(StatusOrdemServico.CANCELADA, resultado.status());
         assertEquals(StatusOrcamento.REJEITADO, os.orcamento.status);
         assertEquals(validadeOriginal, os.validadeAte);
         assertEquals(prazoOriginal, resultado.prazoServico());
